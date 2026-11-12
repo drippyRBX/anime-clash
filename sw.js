@@ -1,6 +1,6 @@
-// Anime Clash service worker — v2.0.1
+// Anime Clash service worker — v2.1
 // Network-first for the game page (so updates always land), cache-first for local icons/manifest.
-var CACHE = "anime-clash-v2.0.1";
+var CACHE = "anime-clash-v2.1";
 var ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./art/home-island.webp"];
 /* Character art (./art/<slug>.webp, ~29 MB for all 100) is deliberately NOT
    precached at install — the fetch handler below caches each image on first
