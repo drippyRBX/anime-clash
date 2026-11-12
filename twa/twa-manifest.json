@@ -1,0 +1,42 @@
+{
+  "additionalTrustedOrigins": [],
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "backgroundColor": "#0f0b1e",
+  "display": "standalone",
+  "enableNotifications": false,
+  "enableSiteSettingsShortcut": true,
+  "fallbackType": "customtabs",
+  "features": {},
+  "fingerprints": [],
+  "fullScopeUrl": "https://drippyRBX.github.io/anime-clash/",
+  "generatorApp": "bubblewrap-cli",
+  "host": "drippyRBX.github.io",
+  "iconUrl": "https://drippyRBX.github.io/anime-clash/icon-512.png",
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "launcherName": "Anime Clash",
+  "maskableIconUrl": "https://drippyRBX.github.io/anime-clash/icon-512.png",
+  "minSdkVersion": 24,
+  "name": "Anime Clash",
+  "navigationColor": "#7c3aed",
+  "navigationColorDark": "#7c3aed",
+  "navigationDividerColor": "#00000000",
+  "navigationDividerColorDark": "#00000000",
+  "orientation": "portrait",
+  "packageId": "io.github.drippyrbx.animeclash",
+  "retainedBundles": [],
+  "shortcuts": [],
+  "signingKey": {
+    "alias": "android",
+    "path": "./android.keystore"
+  },
+  "splashScreenFadeOutDuration": 300,
+  "startUrl": "/anime-clash/index.html",
+  "themeColor": "#7c3aed",
+  "themeColorDark": "#7c3aed",
+  "webManifestUrl": "https://drippyRBX.github.io/anime-clash/manifest.json"
+}
