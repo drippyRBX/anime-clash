@@ -1,0 +1,4093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#7c3aed">
+<title>Anime Clash — Anime Battle Arena</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<style>
+/* Anime Clash v1 — dark anime arena theme. Mobile-first, portrait. */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0f0b1e;--bg2:#1a1233;--card:#221744;--card2:#2c1e55;--line:#3d2a72;--pink:#ff4d8d;--violet:#7c3aed;--gold:#ffc93c;--gem:#4dd8ff;--green:#3ddc84;--red:#ff4d5e;--text:#f5f0ff;--muted:#b9a8e8}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;min-height:100%}
+body{max-width:480px;margin:0 auto;min-height:100vh;position:relative}
+button{font-family:inherit;cursor:pointer}
+input,select{font-family:inherit}
+h1,h2,h3{margin:0}
+.sub{color:var(--muted);font-size:13px;line-height:1.45}
+.hidden{display:none!important}
+#toasts{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:999;width:min(92vw,440px);pointer-events:none}
+.toast{background:#2c1e55;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:6px;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+/* ---------- auth gate ---------- */
+#authGate{padding:18px 14px 30px}
+.gate-hero{text-align:center;padding:14px 0 6px}
+.gate-hero .logo{font-size:52px;line-height:1}
+.gate-hero h1{font-size:34px;letter-spacing:1px;background:linear-gradient(90deg,#ff4d8d,#7c3aed,#4dd8ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gate-hero p{color:var(--muted);margin:6px 0 0;font-size:14px}
+.ver-badge{display:inline-block;background:linear-gradient(90deg,#ff4d8d,#ff8a3d);color:#fff;font-weight:800;border-radius:999px;padding:4px 12px;font-size:13px;margin:10px 0 2px}
+.gate-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:14px}
+.gate-card input{width:100%;background:#150e2a;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px;margin:6px 0;font-size:16px}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:13px;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--pink),var(--violet));margin:8px 0}
+.btn.blue{background:linear-gradient(90deg,#3b82f6,#7c3aed)}
+.btn.green{background:linear-gradient(90deg,#16a34a,#3ddc84);color:#06280f}
+.btn.ghost{background:#2c1e55;border:1px solid var(--line)}
+.btn.small{width:auto;display:inline-block;padding:8px 14px;font-size:14px;margin:4px 4px 4px 0}
+.btn:disabled{opacity:.55}
+.gate-features{margin:14px 0 0;padding:0 4px;list-style:none}
+.gate-features li{padding:5px 0;font-size:14px;color:var(--text)}
+.foot{text-align:center;color:var(--muted);font-size:12px;padding:16px}
+/* ---------- banned screen ---------- */
+#bannedScreen{position:fixed;inset:0;background:#160a0a;z-index:998;display:none;align-items:center;justify-content:center;text-align:center;padding:20px}
+#bannedScreen .box{max-width:380px}
+#bannedScreen h1{font-size:40px}
+#bannedScreen .reason{background:#2a1010;border:1px solid #7a2020;border-radius:12px;padding:12px;margin:12px 0}
+/* ---------- top bar ---------- */
+#topBar{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#1a1233,#150e2a);border-bottom:1px solid var(--line);padding:8px 10px;display:flex;align-items:center;gap:8px}
+#hudAvatar{width:42px;height:42px;border-radius:50%;overflow:hidden;flex:0 0 42px;background:#2c1e55;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid var(--gold)}
+#hudAvatar img{width:100%;height:100%;object-fit:cover}
+#hudName{font-weight:800;font-size:15px;line-height:1.1}
+#hudRole{font-size:11px;color:var(--muted)}
+.currencies{margin-left:auto;display:flex;gap:6px}
+.cur{background:#150e2a;border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:13px;font-weight:800;white-space:nowrap}
+.cur.gems{color:var(--gem)} .cur.coins{color:var(--gold)} .cur.troph{color:var(--pink)}
+.role-tag{display:inline-block;border-radius:999px;padding:1px 7px;font-size:11px;font-weight:800;margin-left:4px}
+.tag-owner{background:gold;color:#3a2a00} .tag-admin{background:#2563eb;color:#fff}
+.title-tag{display:inline-block;border-radius:999px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:4px;background:#3d2a72;color:#e9d5ff}
+/* ---------- views / nav ---------- */
+.view{padding:12px 12px 90px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.card h2{font-size:18px;margin-bottom:6px}
+.card h3{font-size:16px;margin-bottom:6px}
+#bottomNav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);background:#150e2a;border-top:1px solid var(--line);display:flex;z-index:60;padding-bottom:env(safe-area-inset-bottom)}
+#bottomNav button{flex:1;background:none;border:0;color:var(--muted);padding:10px 2px 12px;font-size:11px;font-weight:700}
+#bottomNav button.on{color:#fff}
+#bottomNav button .ic{display:block;font-size:20px;line-height:1.1}
+/* ---------- battle ---------- */
+#battleArena{position:relative;width:100%;aspect-ratio:360/560;background:linear-gradient(180deg,#274d2d 0 49.5%,#2a6db0 49.5% 50.5%,#3d7a35 50.5% 100%);border-radius:14px;overflow:hidden;border:2px solid var(--line);touch-action:none;user-select:none}
+#battleArena .river{position:absolute;left:0;right:0;top:49.5%;height:1%;background:#2a6db0}
+.bridge{position:absolute;top:46%;height:8%;width:15%;background:#8a6b45;border:2px solid #6b4f2a;border-radius:4px}
+.tower{position:absolute;width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid rgba(255,255,255,.35)}
+.tower.enemy{background:#7f1d2e} .tower.mine{background:#1d4ed8}
+.tower .hpbar{position:absolute;left:-4px;right:-4px;top:-9px;height:6px;background:#0008;border-radius:3px;overflow:hidden}
+.tower .hpbar i{display:block;height:100%;background:var(--green)}
+.tower.king{width:56px;height:56px;font-size:30px}
+.unit{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #fff3;z-index:5}
+.unit.mine{border-color:#4dd8ff;background:#1d4ed8cc} .unit.enemy{border-color:#ff8a8a;background:#7f1d2ecc}
+.unit.fly{transform:translateY(-8px);box-shadow:0 6px 10px rgba(0,0,0,.5)}
+.unit .uhp{position:absolute;left:-2px;right:-2px;top:-7px;height:4px;background:#0008;border-radius:2px;overflow:hidden}
+.unit .uhp i{display:block;height:100%;background:var(--green)}
+.unit.sel{outline:3px solid var(--gold)}
+#battleTimer{font-size:22px;font-weight:900;text-align:center;padding:4px}
+#elixirBarWrap{height:14px;background:#150e2a;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:6px 0 2px}
+#elixirBar{height:100%;width:0%;background:linear-gradient(90deg,#c026d3,#e879f9)}
+#elixirNum{text-align:center;font-size:12px;color:#e879f9;font-weight:800}
+.hand{display:flex;gap:6px;margin-top:8px}
+.handCard{flex:1;background:var(--card2);border:2px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;font-size:12px}
+.handCard.sel{border-color:var(--gold);background:#3d2a72}
+.handCard .e{font-size:20px;line-height:1}
+.handCard .cost{color:#e879f9;font-weight:800}
+.handCard.next{opacity:.55}
+.handCard:disabled{opacity:.4}
+#battleResult{text-align:center;padding:14px}
+#battleResult h2{font-size:28px}
+/* ---------- lists ---------- */
+.unitRow,.shopRow,.lbRow,.playerRow{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
+.unitRow .ic,.shopRow .ic{font-size:30px;width:40px;text-align:center}
+.unitRow .nm,.shopRow .nm{font-weight:800}
+.unitRow .st,.shopRow .st{font-size:12px;color:var(--muted)}
+.unitRow .acts,.shopRow .acts{margin-left:auto;text-align:right}
+.pill{display:inline-block;background:#150e2a;border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:11px;font-weight:800;margin:2px 2px 0 0}
+.pill.common{color:#cbd5e1}.pill.rare{color:#4dd8ff}.pill.epic{color:#c084fc}
+#lbList .lbRow .rank{font-weight:900;width:28px;text-align:center}
+/* ---------- profile ---------- */
+#profileBanner{height:110px;border-radius:14px;background:linear-gradient(90deg,#7c3aed,#ff4d8d);position:relative;overflow:hidden;margin-bottom:-24px}
+#profileBanner img{width:100%;height:100%;object-fit:cover}
+#profileHead{display:flex;align-items:flex-end;gap:10px;padding:0 6px}
+#profileAvatar{width:64px;height:64px;border-radius:50%;border:3px solid var(--bg);background:#2c1e55;display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden}
+#profileAvatar img{width:100%;height:100%;object-fit:cover}
+.statGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.statGrid .st{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.statGrid .st b{font-size:20px;display:block}
+.statGrid .st span{font-size:11px;color:var(--muted)}
+input[type=text],input[type=password],input[type=number],select{width:100%;background:#150e2a;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px;margin:6px 0;font-size:15px}
+label.fl{display:inline-block;background:#2c1e55;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:700;margin:6px 0;cursor:pointer}
+#toastLog{max-height:120px;overflow:auto;font-size:12px;color:var(--muted)}
+#toastLog div{padding:2px 0;border-bottom:1px solid #ffffff10}
+.permRow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #ffffff10;font-size:14px}
+.permRow input{width:auto;margin:0}
+.chip-btn{display:inline-block;background:#2c1e55;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:700;margin:4px 4px 0 0}
+.toolCard{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
+.toolCard b{font-size:14px}
+.toolCard p{margin:4px 0 8px}
+</style>
+</head>
+<body>
+<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
+<script>
+/* Anime Clash v1: vendored GIF libraries (inlined — no CDN, no worker, no WASM):
+   omggif 1.0.10 (MIT, decode) + gifenc 1.0.3 (MIT, encode).
+   Same shrinker as Pig Clicker v2.5.3 — big Tenor GIFs shrink in the
+   browser so they fit the 300 KB save-doc cap, animation preserved. */
+(function(){var exports={};
+// (c) Dean McNamee <dean@gmail.com>, 2013.
+//
+// https://github.com/deanm/omggif
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+//
+// omggif is a JavaScript implementation of a GIF 89a encoder and decoder,
+// including animation and compression.  It does not rely on any specific
+// underlying system, so should run in the browser, Node, or Plask.
+
+"use strict";
+
+function GifWriter(buf, width, height, gopts) {
+  var p = 0;
+
+  var gopts = gopts === undefined ? { } : gopts;
+  var loop_count = gopts.loop === undefined ? null : gopts.loop;
+  var global_palette = gopts.palette === undefined ? null : gopts.palette;
+
+  if (width <= 0 || height <= 0 || width > 65535 || height > 65535)
+    throw new Error("Width/Height invalid.");
+
+  function check_palette_and_num_colors(palette) {
+    var num_colors = palette.length;
+    if (num_colors < 2 || num_colors > 256 ||  num_colors & (num_colors-1)) {
+      throw new Error(
+          "Invalid code/color length, must be power of 2 and 2 .. 256.");
+    }
+    return num_colors;
+  }
+
+  // - Header.
+  buf[p++] = 0x47; buf[p++] = 0x49; buf[p++] = 0x46;  // GIF
+  buf[p++] = 0x38; buf[p++] = 0x39; buf[p++] = 0x61;  // 89a
+
+  // Handling of Global Color Table (palette) and background index.
+  var gp_num_colors_pow2 = 0;
+  var background = 0;
+  if (global_palette !== null) {
+    var gp_num_colors = check_palette_and_num_colors(global_palette);
+    while (gp_num_colors >>= 1) ++gp_num_colors_pow2;
+    gp_num_colors = 1 << gp_num_colors_pow2;
+    --gp_num_colors_pow2;
+    if (gopts.background !== undefined) {
+      background = gopts.background;
+      if (background >= gp_num_colors)
+        throw new Error("Background index out of range.");
+      // The GIF spec states that a background index of 0 should be ignored, so
+      // this is probably a mistake and you really want to set it to another
+      // slot in the palette.  But actually in the end most browsers, etc end
+      // up ignoring this almost completely (including for dispose background).
+      if (background === 0)
+        throw new Error("Background index explicitly passed as 0.");
+    }
+  }
+
+  // - Logical Screen Descriptor.
+  // NOTE(deanm): w/h apparently ignored by implementations, but set anyway.
+  buf[p++] = width & 0xff; buf[p++] = width >> 8 & 0xff;
+  buf[p++] = height & 0xff; buf[p++] = height >> 8 & 0xff;
+  // NOTE: Indicates 0-bpp original color resolution (unused?).
+  buf[p++] = (global_palette !== null ? 0x80 : 0) |  // Global Color Table Flag.
+             gp_num_colors_pow2;  // NOTE: No sort flag (unused?).
+  buf[p++] = background;  // Background Color Index.
+  buf[p++] = 0;  // Pixel aspect ratio (unused?).
+
+  // - Global Color Table
+  if (global_palette !== null) {
+    for (var i = 0, il = global_palette.length; i < il; ++i) {
+      var rgb = global_palette[i];
+      buf[p++] = rgb >> 16 & 0xff;
+      buf[p++] = rgb >> 8 & 0xff;
+      buf[p++] = rgb & 0xff;
+    }
+  }
+
+  if (loop_count !== null) {  // Netscape block for looping.
+    if (loop_count < 0 || loop_count > 65535)
+      throw new Error("Loop count invalid.")
+    // Extension code, label, and length.
+    buf[p++] = 0x21; buf[p++] = 0xff; buf[p++] = 0x0b;
+    // NETSCAPE2.0
+    buf[p++] = 0x4e; buf[p++] = 0x45; buf[p++] = 0x54; buf[p++] = 0x53;
+    buf[p++] = 0x43; buf[p++] = 0x41; buf[p++] = 0x50; buf[p++] = 0x45;
+    buf[p++] = 0x32; buf[p++] = 0x2e; buf[p++] = 0x30;
+    // Sub-block
+    buf[p++] = 0x03; buf[p++] = 0x01;
+    buf[p++] = loop_count & 0xff; buf[p++] = loop_count >> 8 & 0xff;
+    buf[p++] = 0x00;  // Terminator.
+  }
+
+
+  var ended = false;
+
+  this.addFrame = function(x, y, w, h, indexed_pixels, opts) {
+    if (ended === true) { --p; ended = false; }  // Un-end.
+
+    opts = opts === undefined ? { } : opts;
+
+    // TODO(deanm): Bounds check x, y.  Do they need to be within the virtual
+    // canvas width/height, I imagine?
+    if (x < 0 || y < 0 || x > 65535 || y > 65535)
+      throw new Error("x/y invalid.")
+
+    if (w <= 0 || h <= 0 || w > 65535 || h > 65535)
+      throw new Error("Width/Height invalid.")
+
+    if (indexed_pixels.length < w * h)
+      throw new Error("Not enough pixels for the frame size.");
+
+    var using_local_palette = true;
+    var palette = opts.palette;
+    if (palette === undefined || palette === null) {
+      using_local_palette = false;
+      palette = global_palette;
+    }
+
+    if (palette === undefined || palette === null)
+      throw new Error("Must supply either a local or global palette.");
+
+    var num_colors = check_palette_and_num_colors(palette);
+
+    // Compute the min_code_size (power of 2), destroying num_colors.
+    var min_code_size = 0;
+    while (num_colors >>= 1) ++min_code_size;
+    num_colors = 1 << min_code_size;  // Now we can easily get it back.
+
+    var delay = opts.delay === undefined ? 0 : opts.delay;
+
+    // From the spec:
+    //     0 -   No disposal specified. The decoder is
+    //           not required to take any action.
+    //     1 -   Do not dispose. The graphic is to be left
+    //           in place.
+    //     2 -   Restore to background color. The area used by the
+    //           graphic must be restored to the background color.
+    //     3 -   Restore to previous. The decoder is required to
+    //           restore the area overwritten by the graphic with
+    //           what was there prior to rendering the graphic.
+    //  4-7 -    To be defined.
+    // NOTE(deanm): Dispose background doesn't really work, apparently most
+    // browsers ignore the background palette index and clear to transparency.
+    var disposal = opts.disposal === undefined ? 0 : opts.disposal;
+    if (disposal < 0 || disposal > 3)  // 4-7 is reserved.
+      throw new Error("Disposal out of range.");
+
+    var use_transparency = false;
+    var transparent_index = 0;
+    if (opts.transparent !== undefined && opts.transparent !== null) {
+      use_transparency = true;
+      transparent_index = opts.transparent;
+      if (transparent_index < 0 || transparent_index >= num_colors)
+        throw new Error("Transparent color index.");
+    }
+
+    if (disposal !== 0 || use_transparency || delay !== 0) {
+      // - Graphics Control Extension
+      buf[p++] = 0x21; buf[p++] = 0xf9;  // Extension / Label.
+      buf[p++] = 4;  // Byte size.
+
+      buf[p++] = disposal << 2 | (use_transparency === true ? 1 : 0);
+      buf[p++] = delay & 0xff; buf[p++] = delay >> 8 & 0xff;
+      buf[p++] = transparent_index;  // Transparent color index.
+      buf[p++] = 0;  // Block Terminator.
+    }
+
+    // - Image Descriptor
+    buf[p++] = 0x2c;  // Image Seperator.
+    buf[p++] = x & 0xff; buf[p++] = x >> 8 & 0xff;  // Left.
+    buf[p++] = y & 0xff; buf[p++] = y >> 8 & 0xff;  // Top.
+    buf[p++] = w & 0xff; buf[p++] = w >> 8 & 0xff;
+    buf[p++] = h & 0xff; buf[p++] = h >> 8 & 0xff;
+    // NOTE: No sort flag (unused?).
+    // TODO(deanm): Support interlace.
+    buf[p++] = using_local_palette === true ? (0x80 | (min_code_size-1)) : 0;
+
+    // - Local Color Table
+    if (using_local_palette === true) {
+      for (var i = 0, il = palette.length; i < il; ++i) {
+        var rgb = palette[i];
+        buf[p++] = rgb >> 16 & 0xff;
+        buf[p++] = rgb >> 8 & 0xff;
+        buf[p++] = rgb & 0xff;
+      }
+    }
+
+    p = GifWriterOutputLZWCodeStream(
+            buf, p, min_code_size < 2 ? 2 : min_code_size, indexed_pixels);
+
+    return p;
+  };
+
+  this.end = function() {
+    if (ended === false) {
+      buf[p++] = 0x3b;  // Trailer.
+      ended = true;
+    }
+    return p;
+  };
+
+  this.getOutputBuffer = function() { return buf; };
+  this.setOutputBuffer = function(v) { buf = v; };
+  this.getOutputBufferPosition = function() { return p; };
+  this.setOutputBufferPosition = function(v) { p = v; };
+}
+
+// Main compression routine, palette indexes -> LZW code stream.
+// |index_stream| must have at least one entry.
+function GifWriterOutputLZWCodeStream(buf, p, min_code_size, index_stream) {
+  buf[p++] = min_code_size;
+  var cur_subblock = p++;  // Pointing at the length field.
+
+  var clear_code = 1 << min_code_size;
+  var code_mask = clear_code - 1;
+  var eoi_code = clear_code + 1;
+  var next_code = eoi_code + 1;
+
+  var cur_code_size = min_code_size + 1;  // Number of bits per code.
+  var cur_shift = 0;
+  // We have at most 12-bit codes, so we should have to hold a max of 19
+  // bits here (and then we would write out).
+  var cur = 0;
+
+  function emit_bytes_to_buffer(bit_block_size) {
+    while (cur_shift >= bit_block_size) {
+      buf[p++] = cur & 0xff;
+      cur >>= 8; cur_shift -= 8;
+      if (p === cur_subblock + 256) {  // Finished a subblock.
+        buf[cur_subblock] = 255;
+        cur_subblock = p++;
+      }
+    }
+  }
+
+  function emit_code(c) {
+    cur |= c << cur_shift;
+    cur_shift += cur_code_size;
+    emit_bytes_to_buffer(8);
+  }
+
+  // I am not an expert on the topic, and I don't want to write a thesis.
+  // However, it is good to outline here the basic algorithm and the few data
+  // structures and optimizations here that make this implementation fast.
+  // The basic idea behind LZW is to build a table of previously seen runs
+  // addressed by a short id (herein called output code).  All data is
+  // referenced by a code, which represents one or more values from the
+  // original input stream.  All input bytes can be referenced as the same
+  // value as an output code.  So if you didn't want any compression, you
+  // could more or less just output the original bytes as codes (there are
+  // some details to this, but it is the idea).  In order to achieve
+  // compression, values greater then the input range (codes can be up to
+  // 12-bit while input only 8-bit) represent a sequence of previously seen
+  // inputs.  The decompressor is able to build the same mapping while
+  // decoding, so there is always a shared common knowledge between the
+  // encoding and decoder, which is also important for "timing" aspects like
+  // how to handle variable bit width code encoding.
+  //
+  // One obvious but very important consequence of the table system is there
+  // is always a unique id (at most 12-bits) to map the runs.  'A' might be
+  // 4, then 'AA' might be 10, 'AAA' 11, 'AAAA' 12, etc.  This relationship
+  // can be used for an effecient lookup strategy for the code mapping.  We
+  // need to know if a run has been seen before, and be able to map that run
+  // to the output code.  Since we start with known unique ids (input bytes),
+  // and then from those build more unique ids (table entries), we can
+  // continue this chain (almost like a linked list) to always have small
+  // integer values that represent the current byte chains in the encoder.
+  // This means instead of tracking the input bytes (AAAABCD) to know our
+  // current state, we can track the table entry for AAAABC (it is guaranteed
+  // to exist by the nature of the algorithm) and the next character D.
+  // Therefor the tuple of (table_entry, byte) is guaranteed to also be
+  // unique.  This allows us to create a simple lookup key for mapping input
+  // sequences to codes (table indices) without having to store or search
+  // any of the code sequences.  So if 'AAAA' has a table entry of 12, the
+  // tuple of ('AAAA', K) for any input byte K will be unique, and can be our
+  // key.  This leads to a integer value at most 20-bits, which can always
+  // fit in an SMI value and be used as a fast sparse array / object key.
+
+  // Output code for the current contents of the index buffer.
+  var ib_code = index_stream[0] & code_mask;  // Load first input index.
+  var code_table = { };  // Key'd on our 20-bit "tuple".
+
+  emit_code(clear_code);  // Spec says first code should be a clear code.
+
+  // First index already loaded, process the rest of the stream.
+  for (var i = 1, il = index_stream.length; i < il; ++i) {
+    var k = index_stream[i] & code_mask;
+    var cur_key = ib_code << 8 | k;  // (prev, k) unique tuple.
+    var cur_code = code_table[cur_key];  // buffer + k.
+
+    // Check if we have to create a new code table entry.
+    if (cur_code === undefined) {  // We don't have buffer + k.
+      // Emit index buffer (without k).
+      // This is an inline version of emit_code, because this is the core
+      // writing routine of the compressor (and V8 cannot inline emit_code
+      // because it is a closure here in a different context).  Additionally
+      // we can call emit_byte_to_buffer less often, because we can have
+      // 30-bits (from our 31-bit signed SMI), and we know our codes will only
+      // be 12-bits, so can safely have 18-bits there without overflow.
+      // emit_code(ib_code);
+      cur |= ib_code << cur_shift;
+      cur_shift += cur_code_size;
+      while (cur_shift >= 8) {
+        buf[p++] = cur & 0xff;
+        cur >>= 8; cur_shift -= 8;
+        if (p === cur_subblock + 256) {  // Finished a subblock.
+          buf[cur_subblock] = 255;
+          cur_subblock = p++;
+        }
+      }
+
+      if (next_code === 4096) {  // Table full, need a clear.
+        emit_code(clear_code);
+        next_code = eoi_code + 1;
+        cur_code_size = min_code_size + 1;
+        code_table = { };
+      } else {  // Table not full, insert a new entry.
+        // Increase our variable bit code sizes if necessary.  This is a bit
+        // tricky as it is based on "timing" between the encoding and
+        // decoder.  From the encoders perspective this should happen after
+        // we've already emitted the index buffer and are about to create the
+        // first table entry that would overflow our current code bit size.
+        if (next_code >= (1 << cur_code_size)) ++cur_code_size;
+        code_table[cur_key] = next_code++;  // Insert into code table.
+      }
+
+      ib_code = k;  // Index buffer to single input k.
+    } else {
+      ib_code = cur_code;  // Index buffer to sequence in code table.
+    }
+  }
+
+  emit_code(ib_code);  // There will still be something in the index buffer.
+  emit_code(eoi_code);  // End Of Information.
+
+  // Flush / finalize the sub-blocks stream to the buffer.
+  emit_bytes_to_buffer(1);
+
+  // Finish the sub-blocks, writing out any unfinished lengths and
+  // terminating with a sub-block of length 0.  If we have already started
+  // but not yet used a sub-block it can just become the terminator.
+  if (cur_subblock + 1 === p) {  // Started but unused.
+    buf[cur_subblock] = 0;
+  } else {  // Started and used, write length and additional terminator block.
+    buf[cur_subblock] = p - cur_subblock - 1;
+    buf[p++] = 0;
+  }
+  return p;
+}
+
+function GifReader(buf) {
+  var p = 0;
+
+  // - Header (GIF87a or GIF89a).
+  if (buf[p++] !== 0x47 ||            buf[p++] !== 0x49 || buf[p++] !== 0x46 ||
+      buf[p++] !== 0x38 || (buf[p++]+1 & 0xfd) !== 0x38 || buf[p++] !== 0x61) {
+    throw new Error("Invalid GIF 87a/89a header.");
+  }
+
+  // - Logical Screen Descriptor.
+  var width = buf[p++] | buf[p++] << 8;
+  var height = buf[p++] | buf[p++] << 8;
+  var pf0 = buf[p++];  // <Packed Fields>.
+  var global_palette_flag = pf0 >> 7;
+  var num_global_colors_pow2 = pf0 & 0x7;
+  var num_global_colors = 1 << (num_global_colors_pow2 + 1);
+  var background = buf[p++];
+  buf[p++];  // Pixel aspect ratio (unused?).
+
+  var global_palette_offset = null;
+  var global_palette_size   = null;
+
+  if (global_palette_flag) {
+    global_palette_offset = p;
+    global_palette_size = num_global_colors;
+    p += num_global_colors * 3;  // Seek past palette.
+  }
+
+  var no_eof = true;
+
+  var frames = [ ];
+
+  var delay = 0;
+  var transparent_index = null;
+  var disposal = 0;  // 0 - No disposal specified.
+  var loop_count = null;
+
+  this.width = width;
+  this.height = height;
+
+  while (no_eof && p < buf.length) {
+    switch (buf[p++]) {
+      case 0x21:  // Graphics Control Extension Block
+        switch (buf[p++]) {
+          case 0xff:  // Application specific block
+            // Try if it's a Netscape block (with animation loop counter).
+            if (buf[p   ] !== 0x0b ||  // 21 FF already read, check block size.
+                // NETSCAPE2.0
+                buf[p+1 ] == 0x4e && buf[p+2 ] == 0x45 && buf[p+3 ] == 0x54 &&
+                buf[p+4 ] == 0x53 && buf[p+5 ] == 0x43 && buf[p+6 ] == 0x41 &&
+                buf[p+7 ] == 0x50 && buf[p+8 ] == 0x45 && buf[p+9 ] == 0x32 &&
+                buf[p+10] == 0x2e && buf[p+11] == 0x30 &&
+                // Sub-block
+                buf[p+12] == 0x03 && buf[p+13] == 0x01 && buf[p+16] == 0) {
+              p += 14;
+              loop_count = buf[p++] | buf[p++] << 8;
+              p++;  // Skip terminator.
+            } else {  // We don't know what it is, just try to get past it.
+              p += 12;
+              while (true) {  // Seek through subblocks.
+                var block_size = buf[p++];
+                // Bad block size (ex: undefined from an out of bounds read).
+                if (!(block_size >= 0)) throw Error("Invalid block size");
+                if (block_size === 0) break;  // 0 size is terminator
+                p += block_size;
+              }
+            }
+            break;
+
+          case 0xf9:  // Graphics Control Extension
+            if (buf[p++] !== 0x4 || buf[p+4] !== 0)
+              throw new Error("Invalid graphics extension block.");
+            var pf1 = buf[p++];
+            delay = buf[p++] | buf[p++] << 8;
+            transparent_index = buf[p++];
+            if ((pf1 & 1) === 0) transparent_index = null;
+            disposal = pf1 >> 2 & 0x7;
+            p++;  // Skip terminator.
+            break;
+
+          case 0xfe:  // Comment Extension.
+            while (true) {  // Seek through subblocks.
+              var block_size = buf[p++];
+              // Bad block size (ex: undefined from an out of bounds read).
+              if (!(block_size >= 0)) throw Error("Invalid block size");
+              if (block_size === 0) break;  // 0 size is terminator
+              // console.log(buf.slice(p, p+block_size).toString('ascii'));
+              p += block_size;
+            }
+            break;
+
+          default:
+            throw new Error(
+                "Unknown graphic control label: 0x" + buf[p-1].toString(16));
+        }
+        break;
+
+      case 0x2c:  // Image Descriptor.
+        var x = buf[p++] | buf[p++] << 8;
+        var y = buf[p++] | buf[p++] << 8;
+        var w = buf[p++] | buf[p++] << 8;
+        var h = buf[p++] | buf[p++] << 8;
+        var pf2 = buf[p++];
+        var local_palette_flag = pf2 >> 7;
+        var interlace_flag = pf2 >> 6 & 1;
+        var num_local_colors_pow2 = pf2 & 0x7;
+        var num_local_colors = 1 << (num_local_colors_pow2 + 1);
+        var palette_offset = global_palette_offset;
+        var palette_size = global_palette_size;
+        var has_local_palette = false;
+        if (local_palette_flag) {
+          var has_local_palette = true;
+          palette_offset = p;  // Override with local palette.
+          palette_size = num_local_colors;
+          p += num_local_colors * 3;  // Seek past palette.
+        }
+
+        var data_offset = p;
+
+        p++;  // codesize
+        while (true) {
+          var block_size = buf[p++];
+          // Bad block size (ex: undefined from an out of bounds read).
+          if (!(block_size >= 0)) throw Error("Invalid block size");
+          if (block_size === 0) break;  // 0 size is terminator
+          p += block_size;
+        }
+
+        frames.push({x: x, y: y, width: w, height: h,
+                     has_local_palette: has_local_palette,
+                     palette_offset: palette_offset,
+                     palette_size: palette_size,
+                     data_offset: data_offset,
+                     data_length: p - data_offset,
+                     transparent_index: transparent_index,
+                     interlaced: !!interlace_flag,
+                     delay: delay,
+                     disposal: disposal});
+        break;
+
+      case 0x3b:  // Trailer Marker (end of file).
+        no_eof = false;
+        break;
+
+      default:
+        throw new Error("Unknown gif block: 0x" + buf[p-1].toString(16));
+        break;
+    }
+  }
+
+  this.numFrames = function() {
+    return frames.length;
+  };
+
+  this.loopCount = function() {
+    return loop_count;
+  };
+
+  this.frameInfo = function(frame_num) {
+    if (frame_num < 0 || frame_num >= frames.length)
+      throw new Error("Frame index out of range.");
+    return frames[frame_num];
+  }
+
+  this.decodeAndBlitFrameBGRA = function(frame_num, pixels) {
+    var frame = this.frameInfo(frame_num);
+    var num_pixels = frame.width * frame.height;
+    var index_stream = new Uint8Array(num_pixels);  // At most 8-bit indices.
+    GifReaderLZWOutputIndexStream(
+        buf, frame.data_offset, index_stream, num_pixels);
+    var palette_offset = frame.palette_offset;
+
+    // NOTE(deanm): It seems to be much faster to compare index to 256 than
+    // to === null.  Not sure why, but CompareStub_EQ_STRICT shows up high in
+    // the profile, not sure if it's related to using a Uint8Array.
+    var trans = frame.transparent_index;
+    if (trans === null) trans = 256;
+
+    // We are possibly just blitting to a portion of the entire frame.
+    // That is a subrect within the framerect, so the additional pixels
+    // must be skipped over after we finished a scanline.
+    var framewidth  = frame.width;
+    var framestride = width - framewidth;
+    var xleft       = framewidth;  // Number of subrect pixels left in scanline.
+
+    // Output indicies of the top left and bottom right corners of the subrect.
+    var opbeg = ((frame.y * width) + frame.x) * 4;
+    var opend = ((frame.y + frame.height) * width + frame.x) * 4;
+    var op    = opbeg;
+
+    var scanstride = framestride * 4;
+
+    // Use scanstride to skip past the rows when interlacing.  This is skipping
+    // 7 rows for the first two passes, then 3 then 1.
+    if (frame.interlaced === true) {
+      scanstride += width * 4 * 7;  // Pass 1.
+    }
+
+    var interlaceskip = 8;  // Tracking the row interval in the current pass.
+
+    for (var i = 0, il = index_stream.length; i < il; ++i) {
+      var index = index_stream[i];
+
+      if (xleft === 0) {  // Beginning of new scan line
+        op += scanstride;
+        xleft = framewidth;
+        if (op >= opend) { // Catch the wrap to switch passes when interlacing.
+          scanstride = framestride * 4 + width * 4 * (interlaceskip-1);
+          // interlaceskip / 2 * 4 is interlaceskip << 1.
+          op = opbeg + (framewidth + framestride) * (interlaceskip << 1);
+          interlaceskip >>= 1;
+        }
+      }
+
+      if (index === trans) {
+        op += 4;
+      } else {
+        var r = buf[palette_offset + index * 3];
+        var g = buf[palette_offset + index * 3 + 1];
+        var b = buf[palette_offset + index * 3 + 2];
+        pixels[op++] = b;
+        pixels[op++] = g;
+        pixels[op++] = r;
+        pixels[op++] = 255;
+      }
+      --xleft;
+    }
+  };
+
+  // I will go to copy and paste hell one day...
+  this.decodeAndBlitFrameRGBA = function(frame_num, pixels) {
+    var frame = this.frameInfo(frame_num);
+    var num_pixels = frame.width * frame.height;
+    var index_stream = new Uint8Array(num_pixels);  // At most 8-bit indices.
+    GifReaderLZWOutputIndexStream(
+        buf, frame.data_offset, index_stream, num_pixels);
+    var palette_offset = frame.palette_offset;
+
+    // NOTE(deanm): It seems to be much faster to compare index to 256 than
+    // to === null.  Not sure why, but CompareStub_EQ_STRICT shows up high in
+    // the profile, not sure if it's related to using a Uint8Array.
+    var trans = frame.transparent_index;
+    if (trans === null) trans = 256;
+
+    // We are possibly just blitting to a portion of the entire frame.
+    // That is a subrect within the framerect, so the additional pixels
+    // must be skipped over after we finished a scanline.
+    var framewidth  = frame.width;
+    var framestride = width - framewidth;
+    var xleft       = framewidth;  // Number of subrect pixels left in scanline.
+
+    // Output indicies of the top left and bottom right corners of the subrect.
+    var opbeg = ((frame.y * width) + frame.x) * 4;
+    var opend = ((frame.y + frame.height) * width + frame.x) * 4;
+    var op    = opbeg;
+
+    var scanstride = framestride * 4;
+
+    // Use scanstride to skip past the rows when interlacing.  This is skipping
+    // 7 rows for the first two passes, then 3 then 1.
+    if (frame.interlaced === true) {
+      scanstride += width * 4 * 7;  // Pass 1.
+    }
+
+    var interlaceskip = 8;  // Tracking the row interval in the current pass.
+
+    for (var i = 0, il = index_stream.length; i < il; ++i) {
+      var index = index_stream[i];
+
+      if (xleft === 0) {  // Beginning of new scan line
+        op += scanstride;
+        xleft = framewidth;
+        if (op >= opend) { // Catch the wrap to switch passes when interlacing.
+          scanstride = framestride * 4 + width * 4 * (interlaceskip-1);
+          // interlaceskip / 2 * 4 is interlaceskip << 1.
+          op = opbeg + (framewidth + framestride) * (interlaceskip << 1);
+          interlaceskip >>= 1;
+        }
+      }
+
+      if (index === trans) {
+        op += 4;
+      } else {
+        var r = buf[palette_offset + index * 3];
+        var g = buf[palette_offset + index * 3 + 1];
+        var b = buf[palette_offset + index * 3 + 2];
+        pixels[op++] = r;
+        pixels[op++] = g;
+        pixels[op++] = b;
+        pixels[op++] = 255;
+      }
+      --xleft;
+    }
+  };
+}
+
+function GifReaderLZWOutputIndexStream(code_stream, p, output, output_length) {
+  var min_code_size = code_stream[p++];
+
+  var clear_code = 1 << min_code_size;
+  var eoi_code = clear_code + 1;
+  var next_code = eoi_code + 1;
+
+  var cur_code_size = min_code_size + 1;  // Number of bits per code.
+  // NOTE: This shares the same name as the encoder, but has a different
+  // meaning here.  Here this masks each code coming from the code stream.
+  var code_mask = (1 << cur_code_size) - 1;
+  var cur_shift = 0;
+  var cur = 0;
+
+  var op = 0;  // Output pointer.
+
+  var subblock_size = code_stream[p++];
+
+  // TODO(deanm): Would using a TypedArray be any faster?  At least it would
+  // solve the fast mode / backing store uncertainty.
+  // var code_table = Array(4096);
+  var code_table = new Int32Array(4096);  // Can be signed, we only use 20 bits.
+
+  var prev_code = null;  // Track code-1.
+
+  while (true) {
+    // Read up to two bytes, making sure we always 12-bits for max sized code.
+    while (cur_shift < 16) {
+      if (subblock_size === 0) break;  // No more data to be read.
+
+      cur |= code_stream[p++] << cur_shift;
+      cur_shift += 8;
+
+      if (subblock_size === 1) {  // Never let it get to 0 to hold logic above.
+        subblock_size = code_stream[p++];  // Next subblock.
+      } else {
+        --subblock_size;
+      }
+    }
+
+    // TODO(deanm): We should never really get here, we should have received
+    // and EOI.
+    if (cur_shift < cur_code_size)
+      break;
+
+    var code = cur & code_mask;
+    cur >>= cur_code_size;
+    cur_shift -= cur_code_size;
+
+    // TODO(deanm): Maybe should check that the first code was a clear code,
+    // at least this is what you're supposed to do.  But actually our encoder
+    // now doesn't emit a clear code first anyway.
+    if (code === clear_code) {
+      // We don't actually have to clear the table.  This could be a good idea
+      // for greater error checking, but we don't really do any anyway.  We
+      // will just track it with next_code and overwrite old entries.
+
+      next_code = eoi_code + 1;
+      cur_code_size = min_code_size + 1;
+      code_mask = (1 << cur_code_size) - 1;
+
+      // Don't update prev_code ?
+      prev_code = null;
+      continue;
+    } else if (code === eoi_code) {
+      break;
+    }
+
+    // We have a similar situation as the decoder, where we want to store
+    // variable length entries (code table entries), but we want to do in a
+    // faster manner than an array of arrays.  The code below stores sort of a
+    // linked list within the code table, and then "chases" through it to
+    // construct the dictionary entries.  When a new entry is created, just the
+    // last byte is stored, and the rest (prefix) of the entry is only
+    // referenced by its table entry.  Then the code chases through the
+    // prefixes until it reaches a single byte code.  We have to chase twice,
+    // first to compute the length, and then to actually copy the data to the
+    // output (backwards, since we know the length).  The alternative would be
+    // storing something in an intermediate stack, but that doesn't make any
+    // more sense.  I implemented an approach where it also stored the length
+    // in the code table, although it's a bit tricky because you run out of
+    // bits (12 + 12 + 8), but I didn't measure much improvements (the table
+    // entries are generally not the long).  Even when I created benchmarks for
+    // very long table entries the complexity did not seem worth it.
+    // The code table stores the prefix entry in 12 bits and then the suffix
+    // byte in 8 bits, so each entry is 20 bits.
+
+    var chase_code = code < next_code ? code : prev_code;
+
+    // Chase what we will output, either {CODE} or {CODE-1}.
+    var chase_length = 0;
+    var chase = chase_code;
+    while (chase > clear_code) {
+      chase = code_table[chase] >> 8;
+      ++chase_length;
+    }
+
+    var k = chase;
+
+    var op_end = op + chase_length + (chase_code !== code ? 1 : 0);
+    if (op_end > output_length) {
+      console.log("Warning, gif stream longer than expected.");
+      return;
+    }
+
+    // Already have the first byte from the chase, might as well write it fast.
+    output[op++] = k;
+
+    op += chase_length;
+    var b = op;  // Track pointer, writing backwards.
+
+    if (chase_code !== code)  // The case of emitting {CODE-1} + k.
+      output[op++] = k;
+
+    chase = chase_code;
+    while (chase_length--) {
+      chase = code_table[chase];
+      output[--b] = chase & 0xff;  // Write backwards.
+      chase >>= 8;  // Pull down to the prefix code.
+    }
+
+    if (prev_code !== null && next_code < 4096) {
+      code_table[next_code++] = prev_code << 8 | k;
+      // TODO(deanm): Figure out this clearing vs code growth logic better.  I
+      // have an feeling that it should just happen somewhere else, for now it
+      // is awkward between when we grow past the max and then hit a clear code.
+      // For now just check if we hit the max 12-bits (then a clear code should
+      // follow, also of course encoded in 12-bits).
+      if (next_code >= code_mask+1 && cur_code_size < 12) {
+        ++cur_code_size;
+        code_mask = code_mask << 1 | 1;
+      }
+    }
+
+    prev_code = code;
+  }
+
+  if (op !== output_length) {
+    console.log("Warning, gif stream shorter than expected.");
+  }
+
+  return output;
+}
+
+// CommonJS.
+try { exports.GifWriter = GifWriter; exports.GifReader = GifReader } catch(e) {}
+
+window.GifReader=exports.GifReader;window.GifWriter=exports.GifWriter;})();
+(function(){var exports={};
+var __defProp = Object.defineProperty;
+var __markAsModule = (target) => __defProp(target, "__esModule", {value: true});
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, {get: all[name], enumerable: true});
+};
+
+// src/index.js
+__markAsModule(exports);
+__export(exports, {
+  GIFEncoder: () => GIFEncoder,
+  applyPalette: () => applyPalette,
+  default: () => src_default,
+  nearestColor: () => nearestColor,
+  nearestColorIndex: () => nearestColorIndex,
+  nearestColorIndexWithDistance: () => nearestColorIndexWithDistance,
+  prequantize: () => prequantize,
+  quantize: () => quantize,
+  snapColorsToPalette: () => snapColorsToPalette
+});
+
+// src/constants.js
+var constants_default = {
+  signature: "GIF",
+  version: "89a",
+  trailer: 59,
+  extensionIntroducer: 33,
+  applicationExtensionLabel: 255,
+  graphicControlExtensionLabel: 249,
+  imageSeparator: 44,
+  signatureSize: 3,
+  versionSize: 3,
+  globalColorTableFlagMask: 128,
+  colorResolutionMask: 112,
+  sortFlagMask: 8,
+  globalColorTableSizeMask: 7,
+  applicationIdentifierSize: 8,
+  applicationAuthCodeSize: 3,
+  disposalMethodMask: 28,
+  userInputFlagMask: 2,
+  transparentColorFlagMask: 1,
+  localColorTableFlagMask: 128,
+  interlaceFlagMask: 64,
+  idSortFlagMask: 32,
+  localColorTableSizeMask: 7
+};
+
+// src/stream.js
+function createStream(initialCapacity = 256) {
+  let cursor = 0;
+  let contents = new Uint8Array(initialCapacity);
+  return {
+    get buffer() {
+      return contents.buffer;
+    },
+    reset() {
+      cursor = 0;
+    },
+    bytesView() {
+      return contents.subarray(0, cursor);
+    },
+    bytes() {
+      return contents.slice(0, cursor);
+    },
+    writeByte(byte) {
+      expand(cursor + 1);
+      contents[cursor] = byte;
+      cursor++;
+    },
+    writeBytes(data, offset = 0, byteLength = data.length) {
+      expand(cursor + byteLength);
+      for (let i = 0; i < byteLength; i++) {
+        contents[cursor++] = data[i + offset];
+      }
+    },
+    writeBytesView(data, offset = 0, byteLength = data.byteLength) {
+      expand(cursor + byteLength);
+      contents.set(data.subarray(offset, offset + byteLength), cursor);
+      cursor += byteLength;
+    }
+  };
+  function expand(newCapacity) {
+    var prevCapacity = contents.length;
+    if (prevCapacity >= newCapacity)
+      return;
+    var CAPACITY_DOUBLING_MAX = 1024 * 1024;
+    newCapacity = Math.max(newCapacity, prevCapacity * (prevCapacity < CAPACITY_DOUBLING_MAX ? 2 : 1.125) >>> 0);
+    if (prevCapacity != 0)
+      newCapacity = Math.max(newCapacity, 256);
+    const oldContents = contents;
+    contents = new Uint8Array(newCapacity);
+    if (cursor > 0)
+      contents.set(oldContents.subarray(0, cursor), 0);
+  }
+}
+
+// src/lzwEncode.js
+var BITS = 12;
+var DEFAULT_HSIZE = 5003;
+var MASKS = [
+  0,
+  1,
+  3,
+  7,
+  15,
+  31,
+  63,
+  127,
+  255,
+  511,
+  1023,
+  2047,
+  4095,
+  8191,
+  16383,
+  32767,
+  65535
+];
+function lzwEncode(width, height, pixels, colorDepth, outStream = createStream(512), accum = new Uint8Array(256), htab = new Int32Array(DEFAULT_HSIZE), codetab = new Int32Array(DEFAULT_HSIZE)) {
+  const hsize = htab.length;
+  const initCodeSize = Math.max(2, colorDepth);
+  accum.fill(0);
+  codetab.fill(0);
+  htab.fill(-1);
+  let cur_accum = 0;
+  let cur_bits = 0;
+  const init_bits = initCodeSize + 1;
+  const g_init_bits = init_bits;
+  let clear_flg = false;
+  let n_bits = g_init_bits;
+  let maxcode = (1 << n_bits) - 1;
+  const ClearCode = 1 << init_bits - 1;
+  const EOFCode = ClearCode + 1;
+  let free_ent = ClearCode + 2;
+  let a_count = 0;
+  let ent = pixels[0];
+  let hshift = 0;
+  for (let fcode = hsize; fcode < 65536; fcode *= 2) {
+    ++hshift;
+  }
+  hshift = 8 - hshift;
+  outStream.writeByte(initCodeSize);
+  output(ClearCode);
+  const length = pixels.length;
+  for (let idx = 1; idx < length; idx++) {
+    next_block: {
+      const c = pixels[idx];
+      const fcode = (c << BITS) + ent;
+      let i = c << hshift ^ ent;
+      if (htab[i] === fcode) {
+        ent = codetab[i];
+        break next_block;
+      }
+      const disp = i === 0 ? 1 : hsize - i;
+      while (htab[i] >= 0) {
+        i -= disp;
+        if (i < 0)
+          i += hsize;
+        if (htab[i] === fcode) {
+          ent = codetab[i];
+          break next_block;
+        }
+      }
+      output(ent);
+      ent = c;
+      if (free_ent < 1 << BITS) {
+        codetab[i] = free_ent++;
+        htab[i] = fcode;
+      } else {
+        htab.fill(-1);
+        free_ent = ClearCode + 2;
+        clear_flg = true;
+        output(ClearCode);
+      }
+    }
+  }
+  output(ent);
+  output(EOFCode);
+  outStream.writeByte(0);
+  return outStream.bytesView();
+  function output(code) {
+    cur_accum &= MASKS[cur_bits];
+    if (cur_bits > 0)
+      cur_accum |= code << cur_bits;
+    else
+      cur_accum = code;
+    cur_bits += n_bits;
+    while (cur_bits >= 8) {
+      accum[a_count++] = cur_accum & 255;
+      if (a_count >= 254) {
+        outStream.writeByte(a_count);
+        outStream.writeBytesView(accum, 0, a_count);
+        a_count = 0;
+      }
+      cur_accum >>= 8;
+      cur_bits -= 8;
+    }
+    if (free_ent > maxcode || clear_flg) {
+      if (clear_flg) {
+        n_bits = g_init_bits;
+        maxcode = (1 << n_bits) - 1;
+        clear_flg = false;
+      } else {
+        ++n_bits;
+        maxcode = n_bits === BITS ? 1 << n_bits : (1 << n_bits) - 1;
+      }
+    }
+    if (code == EOFCode) {
+      while (cur_bits > 0) {
+        accum[a_count++] = cur_accum & 255;
+        if (a_count >= 254) {
+          outStream.writeByte(a_count);
+          outStream.writeBytesView(accum, 0, a_count);
+          a_count = 0;
+        }
+        cur_accum >>= 8;
+        cur_bits -= 8;
+      }
+      if (a_count > 0) {
+        outStream.writeByte(a_count);
+        outStream.writeBytesView(accum, 0, a_count);
+        a_count = 0;
+      }
+    }
+  }
+}
+var lzwEncode_default = lzwEncode;
+
+// src/rgb-packing.js
+function rgb888_to_rgb565(r, g, b) {
+  return r << 8 & 63488 | g << 2 & 992 | b >> 3;
+}
+function rgba8888_to_rgba4444(r, g, b, a) {
+  return r >> 4 | g & 240 | (b & 240) << 4 | (a & 240) << 8;
+}
+function rgb888_to_rgb444(r, g, b) {
+  return r >> 4 << 8 | g & 240 | b >> 4;
+}
+
+// src/pnnquant2.js
+function clamp(value, min, max) {
+  return value < min ? min : value > max ? max : value;
+}
+function sqr(value) {
+  return value * value;
+}
+function find_nn(bins, idx, hasAlpha) {
+  var nn = 0;
+  var err = 1e100;
+  const bin1 = bins[idx];
+  const n1 = bin1.cnt;
+  const wa = bin1.ac;
+  const wr = bin1.rc;
+  const wg = bin1.gc;
+  const wb = bin1.bc;
+  for (var i = bin1.fw; i != 0; i = bins[i].fw) {
+    const bin = bins[i];
+    const n2 = bin.cnt;
+    const nerr2 = n1 * n2 / (n1 + n2);
+    if (nerr2 >= err)
+      continue;
+    var nerr = 0;
+    if (hasAlpha) {
+      nerr += nerr2 * sqr(bin.ac - wa);
+      if (nerr >= err)
+        continue;
+    }
+    nerr += nerr2 * sqr(bin.rc - wr);
+    if (nerr >= err)
+      continue;
+    nerr += nerr2 * sqr(bin.gc - wg);
+    if (nerr >= err)
+      continue;
+    nerr += nerr2 * sqr(bin.bc - wb);
+    if (nerr >= err)
+      continue;
+    err = nerr;
+    nn = i;
+  }
+  bin1.err = err;
+  bin1.nn = nn;
+}
+function create_bin() {
+  return {
+    ac: 0,
+    rc: 0,
+    gc: 0,
+    bc: 0,
+    cnt: 0,
+    nn: 0,
+    fw: 0,
+    bk: 0,
+    tm: 0,
+    mtm: 0,
+    err: 0
+  };
+}
+function create_bin_list(data, format) {
+  const bincount = format === "rgb444" ? 4096 : 65536;
+  const bins = new Array(bincount);
+  const size = data.length;
+  if (format === "rgba4444") {
+    for (let i = 0; i < size; ++i) {
+      const color = data[i];
+      const a = color >> 24 & 255;
+      const b = color >> 16 & 255;
+      const g = color >> 8 & 255;
+      const r = color & 255;
+      const index = rgba8888_to_rgba4444(r, g, b, a);
+      let bin = index in bins ? bins[index] : bins[index] = create_bin();
+      bin.rc += r;
+      bin.gc += g;
+      bin.bc += b;
+      bin.ac += a;
+      bin.cnt++;
+    }
+  } else if (format === "rgb444") {
+    for (let i = 0; i < size; ++i) {
+      const color = data[i];
+      const b = color >> 16 & 255;
+      const g = color >> 8 & 255;
+      const r = color & 255;
+      const index = rgb888_to_rgb444(r, g, b);
+      let bin = index in bins ? bins[index] : bins[index] = create_bin();
+      bin.rc += r;
+      bin.gc += g;
+      bin.bc += b;
+      bin.cnt++;
+    }
+  } else {
+    for (let i = 0; i < size; ++i) {
+      const color = data[i];
+      const b = color >> 16 & 255;
+      const g = color >> 8 & 255;
+      const r = color & 255;
+      const index = rgb888_to_rgb565(r, g, b);
+      let bin = index in bins ? bins[index] : bins[index] = create_bin();
+      bin.rc += r;
+      bin.gc += g;
+      bin.bc += b;
+      bin.cnt++;
+    }
+  }
+  return bins;
+}
+function quantize(rgba, maxColors, opts = {}) {
+  const {
+    format = "rgb565",
+    clearAlpha = true,
+    clearAlphaColor = 0,
+    clearAlphaThreshold = 0,
+    oneBitAlpha = false
+  } = opts;
+  if (!rgba || !rgba.buffer) {
+    throw new Error("quantize() expected RGBA Uint8Array data");
+  }
+  if (!(rgba instanceof Uint8Array) && !(rgba instanceof Uint8ClampedArray)) {
+    throw new Error("quantize() expected RGBA Uint8Array data");
+  }
+  const data = new Uint32Array(rgba.buffer);
+  let useSqrt = opts.useSqrt !== false;
+  const hasAlpha = format === "rgba4444";
+  const bins = create_bin_list(data, format);
+  const bincount = bins.length;
+  const bincountMinusOne = bincount - 1;
+  const heap = new Uint32Array(bincount + 1);
+  var maxbins = 0;
+  for (var i = 0; i < bincount; ++i) {
+    const bin = bins[i];
+    if (bin != null) {
+      var d = 1 / bin.cnt;
+      if (hasAlpha)
+        bin.ac *= d;
+      bin.rc *= d;
+      bin.gc *= d;
+      bin.bc *= d;
+      bins[maxbins++] = bin;
+    }
+  }
+  if (sqr(maxColors) / maxbins < 0.022) {
+    useSqrt = false;
+  }
+  var i = 0;
+  for (; i < maxbins - 1; ++i) {
+    bins[i].fw = i + 1;
+    bins[i + 1].bk = i;
+    if (useSqrt)
+      bins[i].cnt = Math.sqrt(bins[i].cnt);
+  }
+  if (useSqrt)
+    bins[i].cnt = Math.sqrt(bins[i].cnt);
+  var h, l, l2;
+  for (i = 0; i < maxbins; ++i) {
+    find_nn(bins, i, false);
+    var err = bins[i].err;
+    for (l = ++heap[0]; l > 1; l = l2) {
+      l2 = l >> 1;
+      if (bins[h = heap[l2]].err <= err)
+        break;
+      heap[l] = h;
+    }
+    heap[l] = i;
+  }
+  var extbins = maxbins - maxColors;
+  for (i = 0; i < extbins; ) {
+    var tb;
+    for (; ; ) {
+      var b1 = heap[1];
+      tb = bins[b1];
+      if (tb.tm >= tb.mtm && bins[tb.nn].mtm <= tb.tm)
+        break;
+      if (tb.mtm == bincountMinusOne)
+        b1 = heap[1] = heap[heap[0]--];
+      else {
+        find_nn(bins, b1, false);
+        tb.tm = i;
+      }
+      var err = bins[b1].err;
+      for (l = 1; (l2 = l + l) <= heap[0]; l = l2) {
+        if (l2 < heap[0] && bins[heap[l2]].err > bins[heap[l2 + 1]].err)
+          l2++;
+        if (err <= bins[h = heap[l2]].err)
+          break;
+        heap[l] = h;
+      }
+      heap[l] = b1;
+    }
+    var nb = bins[tb.nn];
+    var n1 = tb.cnt;
+    var n2 = nb.cnt;
+    var d = 1 / (n1 + n2);
+    if (hasAlpha)
+      tb.ac = d * (n1 * tb.ac + n2 * nb.ac);
+    tb.rc = d * (n1 * tb.rc + n2 * nb.rc);
+    tb.gc = d * (n1 * tb.gc + n2 * nb.gc);
+    tb.bc = d * (n1 * tb.bc + n2 * nb.bc);
+    tb.cnt += nb.cnt;
+    tb.mtm = ++i;
+    bins[nb.bk].fw = nb.fw;
+    bins[nb.fw].bk = nb.bk;
+    nb.mtm = bincountMinusOne;
+  }
+  let palette = [];
+  var k = 0;
+  for (i = 0; ; ++k) {
+    let r = clamp(Math.round(bins[i].rc), 0, 255);
+    let g = clamp(Math.round(bins[i].gc), 0, 255);
+    let b = clamp(Math.round(bins[i].bc), 0, 255);
+    let a = 255;
+    if (hasAlpha) {
+      a = clamp(Math.round(bins[i].ac), 0, 255);
+      if (oneBitAlpha) {
+        const threshold = typeof oneBitAlpha === "number" ? oneBitAlpha : 127;
+        a = a <= threshold ? 0 : 255;
+      }
+      if (clearAlpha && a <= clearAlphaThreshold) {
+        r = g = b = clearAlphaColor;
+        a = 0;
+      }
+    }
+    const color = hasAlpha ? [r, g, b, a] : [r, g, b];
+    const exists = existsInPalette(palette, color);
+    if (!exists)
+      palette.push(color);
+    if ((i = bins[i].fw) == 0)
+      break;
+  }
+  return palette;
+}
+function existsInPalette(palette, color) {
+  for (let i = 0; i < palette.length; i++) {
+    const p = palette[i];
+    let matchesRGB = p[0] === color[0] && p[1] === color[1] && p[2] === color[2];
+    let matchesAlpha = p.length >= 4 && color.length >= 4 ? p[3] === color[3] : true;
+    if (matchesRGB && matchesAlpha)
+      return true;
+  }
+  return false;
+}
+
+// src/color.js
+function euclideanDistanceSquared(a, b) {
+  var sum = 0;
+  var n;
+  for (n = 0; n < a.length; n++) {
+    const dx = a[n] - b[n];
+    sum += dx * dx;
+  }
+  return sum;
+}
+
+// src/palettize.js
+function roundStep(byte, step) {
+  return step > 1 ? Math.round(byte / step) * step : byte;
+}
+function prequantize(rgba, {roundRGB = 5, roundAlpha = 10, oneBitAlpha = null} = {}) {
+  const data = new Uint32Array(rgba.buffer);
+  for (let i = 0; i < data.length; i++) {
+    const color = data[i];
+    let a = color >> 24 & 255;
+    let b = color >> 16 & 255;
+    let g = color >> 8 & 255;
+    let r = color & 255;
+    a = roundStep(a, roundAlpha);
+    if (oneBitAlpha) {
+      const threshold = typeof oneBitAlpha === "number" ? oneBitAlpha : 127;
+      a = a <= threshold ? 0 : 255;
+    }
+    r = roundStep(r, roundRGB);
+    g = roundStep(g, roundRGB);
+    b = roundStep(b, roundRGB);
+    data[i] = a << 24 | b << 16 | g << 8 | r << 0;
+  }
+}
+function applyPalette(rgba, palette, format = "rgb565") {
+  if (!rgba || !rgba.buffer) {
+    throw new Error("quantize() expected RGBA Uint8Array data");
+  }
+  if (!(rgba instanceof Uint8Array) && !(rgba instanceof Uint8ClampedArray)) {
+    throw new Error("quantize() expected RGBA Uint8Array data");
+  }
+  if (palette.length > 256) {
+    throw new Error("applyPalette() only works with 256 colors or less");
+  }
+  const data = new Uint32Array(rgba.buffer);
+  const length = data.length;
+  const bincount = format === "rgb444" ? 4096 : 65536;
+  const index = new Uint8Array(length);
+  const cache = new Array(bincount);
+  const hasAlpha = format === "rgba4444";
+  if (format === "rgba4444") {
+    for (let i = 0; i < length; i++) {
+      const color = data[i];
+      const a = color >> 24 & 255;
+      const b = color >> 16 & 255;
+      const g = color >> 8 & 255;
+      const r = color & 255;
+      const key = rgba8888_to_rgba4444(r, g, b, a);
+      const idx = key in cache ? cache[key] : cache[key] = nearestColorIndexRGBA(r, g, b, a, palette);
+      index[i] = idx;
+    }
+  } else {
+    const rgb888_to_key = format === "rgb444" ? rgb888_to_rgb444 : rgb888_to_rgb565;
+    for (let i = 0; i < length; i++) {
+      const color = data[i];
+      const b = color >> 16 & 255;
+      const g = color >> 8 & 255;
+      const r = color & 255;
+      const key = rgb888_to_key(r, g, b);
+      const idx = key in cache ? cache[key] : cache[key] = nearestColorIndexRGB(r, g, b, palette);
+      index[i] = idx;
+    }
+  }
+  return index;
+}
+function nearestColorIndexRGBA(r, g, b, a, palette) {
+  let k = 0;
+  let mindist = 1e100;
+  for (let i = 0; i < palette.length; i++) {
+    const px2 = palette[i];
+    const a2 = px2[3];
+    let curdist = sqr2(a2 - a);
+    if (curdist > mindist)
+      continue;
+    const r2 = px2[0];
+    curdist += sqr2(r2 - r);
+    if (curdist > mindist)
+      continue;
+    const g2 = px2[1];
+    curdist += sqr2(g2 - g);
+    if (curdist > mindist)
+      continue;
+    const b2 = px2[2];
+    curdist += sqr2(b2 - b);
+    if (curdist > mindist)
+      continue;
+    mindist = curdist;
+    k = i;
+  }
+  return k;
+}
+function nearestColorIndexRGB(r, g, b, palette) {
+  let k = 0;
+  let mindist = 1e100;
+  for (let i = 0; i < palette.length; i++) {
+    const px2 = palette[i];
+    const r2 = px2[0];
+    let curdist = sqr2(r2 - r);
+    if (curdist > mindist)
+      continue;
+    const g2 = px2[1];
+    curdist += sqr2(g2 - g);
+    if (curdist > mindist)
+      continue;
+    const b2 = px2[2];
+    curdist += sqr2(b2 - b);
+    if (curdist > mindist)
+      continue;
+    mindist = curdist;
+    k = i;
+  }
+  return k;
+}
+function snapColorsToPalette(palette, knownColors, threshold = 5) {
+  if (!palette.length || !knownColors.length)
+    return;
+  const paletteRGB = palette.map((p) => p.slice(0, 3));
+  const thresholdSq = threshold * threshold;
+  const dim = palette[0].length;
+  for (let i = 0; i < knownColors.length; i++) {
+    let color = knownColors[i];
+    if (color.length < dim) {
+      color = [color[0], color[1], color[2], 255];
+    } else if (color.length > dim) {
+      color = color.slice(0, 3);
+    } else {
+      color = color.slice();
+    }
+    const r = nearestColorIndexWithDistance(paletteRGB, color.slice(0, 3), euclideanDistanceSquared);
+    const idx = r[0];
+    const distanceSq = r[1];
+    if (distanceSq > 0 && distanceSq <= thresholdSq) {
+      palette[idx] = color;
+    }
+  }
+}
+function sqr2(a) {
+  return a * a;
+}
+function nearestColorIndex(colors, pixel, distanceFn = euclideanDistanceSquared) {
+  let minDist = Infinity;
+  let minDistIndex = -1;
+  for (let j = 0; j < colors.length; j++) {
+    const paletteColor = colors[j];
+    const dist = distanceFn(pixel, paletteColor);
+    if (dist < minDist) {
+      minDist = dist;
+      minDistIndex = j;
+    }
+  }
+  return minDistIndex;
+}
+function nearestColorIndexWithDistance(colors, pixel, distanceFn = euclideanDistanceSquared) {
+  let minDist = Infinity;
+  let minDistIndex = -1;
+  for (let j = 0; j < colors.length; j++) {
+    const paletteColor = colors[j];
+    const dist = distanceFn(pixel, paletteColor);
+    if (dist < minDist) {
+      minDist = dist;
+      minDistIndex = j;
+    }
+  }
+  return [minDistIndex, minDist];
+}
+function nearestColor(colors, pixel, distanceFn = euclideanDistanceSquared) {
+  return colors[nearestColorIndex(colors, pixel, distanceFn)];
+}
+
+// src/index.js
+function GIFEncoder(opt = {}) {
+  const {initialCapacity = 4096, auto = true} = opt;
+  const stream = createStream(initialCapacity);
+  const HSIZE = 5003;
+  const accum = new Uint8Array(256);
+  const htab = new Int32Array(HSIZE);
+  const codetab = new Int32Array(HSIZE);
+  let hasInit = false;
+  return {
+    reset() {
+      stream.reset();
+      hasInit = false;
+    },
+    finish() {
+      stream.writeByte(constants_default.trailer);
+    },
+    bytes() {
+      return stream.bytes();
+    },
+    bytesView() {
+      return stream.bytesView();
+    },
+    get buffer() {
+      return stream.buffer;
+    },
+    get stream() {
+      return stream;
+    },
+    writeHeader,
+    writeFrame(index, width, height, opts = {}) {
+      const {
+        transparent = false,
+        transparentIndex = 0,
+        delay = 0,
+        palette = null,
+        repeat = 0,
+        colorDepth = 8,
+        dispose = -1
+      } = opts;
+      let first = false;
+      if (auto) {
+        if (!hasInit) {
+          first = true;
+          writeHeader();
+          hasInit = true;
+        }
+      } else {
+        first = Boolean(opts.first);
+      }
+      width = Math.max(0, Math.floor(width));
+      height = Math.max(0, Math.floor(height));
+      if (first) {
+        if (!palette) {
+          throw new Error("First frame must include a { palette } option");
+        }
+        encodeLogicalScreenDescriptor(stream, width, height, palette, colorDepth);
+        encodeColorTable(stream, palette);
+        if (repeat >= 0) {
+          encodeNetscapeExt(stream, repeat);
+        }
+      }
+      const delayTime = Math.round(delay / 10);
+      encodeGraphicControlExt(stream, dispose, delayTime, transparent, transparentIndex);
+      const useLocalColorTable = Boolean(palette) && !first;
+      encodeImageDescriptor(stream, width, height, useLocalColorTable ? palette : null);
+      if (useLocalColorTable)
+        encodeColorTable(stream, palette);
+      encodePixels(stream, index, width, height, colorDepth, accum, htab, codetab);
+    }
+  };
+  function writeHeader() {
+    writeUTFBytes(stream, "GIF89a");
+  }
+}
+function encodeGraphicControlExt(stream, dispose, delay, transparent, transparentIndex) {
+  stream.writeByte(33);
+  stream.writeByte(249);
+  stream.writeByte(4);
+  if (transparentIndex < 0) {
+    transparentIndex = 0;
+    transparent = false;
+  }
+  var transp, disp;
+  if (!transparent) {
+    transp = 0;
+    disp = 0;
+  } else {
+    transp = 1;
+    disp = 2;
+  }
+  if (dispose >= 0) {
+    disp = dispose & 7;
+  }
+  disp <<= 2;
+  const userInput = 0;
+  stream.writeByte(0 | disp | userInput | transp);
+  writeUInt16(stream, delay);
+  stream.writeByte(transparentIndex || 0);
+  stream.writeByte(0);
+}
+function encodeLogicalScreenDescriptor(stream, width, height, palette, colorDepth = 8) {
+  const globalColorTableFlag = 1;
+  const sortFlag = 0;
+  const globalColorTableSize = colorTableSize(palette.length) - 1;
+  const fields = globalColorTableFlag << 7 | colorDepth - 1 << 4 | sortFlag << 3 | globalColorTableSize;
+  const backgroundColorIndex = 0;
+  const pixelAspectRatio = 0;
+  writeUInt16(stream, width);
+  writeUInt16(stream, height);
+  stream.writeBytes([fields, backgroundColorIndex, pixelAspectRatio]);
+}
+function encodeNetscapeExt(stream, repeat) {
+  stream.writeByte(33);
+  stream.writeByte(255);
+  stream.writeByte(11);
+  writeUTFBytes(stream, "NETSCAPE2.0");
+  stream.writeByte(3);
+  stream.writeByte(1);
+  writeUInt16(stream, repeat);
+  stream.writeByte(0);
+}
+function encodeColorTable(stream, palette) {
+  const colorTableLength = 1 << colorTableSize(palette.length);
+  for (let i = 0; i < colorTableLength; i++) {
+    let color = [0, 0, 0];
+    if (i < palette.length) {
+      color = palette[i];
+    }
+    stream.writeByte(color[0]);
+    stream.writeByte(color[1]);
+    stream.writeByte(color[2]);
+  }
+}
+function encodeImageDescriptor(stream, width, height, localPalette) {
+  stream.writeByte(44);
+  writeUInt16(stream, 0);
+  writeUInt16(stream, 0);
+  writeUInt16(stream, width);
+  writeUInt16(stream, height);
+  if (localPalette) {
+    const interlace = 0;
+    const sorted = 0;
+    const palSize = colorTableSize(localPalette.length) - 1;
+    stream.writeByte(128 | interlace | sorted | 0 | palSize);
+  } else {
+    stream.writeByte(0);
+  }
+}
+function encodePixels(stream, index, width, height, colorDepth = 8, accum, htab, codetab) {
+  lzwEncode_default(width, height, index, colorDepth, stream, accum, htab, codetab);
+}
+function writeUInt16(stream, short) {
+  stream.writeByte(short & 255);
+  stream.writeByte(short >> 8 & 255);
+}
+function writeUTFBytes(stream, text) {
+  for (var i = 0; i < text.length; i++) {
+    stream.writeByte(text.charCodeAt(i));
+  }
+}
+function colorTableSize(length) {
+  return Math.max(Math.ceil(Math.log2(length)), 1);
+}
+var src_default = GIFEncoder;
+//# sourceMappingURL=gifenc.js.map
+
+window.gifenc=exports;})();
+</script>
+<div id="toasts"></div>
+
+<!-- ============ AUTH GATE ============ -->
+<div id="authGate">
+  <div class="gate-hero">
+    <div class="logo">⚔️🌸</div>
+    <h1>ANIME CLASH</h1>
+    <p>Anime battle arena — deploy units, smash towers, climb the ranks.</p>
+    <div class="gate-version"><span class="ver-badge">v1.0.0</span> <b>LAUNCH — real PvP, bot tutorial, owner panel</b></div>
+  </div>
+  <div class="gate-card">
+    <h2>Play Anime Clash</h2>
+    <p class="sub">Username + password is all you need — no email required. Your progress saves to the cloud.</p>
+    <input type="text" id="gAuthUser" placeholder="Username (3–16 letters &amp; numbers)" autocomplete="username" maxlength="16">
+    <input type="password" id="gAuthPass" placeholder="Password (6+ characters)" autocomplete="current-password">
+    <button class="btn" id="btnLogin" type="button">⚔️ Log in</button>
+    <button class="btn blue" id="btnRegister" type="button">🌸 Create account</button>
+    <p class="sub" id="authMsg"></p>
+  </div>
+  <ul class="gate-features">
+    <li>⚔️ <b>Real PvP</b> — battle other players live with room codes</li>
+    <li>🤖 <b>Tutorial vs bots</b> — learn the game, practice anytime</li>
+    <li>🃏 <b>8 original anime units</b> — buy them in the shop with gems &amp; coins</li>
+    <li>🎞️ <b>GIF profile pics &amp; banners</b> — big Tenor GIFs shrink to fit, free</li>
+    <li>👑 <b>Owner panel</b> — give gems, ban, manage admins</li>
+  </ul>
+  <p class="foot">Anime Clash v1.0.0 — original characters only. No accounts yet? Hit “Create account”.</p>
+</div>
+
+<!-- ============ BANNED SCREEN ============ -->
+<div id="bannedScreen">
+  <div class="box">
+    <h1>🔨</h1>
+    <h2>You've been banned</h2>
+    <div class="reason"><b>Reason:</b> <span id="bannedReason">—</span><br><b>Until:</b> <span id="bannedUntil">—</span></div>
+    <p class="sub">If this is a mistake, ask the Owner to unban you.</p>
+    <button class="btn ghost" id="btnBannedLogout" type="button">Log out</button>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" class="hidden">
+  <div id="topBar">
+    <div id="hudAvatar">⚔️</div>
+    <div>
+      <div id="hudName">Player</div>
+      <div id="hudRole">Lv 1 · 0 🏆</div>
+    </div>
+    <div class="currencies">
+      <span class="cur gems" id="hudGems">💎 0</span>
+      <span class="cur coins" id="hudCoins">🪙 0</span>
+      <span class="cur troph" id="hudTroph">🏆 0</span>
+    </div>
+  </div>
+
+  <!-- PLAY -->
+  <div class="view" id="viewPlay">
+    <div class="card" id="playMenu">
+      <h2>⚔️ Battle</h2>
+      <p class="sub">Elixir builds up — deploy units, break their towers, take the crown.</p>
+      <button class="btn green" id="btnTutorial" type="button">🤖 Tutorial — vs Bot</button>
+      <button class="btn" id="btnQuickMatch" type="button">⚔️ Quick Match — real player</button>
+      <h3 style="margin-top:14px">🏷️ Play with a friend (room code)</h3>
+      <input type="text" id="roomCodeInput" placeholder="Room code (6 letters)" maxlength="6">
+      <button class="btn blue" id="btnCreateRoom" type="button">➕ Create room</button>
+      <button class="btn ghost" id="btnJoinRoom" type="button">🚪 Join room</button>
+      <p class="sub" id="playStatus"></p>
+      <p class="sub" id="myRoomCode"></p>
+    </div>
+    <div class="card hidden" id="battleCard">
+      <div id="battleTimer">3:00</div>
+      <div id="battleArena"></div>
+      <div id="elixirBarWrap"><div id="elixirBar"></div></div>
+      <div id="elixirNum">Elixir 0/10</div>
+      <div class="hand" id="handCards"></div>
+      <div id="battleResult" class="hidden"></div>
+      <button class="btn ghost" id="btnBattleExit" type="button">Leave battle</button>
+    </div>
+    <div class="card">
+      <h3>📰 Update Log — v1.0.0</h3>
+      <div id="updateLogList"></div>
+    </div>
+  </div>
+
+  <!-- UNITS -->
+  <div class="view hidden" id="viewUnits">
+    <div class="card">
+      <h2>🃏 My Units</h2>
+      <p class="sub">Your deck is every unit you own — buy more in the Shop to grow it. Tap a unit to level it up with coins.</p>
+      <div id="unitsList"></div>
+    </div>
+  </div>
+
+  <!-- SHOP -->
+  <div class="view hidden" id="viewShop">
+    <div class="card">
+      <h2>🛒 Shop — buy units</h2>
+      <p class="sub">Units are bought, not pulled from luck. Win battles to earn coins; gems come from the Owner.</p>
+      <div id="shopList"></div>
+    </div>
+    <div class="card">
+      <h2>💎 Gems</h2>
+      <p class="sub">Gems are the premium currency. The Owner can give gems to players. Win streaks also pay a few gems.</p>
+      <p class="sub" id="shopGemsNote"></p>
+    </div>
+  </div>
+
+  <!-- RANKS -->
+  <div class="view hidden" id="viewRanks">
+    <div class="card">
+      <h2>🏆 Leaderboard — trophies</h2>
+      <p class="sub">Top players by trophies. The Owner and admins don't show up here — it wouldn't be fair.</p>
+      <div id="lbList"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="view hidden" id="viewProfile">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div id="profileBanner"></div>
+      <div id="profileHead">
+        <div id="profileAvatar">⚔️</div>
+        <div>
+          <div id="profileName" style="font-weight:900;font-size:18px">Player</div>
+          <div id="profileTags"></div>
+        </div>
+      </div>
+      <div style="padding:12px">
+        <div class="statGrid">
+          <div class="st"><b id="stTroph">0</b><span>🏆 Trophies</span></div>
+          <div class="st"><b id="stWins">0</b><span>Wins</span></div>
+          <div class="st"><b id="stLevel">1</b><span>Level</span></div>
+          <div class="st"><b id="stGems">0</b><span>💎 Gems</span></div>
+          <div class="st"><b id="stCoins">0</b><span>🪙 Coins</span></div>
+          <div class="st"><b id="stStreak">0</b><span>🔥 Win streak</span></div>
+        </div>
+        <h3 style="margin-top:14px">🎞️ Profile picture (GIF)</h3>
+        <label class="fl" for="gifAvatarFile" id="avatarLabel">🎞️ Upload GIF / image — big GIFs shrink to fit</label>
+        <input type="file" id="gifAvatarFile" accept="image/*" class="hidden">
+        <h3 style="margin-top:10px">🎞️ Banner (GIF)</h3>
+        <label class="fl" for="gifBannerFile" id="bannerLabel">🎞️ Upload GIF banner — big GIFs shrink to fit</label>
+        <input type="file" id="gifBannerFile" accept="image/*" class="hidden">
+        <p class="sub">Upload any GIF from your gallery — it stays animated. Big Tenor GIFs get shrunk in the game so they fit your save, free. Search Tenor in your browser, save the GIF, then upload it here.</p>
+        <h3 style="margin-top:14px">👑 Owner &amp; staff</h3>
+        <div id="roleArea"></div>
+        <div id="staffArea"></div>
+        <h3 style="margin-top:14px">📋 Recent messages</h3>
+        <div id="toastLog"></div>
+        <button class="btn ghost" id="btnSignOut" type="button">Log out</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="bottomNav">
+    <button id="navPlay" class="on" type="button"><span class="ic">⚔️</span>Play</button>
+    <button id="navUnits" type="button"><span class="ic">🃏</span>Units</button>
+    <button id="navShop" type="button"><span class="ic">🛒</span>Shop</button>
+    <button id="navRanks" type="button"><span class="ic">🏆</span>Ranks</button>
+    <button id="navProfile" type="button"><span class="ic">👤</span>Profile</button>
+  </div>
+</div>
+<script>
+
+/* ===== js_10_core.js ===== */
+"use strict";
+/* ================= Anime Clash v1.0.0 — core ================= */
+var CURRENT_VERSION="v1.0.0";
+/* FIREBASE_CONFIG — PLACEHOLDER. The parent creates the real Firebase
+   project ("anime-clash") and swaps these values in before deploy.
+   DO NOT ship with invented keys: with the placeholder, the game runs
+   in guest/offline mode (bot battles + local profile) and shows an
+   honest "accounts aren't wired up yet" message on sign-in. */
+var FIREBASE_CONFIG=(typeof window!=="undefined"&&window.ANIME_CLASH_FIREBASE_CONFIG)||{apiKey:"AIzaSyBJcAkGYzmM7FWKTp157pK8-QlOlbjswlo",authDomain:"anime-clash-414f5.firebaseapp.com",projectId:"anime-clash-414f5",storageBucket:"anime-clash-414f5.firebasestorage.app",messagingSenderId:"605298251284",appId:"1:605298251284:web:25a653f4f5e10dbe557901"};
+/* window.ANIME_CLASH_FIREBASE_CONFIG is the documented injection point
+   for the verification harness (it boots the page with a mock Firebase
+   and a test config). Nothing in production sets it. */
+var FIREBASE_CONFIGURED=FIREBASE_CONFIG.apiKey.indexOf("__")!==0;
+
+/* ---------- tiny utils ---------- */
+function $(id){return document.getElementById(id);}
+function esc(t){var d=document.createElement("div");d.textContent=t==null?"":t;return d.innerHTML;}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function fmtNum(n){n=Math.floor(n||0);if(n>=1000000)return (n/1000000).toFixed(1)+"M";if(n>=1000)return (n/1000).toFixed(1)+"K";return String(n);}
+function rand(a,b){return a+Math.random()*(b-a);}
+function randInt(a,b){return Math.floor(rand(a,b+1));}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function makeRoomCode(){var s="";var L="ABCDEFGHJKLMNPQRSTUVWXYZ";for(var i=0;i<6;i++)s+=L[Math.floor(Math.random()*L.length)];return s;}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function uid2(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+var toastLogArr=[];
+var qol={toasts:true,sound:true};
+function toast(msg){
+ try{toastLogArr.unshift(new Date().toLocaleTimeString()+" — "+msg);if(toastLogArr.length>20)toastLogArr.pop();renderToastLog();}catch(e){}
+ if(!qol.toasts)return;
+ var box=$("toasts");if(!box)return;
+ var t=document.createElement("div");t.className="toast";t.textContent=msg;box.appendChild(t);
+ setTimeout(function(){t.style.opacity="0";t.style.transition="opacity .3s";setTimeout(function(){t.remove();},320);},2600);
+}
+function renderToastLog(){var el=$("toastLog");if(!el)return;el.innerHTML=toastLogArr.map(function(s){return "<div>"+esc(s)+"</div>";}).join("");}
+function fbErrText(code){
+ var map={"permission-denied":"🚫 Not allowed — the game rules blocked that.","auth/user-not-found":"No account with that name — try Create account.","auth/wrong-password":"Wrong password — try again.","auth/email-already-in-use":"That name is taken — pick another one.","auth/weak-password":"Password is too short (6+ characters).","auth/invalid-email":"That name doesn't work — use 3–16 letters & numbers.","auth/too-many-requests":"Too many tries — wait a bit and try again.","auth/network-request-failed":"No connection — check your internet and try again.","not-found":"That doesn't exist anymore."};
+ return map[code]||("Something went wrong ("+code+"). Try again.");
+}
+function noteFbError(err,where){try{console.warn("[fb]",where,err&&err.code,err&&err.message);}catch(e){}}
+
+/* ---------- audio (tiny beeps, same pattern as Pig Clicker) ---------- */
+var AC=null;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(AC&&AC.state==="suspended")AC.resume();return AC;}
+function tone(f0,f1,dur,type,vol){if(!qol.sound)return;var ctx=ac();if(!ctx)return;try{var o=ctx.createOscillator(),g=ctx.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f0,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(30,f1),ctx.currentTime+dur);g.gain.setValueAtTime(vol||0.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+dur);}catch(e){}}
+function sndClick(){tone(700,700,0.06,"sine",0.10);}
+function sndBuy(){tone(660,660,0.07,"sine",0.12);setTimeout(function(){tone(990,990,0.12,"sine",0.12);},70);}
+function sndWin(){[523,659,784,1046].forEach(function(f,i){setTimeout(function(){tone(f,f,0.14,"triangle",0.13);},i*80);});}
+function sndLose(){tone(300,120,0.3,"sawtooth",0.10);}
+function sndErr(){tone(160,90,0.18,"sawtooth",0.10);}
+function sndDeploy(){tone(440,880,0.1,"square",0.08);}
+
+/* ---------- device id (hard-ban targeting — random, not personal data) ---------- */
+var deviceId="";
+function genDeviceId(){var s="";try{var a=new Uint8Array(16);if((window.crypto||{}).getRandomValues)crypto.getRandomValues(a);else a.forEach(function(_,i){a[i]=Math.floor(Math.random()*256);});for(var i=0;i<16;i++)s+=("0"+a[i].toString(16)).slice(-2);}catch(e){for(var j=0;j<32;j++)s+="0123456789abcdef"[Math.floor(Math.random()*16)];}return s;}
+function idbPutDevice(id){try{var rq=indexedDB.open("animeclash",1);rq.onupgradeneeded=function(){try{rq.result.createObjectStore("kv");}catch(e){}};rq.onsuccess=function(){try{var tx=rq.result.transaction("kv","readwrite");tx.objectStore("kv").put(id,"device");}catch(e){}};}catch(e){}}
+function idbGetDevice(cb){try{var rq=indexedDB.open("animeclash",1);rq.onsuccess=function(){try{var tx=rq.result.transaction("kv","readonly");var g=tx.objectStore("kv").get("device");g.onsuccess=function(){cb(g.result||"");};g.onerror=function(){cb("");};}catch(e){cb("");}};rq.onerror=function(){cb("");};}catch(e){cb("");}}
+function getDeviceId(){
+ if(deviceId)return deviceId;
+ var id="";
+ try{id=localStorage.getItem("animeclash.device")||"";}catch(e){}
+ if(!id){var m=document.cookie.match(/(?:^|; )ac_device=([0-9a-f]{32})/);if(m)id=m[1];}
+ if(!id){
+  id=genDeviceId();
+  idbGetDevice(function(old){if(old&&old!==deviceId){deviceId=old;try{localStorage.setItem("animeclash.device",old);}catch(e){}try{document.cookie="ac_device="+old+"; max-age=31536000; path=/; SameSite=Lax";}catch(e){}}});
+ }
+ deviceId=id;
+ try{localStorage.setItem("animeclash.device",id);}catch(e){}
+ try{document.cookie="ac_device="+id+"; max-age=31536000; path=/; SameSite=Lax";}catch(e){}
+ idbPutDevice(id);
+ return id;
+}
+
+/* ---------- username filter (client) ---------- */
+function normalizeName(v){
+ v=String(v||"").toLowerCase();
+ var map={"0":"o","1":"i","3":"e","4":"a","5":"s","7":"t","$":"s","@":"a"};
+ v=v.split("").map(function(c){return map[c]||c;}).join("");
+ v=v.replace(/(.)\1{2,}/g,"$1$1");
+ return v;
+}
+function checkUsername(name){
+ name=String(name||"").trim();
+ if(name.length<3)return{ok:false,why:"Username needs 3+ characters."};
+ if(name.length>16)return{ok:false,why:"Username maxes out at 16 characters."};
+ if(!/^[A-Za-z0-9_ ]+$/.test(name))return{ok:false,why:"Letters, numbers, spaces and _ only."};
+ if(/^[^A-Za-z0-9]+$/.test(name))return{ok:false,why:"That name is all symbols — add some letters."};
+ var norm=normalizeName(name);
+ var bad=["fuck","shit","bitch","cunt","nigg","faggot","pussy","rape","hitler","nazi","porn","sex"];
+ for(var i=0;i<bad.length;i++)if(norm.indexOf(bad[i])>-1)return{ok:false,why:"That name isn't allowed — pick another one."};
+ /* "drippy" is NOT in this list on purpose: the first owner may BE Drippy
+    (Rizz's own name). It is enforced conditionally in doSignUp — allowed
+    only while no owner exists yet (config/owner read) — and the rules
+    backstop it the same way. Once an owner exists, "drippy" is blocked. */
+ var imp=["admin","owner","moderator","mod","staff","animeclash","support"];
+ for(var j=0;j<imp.length;j++)if(norm.indexOf(imp[j])>-1)return{ok:false,why:"That name looks like staff — pick another one."};
+ return{ok:true};
+}
+function nameIsDrippy(name){return normalizeName(name).indexOf("drippy")>-1;}
+function placeholderEmail(uname){
+ return String(uname||"").toLowerCase().replace(/[^a-z0-9_]/g,"")+"@anime-clash.local";
+}
+function resolveLoginEmail(ident){
+ ident=String(ident||"").trim();
+ if(ident.indexOf("@")>-1)return ident;
+ return placeholderEmail(ident);
+}
+
+/* ---------- local state ---------- */
+var S=null; /* player save (mirrors the Firestore user doc) */
+var profile={avatar:"",avatarImg:"",banner:"",bannerGif:""};
+var myCustomTitle="";
+function defaultSave(){
+ return {name:"Player",username:"player",gems:50,coins:500,trophies:0,xp:0,level:1,wins:0,losses:0,winStreak:0,
+  units:{roy:{level:1},josuke:{level:1},light:{level:1},lelouch:{level:1},fern:{level:1},stark:{level:1},momo:{level:1},okarun:{level:1}},
+  deck:["roy","josuke","light","lelouch","fern","stark","momo","okarun"],
+  avatar:"",avatarImg:"",banner:"",bannerGif:"",customTitle:"",
+  tutorialDone:false,lastSeenVersion:""};
+}
+function saveLocal(){try{localStorage.setItem("animeclash.save.v1",JSON.stringify({S:S,profile:profile}));}catch(e){}}
+function loadLocal(){try{var raw=localStorage.getItem("animeclash.save.v1");if(!raw)return false;var d=JSON.parse(raw);if(d&&d.S){S=d.S;profile=d.profile||profile;return true;}}catch(e){}return false;}
+function markDirty(){saveLocal();}
+function levelFromXp(xp){return Math.max(1,Math.floor(Math.sqrt((xp||0)/100))+1);}
+function xpForLevel(l){return (l-1)*(l-1)*100;}
+
+/* ---------- Firebase ---------- */
+var fbApp=null,fbAuth=null,fbDb=null,fbUser=null,fbStorage=null;
+var fbReady=false,fbDenied=false;
+var ownerInfo=null,ownerLoaded=false,adminUids=[],adminPermsByUid={},myRole="player",myDocRole="player";
+var myMuted=false,eventCfg={};
+var unsubscribers=[];
+function teardownCloudListeners(){unsubscribers.forEach(function(u){try{u();}catch(e){}});unsubscribers=[];}
+function fbInit(){
+ if(!FIREBASE_CONFIGURED){fbReady=false;return;}
+ try{
+  if(typeof firebase==="undefined"||!firebase.initializeApp)throw new Error("sdk");
+  fbApp=firebase.initializeApp(FIREBASE_CONFIG);
+  fbAuth=firebase.auth();fbDb=firebase.firestore();
+  try{if(firebase.storage)fbStorage=firebase.storage();}catch(e){fbStorage=null;}
+  fbReady=true;
+  fbAuth.onAuthStateChanged(function(u){
+   fbUser=u||null;
+   renderAuth();
+   if(u){onSignedIn(u);}else{teardownCloudListeners();stopBanWatch();showAuthGate();}
+  });
+ }catch(e){fbReady=false;noteFbError(e,"fbInit");}
+}
+function fbDoc(path){return fbDb.doc(path);}
+function isBanActive(d){
+ if(!d)return false;
+ if(d.banned!==true)return false;
+ if(d.bannedUntil==null)return true;
+ var ms=typeof d.bannedUntil.toMillis==="function"?d.bannedUntil.toMillis():0;
+ return ms>Date.now();
+}
+function banRemainingText(d){
+ if(!d||d.bannedUntil==null)return "permanently";
+ var ms=typeof d.bannedUntil.toMillis==="function"?d.bannedUntil.toMillis():0;
+ var s=Math.max(0,Math.floor((ms-Date.now())/1000));
+ if(s<60)return s+"s";
+ if(s<3600)return Math.floor(s/60)+"m";
+ if(s<86400)return Math.floor(s/3600)+"h";
+ return Math.floor(s/86400)+"d";
+}
+
+/* ---------- ban lock (live listener + device check) ---------- */
+var banLock=false,banInfo=null,banWatchUnsub=null,banCountInt=null;
+function showBannedScreen(){
+ var bs=$("bannedScreen");if(!bs)return;
+ bs.style.display="flex";
+ $("bannedReason").textContent=(banInfo&&banInfo.reason)||"No reason given";
+ $("bannedUntil").textContent=banInfo?(banInfo.until?banRemainingText({bannedUntil:banInfo.until}):"permanently"):"—";
+ $("authGate").style.display="none";$("app").classList.add("hidden");
+ if(banCountInt)clearInterval(banCountInt);
+ banCountInt=setInterval(function(){
+  if(!banLock)return;
+  $("bannedUntil").textContent=banInfo?(banInfo.until?banRemainingText({bannedUntil:banInfo.until}):"permanently"):"—";
+ },1000);
+}
+function clearBanState(){
+ banLock=false;banInfo=null;
+ if(banCountInt){clearInterval(banCountInt);banCountInt=null;}
+ var bs=$("bannedScreen");if(bs)bs.style.display="none";
+}
+function applyBanLock(info){
+ if(banLock)return;
+ banLock=true;banInfo=info||{reason:"",until:null};
+ teardownCloudListeners(); /* NOTE: the ban watch is NOT in unsubscribers —
+  it must survive the lock, because it is the thing that hears the unban */
+ showBannedScreen();
+}
+function stopBanWatch(){if(banWatchUnsub){try{banWatchUnsub();}catch(e){}banWatchUnsub=null;}}
+function watchOwnDoc(){
+ stopBanWatch();
+ if(!fbDb||!fbUser)return;
+ var ref=fbDb.collection("users").doc(fbUser.uid);
+ banWatchUnsub=ref.onSnapshot(function(doc){
+  if(!doc.exists)return;
+  var d=doc.data();
+  if(isBanActive(d)){applyBanLock({reason:d.banReason||"",until:d.bannedUntil||null});}
+  else if(banLock){clearBanState();renderAuth();}
+ });
+ /* The ban watch is deliberately NOT registered in `unsubscribers`:
+    teardownCloudListeners() runs when the ban lands, and if it killed this
+    watch the client would never hear the unban. stopBanWatch() is called
+    explicitly on sign-out instead. */
+}
+function checkDeviceBan(){
+ if(!fbDb||!fbUser)return Promise.resolve(null);
+ var id=getDeviceId();
+ return fbDb.collection("deviceBans").doc(id).get().then(function(doc){
+  if(!doc.exists)return null;
+  var d=doc.data();
+  if(d.bannedUntil&&typeof d.bannedUntil.toMillis==="function"&&d.bannedUntil.toMillis()<Date.now())return null;
+  return d;
+ }).catch(function(){return null;});
+}
+
+/* ---------- auth flows ---------- */
+function showAuthGate(){
+ $("authGate").style.display="block";
+ $("app").classList.add("hidden");
+ $("bannedScreen").style.display="none";
+}
+function renderAuth(){
+ var gate=$("authGate"),app=$("app");
+ if(banLock){showBannedScreen();return;}
+ if(fbUser){gate.style.display="none";app.classList.remove("hidden");}
+ else{showAuthGate();}
+ renderHud();renderRolePanel();
+}
+function onSignedIn(user){
+ if(banLock)return;
+ watchOwnDoc();
+ checkDeviceBan().then(function(devBan){
+  if(devBan){applyBanLock({reason:devBan.reason||"Device ban",until:devBan.bannedUntil||null});return;}
+  loadProfile(user);
+ });
+}
+function loadProfile(user){
+ if(!fbDb)return;
+ fbDb.collection("users").doc(user.uid).get().then(function(doc){
+  if(doc.exists){
+   var d=doc.data();
+   if(isBanActive(d)){applyBanLock({reason:d.banReason||"",until:d.bannedUntil||null});return;}
+   applyDocToState(d);
+  }else{
+   createProfile(user);
+  }
+  refreshRole();
+  renderAll();
+ }).catch(function(err){noteFbError(err,"loadProfile");toast(fbErrText(err.code||"permission-denied"));});
+}
+function applyDocToState(d){
+ S=S||defaultSave();
+ var fields=["name","username","gems","coins","trophies","xp","level","wins","losses","winStreak","units","deck","avatar","avatarImg","banner","bannerGif","customTitle","tutorialDone","lastSeenVersion"];
+ fields.forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
+ profile.avatar=S.avatar||"";profile.avatarImg=S.avatarImg||"";profile.banner=S.banner||"";profile.bannerGif=S.bannerGif||"";
+ myCustomTitle=S.customTitle||"";
+ myMuted=!!d.muted;myDocRole=d.role||"player";
+ S.level=levelFromXp(S.xp);
+ saveLocal();
+}
+function createProfile(user){
+ var base=defaultSave();
+ var name=(user.displayName||"").trim()||"Player";
+ var doc=Object.assign({},base,{uid:user.uid,name:name,username:name,role:"player",
+  banned:false,bannedBy:"",bannedByOwner:false,bannedUntil:null,banReason:"",hardBanned:false,banLengthLabel:"",
+  muted:false,staffInbox:[],friends:[],blocked:[],deviceIds:[getDeviceId()],adminPerms:{},grantedLevel:0,
+  createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+ fbDb.collection("users").doc(user.uid).set(doc).then(function(){
+  S=base;applyDocToState(doc);refreshRole();renderAll();
+  toast("🌸 Welcome to Anime Clash, "+name+"! Play the tutorial to learn the ropes.");
+ }).catch(function(err){noteFbError(err,"createProfile");
+  if(nameIsDrippy(name))toast("That name belongs to the Owner — pick another one.");
+  else toast(fbErrText(err.code||"permission-denied"));});
+}
+function saveCloud(){
+ if(!fbDb||!fbUser||banLock)return;
+ var upd={gems:S.gems,coins:S.coins,trophies:S.trophies,xp:S.xp,level:S.level,wins:S.wins,losses:S.losses,winStreak:S.winStreak,
+  units:S.units,deck:S.deck,avatar:S.avatar,avatarImg:S.avatarImg,banner:S.banner,bannerGif:S.bannerGif,customTitle:myCustomTitle,
+  tutorialDone:S.tutorialDone,lastSeenVersion:S.lastSeenVersion,
+  updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+ fbDb.collection("users").doc(fbUser.uid).update(upd).catch(function(err){
+  fbDenied=true;noteFbError(err,"saveCloud");
+ });
+ saveLocal();
+}
+function doSignUp(){
+ if(!FIREBASE_CONFIGURED){toast("⚠️ Accounts aren't wired up yet — the game needs its Firebase project first. Bot battles still work offline.");return;}
+ var name=($("gAuthUser").value||"").trim();
+ var pass=$("gAuthPass").value||"";
+ var chk=checkUsername(name);
+ if(!chk.ok){sndErr();toast(chk.why);return;}
+ if(pass.length<6){sndErr();toast("Password needs 6+ characters.");return;}
+ /* "drippy" is the owner's own name: allowed ONLY while no owner exists
+    yet. The owner doc is publicly readable (rules) exactly so this
+    signed-out check works. If the read fails, proceed — the rules
+    backstop (nameClean) and the claim-time guard catch it instead. */
+ if(nameIsDrippy(name)){
+  $("authMsg").textContent="Checking the name…";
+  fbDb.collection("config").doc("owner").get().then(function(doc){
+   if(doc.exists){sndErr();$("authMsg").textContent="";toast("That name belongs to the Owner — pick another one.");return;}
+   finishSignUp(name,pass);
+  }).catch(function(){finishSignUp(name,pass);});
+  return;
+ }
+ finishSignUp(name,pass);
+}
+function finishSignUp(name,pass){
+ $("authMsg").textContent="Creating your account…";
+ fbAuth.createUserWithEmailAndPassword(resolveLoginEmail(name),pass).then(function(cred){
+  return cred.user.updateProfile({displayName:name});
+ }).then(function(){
+  toast("🌸 Account created — welcome, "+name+"!");
+ }).catch(function(err){noteFbError(err,"signup");$("authMsg").textContent="";toast(fbErrText(err.code||"permission-denied"));});
+}
+function doSignIn(){
+ if(!FIREBASE_CONFIGURED){toast("⚠️ Accounts aren't wired up yet — the game needs its Firebase project first. Bot battles still work offline.");return;}
+ var ident=($("gAuthUser").value||"").trim();
+ var pass=$("gAuthPass").value||"";
+ if(!ident||!pass){sndErr();toast("Type your username and password.");return;}
+ $("authMsg").textContent="Signing in…";
+ fbAuth.signInWithEmailAndPassword(resolveLoginEmail(ident),pass).then(function(){
+  $("authMsg").textContent="";
+ }).catch(function(err){noteFbError(err,"signin");$("authMsg").textContent="";toast(fbErrText(err.code||"permission-denied"));});
+}
+function doSignOut(){
+ if(fbAuth)fbAuth.signOut().catch(function(){});
+ banLock=false;clearBanState();stopBanWatch();
+ S=defaultSave();profile={avatar:"",avatarImg:"",banner:"",bannerGif:""};
+ try{localStorage.removeItem("animeclash.save.v1");}catch(e){}
+ showAuthGate();
+}
+function refreshRole(){
+ if(!fbDb||!fbUser){myRole="player";return;}
+ fbDb.collection("config").doc("owner").get().then(function(doc){
+  ownerInfo=doc.exists?doc.data():null;ownerLoaded=true;
+  return fbDb.collection("config").doc("admins").get();
+ }).then(function(doc){
+  var d=doc.exists?doc.data():{};
+  adminUids=d.uids||[];
+  adminPermsByUid=d.perms||{};
+  myRole=ownerInfo&&ownerInfo.ownerUid===fbUser.uid?"owner":(adminUids.indexOf(fbUser.uid)>-1?"admin":"player");
+  renderRolePanel();renderHud();renderLeaderboard();
+ }).catch(function(){ownerLoaded=true;renderRolePanel();});
+}
+function roleOfUid(uid,role){if(ownerInfo&&ownerInfo.ownerUid===uid)return "owner";return role||"player";}
+function roleTag(role,p){
+ var t=(p&&p.customTitle)||"";
+ var tag="";
+ if(t)tag='<span class="title-tag">✨ '+esc(t)+'</span>';
+ if(role==="owner")return '<span class="role-tag tag-owner">👑 OWNER</span>'+tag;
+ if(role==="admin")return '<span class="role-tag tag-admin">🛡️ ADMIN</span>'+tag;
+ return tag;
+}
+function displayName(){if(!S)return "Player";return (S&&S.name)||"Player";}
+function adminPermsFor(uid){return adminPermsByUid[uid]||{};}
+function canAdmin(perm){
+ if(myRole==="owner")return true;
+ if(myRole!=="admin")return false;
+ return !!adminPermsFor(fbUser.uid)[perm];
+}
+
+/* ===== js_20_units.js ===== */
+/* ================= Anime Clash — 100-character roster =================
+   The user's own table, verbatim names / series / abilities / forms.
+   Each entry: [id, name, series, icon, color, rarity, role, splash?, signature ability, forms[]]
+   Roles: melee | assassin | ranged | flying | tank | healer.
+   STATS ARE DERIVED BY FORMULA (see unitStats below) — one documented
+   formula by rarity tier + role, not 100 hand-tuned stat blocks.
+   Rarity tiers: Common / Rare / Epic / Legendary / Mythic.
+   Elixir cost: rarity base (2/3/4/6/8) +1 flying +1 tank, capped at 10.
+   ICONS are emoji + colour only — no official anime art, no screenshots. */
+var ROSTER=[
+["goku","Son Goku","Dragon Ball","🔥","#ff7a1a","legendary","melee",0,"Ki manipulation, Kamehameha, Instant Transmission",["Super Saiyan","Super Saiyan 2","Super Saiyan 3","Super Saiyan God","Super Saiyan Blue","Ultra Instinct Sign","Mastered Ultra Instinct"]],
+["vegeta","Vegeta","Dragon Ball","💥","#7c3aed","legendary","melee",0,"Ki blasts, Galick Gun, Final Flash, Hakai energy",["Super Saiyan","Super Saiyan 2","Super Saiyan God","Super Saiyan Blue","Super Saiyan Blue Evolution","Ultra Ego"]],
+["gohan","Gohan","Dragon Ball","📖","#f59e0b","epic","melee",0,"Latent Ki explosions, Masenko, Special Beam Cannon",["Super Saiyan","Super Saiyan 2","Potential Unleashed (Mystic)","Gohan Beast"]],
+["frieza","Frieza","Dragon Ball","❄️","#a78bfa","epic","ranged",0,"Death Beam, Telekinesis, Supernova, Planetary survival",["1st Form","2nd Form","3rd Form","4th Form","100% Full Power","Golden Frieza","Black Frieza"]],
+["naruto","Naruto Uzumaki","Naruto","🍥","#f97316","legendary","melee",0,"Shadow Clones, Rasengan, Wind Release, Tailed Beast Chakra",["Sage Mode","Nine-Tails Chakra Mode","Six Paths Sage Mode","Baryon Mode"]],
+["sasuke","Sasuke Uchiha","Naruto","👁️","#6366f1","epic","assassin",0,"Sharingan, Rinnegan, Chidori, Amaterasu, Susanoo",["Curse Mark Stage 1","Curse Mark Stage 2","Mangekyō Sharingan","Six Paths Rinnegan"]],
+["madara","Madara Uchiha","Naruto","🌋","#dc2626","legendary","ranged",1,"Fire Style, Wood Release, Limbo clones, Meteor summoning",["Eternal Mangekyō Sharingan","Rinnegan","Ten-Tails Jinchūriki"]],
+["luffy","Monkey D. Luffy","One Piece","🍖","#ef4444","legendary","melee",0,"Rubber body, all three Haki types, reality-bending elasticity",["Gear 2","Gear 3","Gear 4 Boundman","Gear 4 Snakeman","Gear 4 Tankman","Gear 5"]],
+["zoro","Roronoa Zoro","One Piece","⚔️","#22c55e","epic","melee",0,"Three-Sword Style, Observation/Armament/Conqueror's Haki",["Asura (Nine-Sword Style)","King of Hell Mode"]],
+["kaido","Kaido","One Piece","🐉","#0ea5e9","legendary","flying",1,"Mythical Zoan Dragon powers, elemental breaths, advanced Haki",["Human Form","Hybrid Form","Azure Dragon Form","Flaming Drum Dragon"]],
+["ichigo","Ichigo Kurosaki","Bleach","🗡️","#f97316","legendary","melee",0,"Getsuga Tenshō, spiritual pressure, Hollow/Quincy hybrid powers",["Shikai","Bankai (Tensa Zangetsu)","Hollow Mask","Vasto Lorde","Mugetsu","Horn of Salvation"]],
+["aizen","Sosuke Aizen","Bleach","👓","#8b5cf6","legendary","ranged",0,"Kyōka Suigetsu (Complete Hypnosis), master Kido",["Shinigami Form","Hōgyoku Chrysalis","Butterfly Form","Monster Form","Muken Seal"]],
+["yhwach","Yhwach","Bleach","👑","#eab308","mythic","ranged",0,"The Almighty (future sight & alteration), soul distribution",["Base Quincy King","Soul King Absorbed Form"]],
+["gon","Gon Freecss","Hunter × Hunter","🎣","#84cc16","rare","assassin",0,"Nen (Enhancer), Jajanken (Rock, Paper, Scissors)",["Base","Adult Gon (Vow-induced peak potential)"]],
+["killua","Killua Zoldyck","Hunter × Hunter","⚡","#38bdf8","epic","assassin",0,"Nen (Transmuter), electricity generation, assassin techniques",["Base","Godspeed (Whirlwind & Speed of Lightning)"]],
+["netero","Netero","Hunter × Hunter","🙏","#f59e0b","rare","melee",0,"Nen (Enhancer/Emitter), supersonic prayer strikes",["Base","100-Type Guanyin Bodhisattva (Zero Hand)"]],
+["meruem","Meruem","Hunter × Hunter","🐜","#a855f7","epic","tank",0,"Nen synthesis (absorbs aura by eating), genius intellect",["Base","Post-Rose Meruem (Photon aura, wings, Rage Blast)"]],
+["gojo","Satoru Gojo","Jujutsu Kaisen","🕶️","#60a5fa","legendary","ranged",0,"Limitless (Infinity, Blue, Red, Purple), Six Eyes, Domain Expansion",["Base (Blindfolded)","Unmasked Six Eyes","Awakened Honored One"]],
+["sukuna","Ryomen Sukuna","Jujutsu Kaisen","😈","#f43f5e","legendary","ranged",1,"Dismantle, Cleave, Malevolent Shrine, Fire Arrow, Reverse Cursed Technique",["Finger-Bearer Vessel (Yuji/Megumi)","True Heian Era Form"]],
+["yuji","Yuji Itadori","Jujutsu Kaisen","👊","#fb923c","epic","melee",0,"Superhuman strength, Divergent Fist, Black Flash, Blood Manipulation, Shrine",["Base","Sukuna-Possessed","Awakened Cursed Womb Vessel"]],
+["megumi","Megumi Fushiguro","Jujutsu Kaisen","🐺","#34d399","rare","ranged",0,"Ten Shadows Technique (Shikigami summoning), shadow manipulation",["Base","Incomplete Domain (Chimera Shadow Garden)","Sukuna Vessel"]],
+["midoriya","Izuku Midoriya","My Hero Academia","💚","#22c55e","epic","melee",0,"One For All (super strength, Blackwhip, Float, Danger Sense, Fa Jin, Gearshift)",["Full Cowl 5%–100%","Infinite 100%","Dark Deku","Overlay"]],
+["bakugo","Katsuki Bakugo","My Hero Academia","💣","#f97316","rare","ranged",0,"Explosion (nitroglycerin sweat ignition), aerial mobility",["Base","Full Body Cluster Awakening"]],
+["todoroki","Shoto Todoroki","My Hero Academia","🔥","#38bdf8","rare","ranged",0,"Half-Cold Half-Hot (cryokinesis & pyrokinesis)",["Base","Phosphor (Cold-Fire synthesis)"]],
+["allmight","All Might","My Hero Academia","💪","#facc15","epic","tank",0,"One For All (weather-changing punches, extreme speed)",["True Emaciated Form","Muscle Form"]],
+["shigaraki","Tomura Shigaraki","My Hero Academia","🖐️","#a78bfa","rare","melee",0,"Decay (disintegration), All For One quirk stockpile, super regeneration",["Base","Awakened Decay","AFO-Enhanced Apex Body"]],
+["tanjiro","Tanjiro Kamado","Demon Slayer","🌊","#38bdf8","epic","melee",0,"Water Breathing, Sun Breathing (Hinokami Kagura), Transparent World",["Base","Demon Slayer Mark","Demon King Tanjiro"]],
+["nezuko","Nezuko Kamado","Demon Slayer","🎋","#f472b6","rare","melee",0,"Blood Demon Art (Exploding Blood), size manipulation, sunlight immunity",["Human","Base Demon","Awakened Berserk Form"]],
+["zenitsu","Zenitsu Agatsuma","Demon Slayer","⚡","#facc15","common","assassin",0,"Thunder Breathing (First Form mastery & Seventh Form creation)",["Awake (Cowardly)","Unconscious Sleep-Fighting State"]],
+["muzan","Muzan Kibutsuji","Demon Slayer","🌙","#c084fc","epic","tank",1,"Biokinesis, flesh whips, demon creation, instant regeneration",["Disguised Forms (Child/Woman/Man)","True White-Haired Combat Form","Giant Baby Form"]],
+["eren","Eren Yeager","Attack on Titan","🗡️","#a3e635","epic","melee",0,"Titan shifting, hardening, Coordinate (Founding Titan control), future memories",["Human","Attack Titan","Warhammer Hybrid","Doomsday Founding Titan"]],
+["levi","Levi Ackerman","Attack on Titan","🔪","#94a3b8","epic","assassin",0,"ODM Gear mastery, Ackerman awakened combat instinct",["Base","Awakened Ackerman Bloodline"]],
+["reiner","Reiner Braun","Attack on Titan","🛡️","#d97706","rare","tank",0,"Titan shifting, full-body hardened armor plates",["Human","Armored Titan","Partially Armored Sprint Form"]],
+["saitama","Saitama","One Punch Man","👊","#facc15","legendary","melee",0,"Limitless physical strength, speed, and durability (Serious Series)",["Casual Mode","Serious Mode"]],
+["genos","Genos","One Punch Man","🤖","#f97316","epic","ranged",0,"Cybernetic incinerators, rocket boosters, core overdrive",["Standard Cyborg","G4 Upgrade","Elder Centipede Upgrade","Ten-Second Mode"]],
+["garou","Garou","One Punch Man","🐺","#ef4444","epic","melee",0,"Water Stream Rock Smashing Fist, reactive evolution",["Human","Half-Monster","Spiral Garou","Monster Garou","Cosmic Fear Mode"]],
+["tatsumaki","Tatsumaki","One Punch Man","🌪️","#22c55e","epic","ranged",1,"Telekinesis, psychic barriers, meteor summoning",["Base","Full-Power Psychic Aura"]],
+["mob","Shigeo Kageyama (Mob)","Mob Psycho 100","💯","#a78bfa","epic","ranged",0,"Telekinesis, psychic energy absorption, astral projection",["Base","100% Emotional States (Rage, Sadness, Courage)","???%"]],
+["denji","Denji","Chainsaw Man","🪚","#f97316","epic","melee",0,"Chainsaw manifestation, blood-fueled regeneration, concept erasure",["Human","Chainsaw Man Hybrid","True Chainsaw Devil (Hero of Hell)"]],
+["makima","Makima","Chainsaw Man","🐕","#f472b6","epic","ranged",0,"Domination over lesser beings, force manipulation, contract immortality",["Humanoid Control Devil"]],
+["power","Power","Chainsaw Man","🩸","#ef4444","rare","melee",0,"Blood manipulation (weapon creation, clotting)",["Blood Fiend","True Blood Devil Form"]],
+["asta","Asta","Black Clover","⚔️","#22c55e","epic","melee",0,"Anti-Magic swords, Ki sensing, magic nullification",["Base","Black Asta","Devil Union","True Devil Union (Zetten)"]],
+["yuno","Yuno Grinberryall","Black Clover","🌟","#facc15","epic","flying",0,"Wind Magic, Star Magic, Mana Zone",["Base","Spirit Dive","Saint Stage","Never-Never Land"]],
+["natsu","Natsu Dragneel","Fairy Tail","🔥","#f97316","epic","melee",1,"Fire Dragon Slayer Magic, Lightning/Fire Dragon modes",["Base","Dragon Force","Lightning Fire Dragon Mode","E.N.D."]],
+["erza","Erza Scarlet","Fairy Tail","🗡️","#ef4444","epic","melee",0,"Requip Magic (weapon and armor summoning)",["Heart Kreuz","Heaven's Wheel","Black Wing","Clear Heart Clothing"]],
+["gray","Gray Fullbuster","Fairy Tail","❄️","#38bdf8","rare","ranged",0,"Ice-Make Magic, Ice Devil Slayer Magic",["Base","Half-Devil Ice Slayer Form"]],
+["edward","Edward Elric","Fullmetal Alchemist","🔧","#facc15","rare","melee",0,"Circle-less Alchemy (transmutation), automail combat",["Base (Clap Alchemy)"]],
+["roy","Roy Mustang","Fullmetal Alchemist","🔥","#3b82f6","common","ranged",0,"Flame Alchemy (spark gloves & oxygen manipulation)",["Base"]],
+["father","Father","Fullmetal Alchemist","👁️","#a78bfa","rare","ranged",0,"Philosopher's Stone alchemy, nuclear fusion, Truth absorption",["Homunculus Flask","Van Hohenheim Vessel","God-Absorbed Form"]],
+["jotaro","Jotaro Kujo","JoJo's Bizarre Adventure","⭐","#6366f1","epic","melee",0,"Star Platinum (super speed, precision, Star Finger, Time Stop)",["Base","Star Platinum: The World"]],
+["dio","DIO","JoJo's Bizarre Adventure","🧛","#f43f5e","epic","melee",0,"Vampirism, Space Ripper Stingy Eyes, The World (Time Stop)",["Human","Vampire (Part 1)","Stand User (Part 3)","High DIO"]],
+["giorno","Giorno Giovanna","JoJo's Bizarre Adventure","🌸","#facc15","epic","melee",0,"Gold Experience (life creation, sensory overload)",["Base","Gold Experience Requiem (Return to Zero)"]],
+["josuke","Josuke Higashikata","JoJo's Bizarre Adventure","💎","#38bdf8","common","melee",0,"Crazy Diamond (matter restoration and reshaping)",["Base"]],
+["light","Light Yagami","Death Note","📓","#94a3b8","common","ranged",0,"Death Note (kills anyone whose name and face are known), genius intellect",["Base","Kira (Shinigami Eyes declined)"]],
+["lelouch","Lelouch vi Britannia","Code Geass","👁️","#a78bfa","common","ranged",0,"Geass of Absolute Obedience (one-time command via eye contact)",["Student","Zero (Masked Vigilante)","Emperor of Britannia"]],
+["kaneki","Kaneki Ken","Tokyo Ghoul","🎭","#f43f5e","epic","melee",0,"Rinkaku Kagune (tentacles), super regeneration, martial arts",["Human","One-Eyed Ghoul","Centipede Kakuja","Black Reaper","Dragon"]],
+["alucard","Alucard","Hellsing","🦇","#dc2626","rare","melee",0,"Vampirism, intangibility, shadow familiars, soul army, omnipresence",["Restraint Levels 6–1","Level 0 Release","Schrödinger-Absorbed"]],
+["jinwoo","Sung Jin-Woo","Solo Leveling","🌑","#7c3aed","legendary","melee",0,"Shadow Extraction (necromancy), Monarch's Domain, Ruler's Authority",["E-Rank Hunter","Shadow Monarch","Astralization (Spiritual Body)"]],
+["rimuru","Rimuru Tempest","That Time I Got Reincarnated as a Slime","💧","#38bdf8","mythic","flying",1,"Predator/Gluttony, Great Sage/Raphael/Ciel, skill mimicry, Void God Azathoth",["Slime","Human Mimic","Demon Lord","True Dragon (Ultimate Slime)"]],
+["anos","Anos Voldigoad","The Misfit of Demon King Academy","👑","#eab308","mythic","flying",1,"Magic Eyes of Destruction, Venuzdonoa (logic-destroying sword)",["Reincarnated Youth","True Demon King of Tyranny"]],
+["ainz","Ainz Ooal Gown","Overlord","💀","#a78bfa","legendary","ranged",0,"Super-Tier Necromancy, instant death magic, world-class items",["Overlord Undead (Momonga)","Momon (Warrior Disguise)"]],
+["naofumi","Naofumi Iwatani","The Rising of the Shield Hero","🛡️","#22c55e","rare","tank",0,"Cardinal Shield transformations, counter-shields, support magic",["Base Shield","Curse Series (Wrath Shield)","Blessed Series"]],
+["kirito","Kirito","Sword Art Online","🗡️","#1f2937","rare","melee",0,"Dual Blades, sword skills, Incarnation (willpower reality bending)",["Black Swordsman","Spriggan","Star King"]],
+["shinra","Shinra Kusakabe","Fire Force","🔥","#f97316","rare","melee",0,"Third Generation Pyrokinesis (rocket feet), Adolla Burst (light speed)",["Base","Corna","Shinrabanshoman (God fusion)"]],
+["arthur","Arthur Boyle","Fire Force","⚔️","#facc15","common","melee",0,"Plasma sword (Excalibur), delusion-powered strength scaling",["Base","Star Ring Knight King"]],
+["benimaru","Benimaru Shinmon","Fire Force","🔥","#ef4444","rare","melee",0,"Hybrid 2nd/3rd Gen Pyrokinesis (heat control & flame generation)",["Base","Crimson Moon Form"]],
+["maka","Maka Albarn","Soul Eater","📖","#22c55e","common","melee",0,"Scythe Meister, soul perception, Anti-Demon Wavelength",["Base","Witch-Hunter Resonance","Grigori Soul Flight","Black Blood Dress"]],
+["kid","Death the Kid","Soul Eater","🔫","#facc15","common","ranged",0,"Dual-pistol resonance, Shinigami soul wavelength",["Base","Lines of Sanzu Connected (True Shinigami)"]],
+["yusuke","Yusuke Urameshi","Yu Yu Hakusho","🔫","#22c55e","rare","ranged",0,"Spirit Gun, Spirit Wave, demon energy",["Human Spirit Detective","Mazoku (Awakened Demon Form)"]],
+["hiei","Hiei","Yu Yu Hakusho","🔥","#dc2626","rare","assassin",0,"Dragon of the Darkness Flame, swordsmanship, Jagan Eye",["Base","Jaganshi (Third Eye)","Dragon-Absorbed State"]],
+["kurama","Kurama","Yu Yu Hakusho","🌹","#f472b6","rare","ranged",0,"Plant manipulation, Rose Whip, demon realm flora summoning",["Shuichi Minamino (Human)","Yoko Kurama (Silver Fox Demon)"]],
+["inuyasha","Inuyasha","Inuyasha","🐺","#cbd5e1","rare","melee",0,"Tetsusaiga (Wind Scar, Backlash Wave, Meido Zangetsuha), Iron Reaver",["Half-Demon","Human (New Moon)","Full Demon Berserk Mode"]],
+["sesshomaru","Sesshomaru","Inuyasha","🐺","#e2e8f0","rare","melee",0,"Bakusaiga (decomposition waves), Tenseiga, poison claws",["Humanoid Form","True Giant Dog Demon Form"]],
+["kenshin","Kenshin Himura","Rurouni Kenshin","⚔️","#ef4444","rare","melee",0,"Hiten Mitsurugi-ryū (god-like sword speed), reverse-blade mastery",["Rurouni (Wanderer)","Hitokiri Battōsai (Assassin Mindset)"]],
+["gintoki","Gintoki Sakata","Gintama","🍬","#cbd5e1","rare","melee",0,"Master swordsman, superhuman durability, parody fourth-wall breaks",["Lazy Odd-Jobs Samurai","Shiroyasha (White Yaksha)"]],
+["usagi","Usagi Tsukino","Sailor Moon","🌙","#f472b6","rare","ranged",0,"Silver Crystal magic, Moon Healing Escalation, cosmic restoration",["Sailor Moon","Super Sailor Moon","Eternal Sailor Moon","Sailor Cosmos"]],
+["sakura","Sakura Kinomoto","Cardcaptor Sakura","🌸","#f9a8d4","common","ranged",0,"Clow/Sakura Card magic (elemental, spatial, and temporal spells)",["Base","Star Wand Master"]],
+["madoka","Madoka Kaname","Puella Magi Madoka Magica","🎀","#f472b6","rare","ranged",0,"Magical bow, purification, universal witch erasure",["Magical Girl","Ultimate Madoka (Law of Cycles Goddess)"]],
+["homura","Homura Akemi","Puella Magi Madoka Magica","⏳","#a78bfa","rare","ranged",0,"Time stop & time loop shield, firearms mastery, memory manipulation",["Glasses Homura","Cool Homura","Akuma Homura (Devil)"]],
+["simon","Simon","Gurren Lagann","🌀","#22c55e","legendary","flying",0,"Spiral Power (evolutionary energy), mecha piloting",["Base","Gurren Lagann","Tengen Toppa Gurren Lagann","Super Tengen Toppa"]],
+["shinji","Shinji Ikari","Neon Genesis Evangelion","🤖","#a78bfa","legendary","flying",0,"Evangelion Unit-01 synchronization, AT Field generation",["Base Pilot","Berserk Eva-01","Pseudo-Evolved Awakened Form"]],
+["guts","Guts","Berserk","🗡️","#1f2937","rare","melee",0,"Dragonslayer swordsmanship, prosthetic cannon arm, pain tolerance",["Black Swordsman","Berserker Armor (Beast of Darkness)"]],
+["griffith","Griffith","Berserk","🕊️","#e2e8f0","rare","melee",0,"Master tactician, swordsmanship, causality & spatial manipulation",["White Hawk (Human)","Femto (God Hand Member)"]],
+["vash","Vash the Stampede","Trigun","🌻","#facc15","rare","ranged",0,"Plant physiology, Angel Arm (city-leveling energy cannon), gunmanship",["Humanoid Plant","Angel Arm Activated"]],
+["seiya","Pegasus Seiya","Saint Seiya","⭐","#f97316","rare","melee",0,"Cosmo energy, Pegasus Meteor Fist, miracle scaling",["Bronze Cloth","Gold Sagittarius Cloth","God Cloth"]],
+["kenshiro","Kenshiro","Fist of the North Star","👊","#facc15","rare","melee",0,"Hokuto Shinken (pressure point detonation), Musō Tensei (intangibility)",["Base","Musō Tensei Awakened"]],
+["meliodas","Meliodas","The Seven Deadly Sins","😈","#22c55e","legendary","melee",0,"Full Counter (reflects magic), Hellblaze, Commandment of Love",["Base","Demon Mark","Assault Mode","Demon King Form"]],
+["escanor","Escanor","The Seven Deadly Sins","☀️","#facc15","rare","tank",0,"Sunshine (power scales with the sun's height), Rhitta axe",["Nighttime Frail Form","Daytime Buff Form","The One","The One Ultimate"]],
+["ban","Ban","The Seven Deadly Sins","🦊","#38bdf8","rare","melee",0,"Snatch (steals physical strength/objects), Purgatory-hardened body",["Immortal Bandit","Post-Purgatory Mortal Peak"]],
+["frieren","Frieren","Frieren: Beyond Journey's End","🧝","#c084fc","rare","healer",0,"Mana suppression, Zoltraak, defensive magic, millennium of spell mastery",["Suppressed Mana Form","Unrestricted Mana Aura"]],
+["fern","Fern","Frieren: Beyond Journey's End","🔮","#a78bfa","common","ranged",0,"Rapid-fire Zoltraak, complete mana concealment",["Base"]],
+["stark","Stark","Frieren: Beyond Journey's End","🪓","#f97316","common","tank",0,"Superhuman physical durability, Lightning Strike axe technique",["Base"]],
+["kafka","Kafka Hibino","Kaiju No. 8","🐛","#38bdf8","rare","melee",0,"Kaiju physiology, sonic punches, core regeneration",["Human","Kaiju No. 8 Form","Berserk Core Overdrive"]],
+["momo","Momo Ayase","Dandadan","✋","#f472b6","common","ranged",0,"Psychokinesis (aura hands), spiritual energy suppression",["Base","Awakened Psychic Aura"]],
+["okarun","Ken Takakura (Okarun)","Dandadan","👻","#a78bfa","common","assassin",0,"Turbo Granny's curse (supersonic speed, rhythmic dashes)",["Human","Turbo Granny Transformed Form"]],
+["mash","Mash Burnedead","Mashle: Magic and Muscles","💪","#facc15","rare","melee",0,"Pure physical muscle magic (flight via kicks, spell-slapping)",["Base","Unlimited Physical Mode"]],
+["tanya","Tanya Degurechaff","The Saga of Tanya the Evil","🎖️","#facc15","common","ranged",0,"Aerial Computation Orb magic, explosive artillery spells",["Base Mage","Type 95 Prayer-Boosted Mode"]],
+["korosensei","Koro-sensei","Assassination Classroom","🐙","#facc15","rare","melee",0,"Mach 20 speed, tentacle regeneration, energy blast",["Base Yellow Octopus","Absolute Defense Sphere"]],
+["zeno","Zeno","Dragon Ball Super","👶","#eab308","mythic","ranged",0,"Erase (instant deletion of timelines, universes, and immortals)",["Base (Omni-King)"]],
+["kumagawa","Misogi Kumagawa","Medaka Box","📖","#1f2937","mythic","ranged",0,"All Fiction (erases concepts, death, and reality from existence), Book Maker",["Base","All Fiction: April Fiction"]]
+];
+var UNIT_BY_ID={};
+var SERIES_LIST=[];
+var RARITY_ORDER={common:0,rare:1,epic:2,legendary:3,mythic:4};
+var RARITY_BASE={common:{hp:500,dmg:90},rare:{hp:750,dmg:120},epic:{hp:1100,dmg:160},legendary:{hp:1500,dmg:220},mythic:{hp:2000,dmg:300}};
+var RARITY_COST={common:2,rare:3,epic:4,legendary:6,mythic:8};
+var SHOP_PRICE={common:{coins:300,gems:0},rare:{coins:600,gems:0},epic:{coins:1200,gems:0},legendary:{coins:0,gems:120},mythic:{coins:0,gems:300}};
+var STARTER_UNITS=["roy","josuke","light","lelouch","fern","stark","momo","okarun"];
+function elixirCost(def){
+ var c=RARITY_COST[def.rarity]||3;
+ if(def.role==="flying")c+=1;
+ if(def.role==="tank")c+=1;
+ return Math.min(10,c);
+}
+var UNITS=ROSTER.map(function(r){
+ var u={id:r[0],name:r[1],series:r[2],icon:r[3],color:r[4],rarity:r[5],role:r[6],splash:!!r[7],ability:r[8],forms:r[9]};
+ u.cost=elixirCost(u);
+ return u;
+});
+UNITS.forEach(function(u){UNIT_BY_ID[u.id]=u;});
+UNITS.forEach(function(u){if(SERIES_LIST.indexOf(u.series)<0)SERIES_LIST.push(u.series);});
+function unitStats(def,level){
+ var base=RARITY_BASE[def.rarity]||RARITY_BASE.common;
+ var hp=base.hp,dmg=base.dmg,speed=44,range=18,rate=1.0,target="ground",heal=0;
+ if(def.role==="assassin"){hp*=0.7;dmg*=1.15;speed=76;range=16;rate=0.7;}
+ else if(def.role==="ranged"){hp*=0.75;dmg*=1.15;speed=40;range=105;rate=1.2;target="both";}
+ else if(def.role==="flying"){hp*=0.9;dmg*=1.0;speed=55;range=50;rate=1.3;target="both";}
+ else if(def.role==="tank"){hp*=1.9;dmg*=0.6;speed=24;range=18;rate=1.3;}
+ else if(def.role==="healer"){hp*=0.8;speed=36;range=0;rate=1.0;heal=65;}
+ var s=1+0.08*((level||1)-1);
+ return {hp:Math.round(hp*s),dmg:Math.round(dmg*s),heal:heal?Math.round(heal*s):0,
+  speed:speed,range:range,rate:rate,target:target,cost:elixirCost(def)};
+}
+function topForm(def){
+ var f=def.forms||[];
+ if(!f.length)return "Full Power";
+ var last=f[f.length-1];
+ if(last==="Base"||last==="Base (Omni-King)")return "Full Power";
+ return last;
+}
+function ownedUnits(){return (S&&S.deck)||[];}
+function ownsUnit(id){return !!(S&&S.units&&S.units[id]);}
+function unitLevel(id){return (S&&S.units&&S.units[id]&&S.units[id].level)||1;}
+function upgradeCost(id){
+ var lvl=unitLevel(id);
+ var mult={common:1,rare:1.5,epic:2,legendary:3,mythic:5}[UNIT_BY_ID[id].rarity]||1;
+ return Math.round(100*lvl*mult);
+}
+function buyUnit(id){
+ var def=UNIT_BY_ID[id];
+ if(!def){toast("That unit doesn't exist.");return false;}
+ if(ownsUnit(id)){toast("You already own "+def.name+".");return false;}
+ var price=SHOP_PRICE[def.rarity]||{coins:500,gems:0};
+ if(price.coins>0&&S.coins<price.coins){sndErr();toast("Not enough coins — you need "+price.coins+" 🪙.");return false;}
+ if(price.gems>0&&S.gems<price.gems){sndErr();toast("Not enough gems — you need "+price.gems+" 💎.");return false;}
+ S.coins-=price.coins;S.gems-=price.gems;
+ if(!S.units)S.units={};
+ S.units[id]={level:1};
+ sndBuy();saveCloud();renderShop();renderUnits();renderHud();
+ toast("🃏 "+def.name+" joined your collection! Add them to your deck in Units.");
+ return true;
+}
+function upgradeUnit(id){
+ var def=UNIT_BY_ID[id];
+ if(!def||!ownsUnit(id))return false;
+ var lvl=unitLevel(id);
+ if(lvl>=10){toast(def.name+" is already max level (10).");return false;}
+ var cost=upgradeCost(id);
+ if(S.coins<cost){sndErr();toast("Not enough coins — level "+(lvl+1)+" costs "+cost+" 🪙.");return false;}
+ S.coins-=cost;S.units[id].level=lvl+1;
+ sndBuy();saveCloud();renderUnits();renderHud();
+ toast("⬆️ "+def.name+" is now level "+(lvl+1)+"! (+8% HP & damage)");
+ return true;
+}
+/* Deck: 8 cards, chosen from owned units. */
+var DECK_MAX=8,DECK_MIN=4;
+function deckHas(id){return (S.deck||[]).indexOf(id)>-1;}
+function toggleDeck(id){
+ if(!ownsUnit(id))return false;
+ var d=S.deck||[];
+ var i=d.indexOf(id);
+ if(i>-1){
+  if(d.length<=DECK_MIN){toast("Your deck needs at least "+DECK_MIN+" units.");return false;}
+  d.splice(i,1);
+ }else{
+  if(d.length>=DECK_MAX){toast("Your deck is full (8) — remove someone first.");return false;}
+  d.push(id);
+ }
+ saveCloud();renderUnits();renderHud();
+ return true;
+}
+function randomDeck(n){
+ var ids=UNITS.map(function(u){return u.id;});
+ shuffle(ids);
+ return ids.slice(0,n||8);
+}
+function grantUnitTo(targetUid,unitId){
+ if(!fbDb||!fbUser)return Promise.reject(new Error("no-fb"));
+ var def=UNIT_BY_ID[unitId];
+ if(!def)return Promise.reject(new Error("bad-unit"));
+ return fbDb.collection("users").doc(targetUid).get().then(function(doc){
+  if(!doc.exists)throw new Error("no-player");
+  var d=doc.data();
+  var units=d.units||{};
+  units[unitId]={level:(units[unitId]&&units[unitId].level)||1};
+  return fbDb.collection("users").doc(targetUid).update({units:units});
+ });
+}
+
+/* ===== js_30_battle.js ===== */
+/* ================= Anime Clash — battle engine =================
+   Arena 360x560 (game units). River at y=280, bridges at x=90 and x=270.
+   Player ("mine") defends the bottom (y>280), enemy the top.
+   Sim runs at 10 Hz (100 ms ticks). The host runs the sim in PvP; the
+   guest only renders host snapshots and sends spawn commands. */
+var ARENA={w:360,h:560,riverY:280,bridges:[90,270]};
+var TOWER_DEFS={
+ mineKing:{x:180,y:525,hp:2400,king:true},mineL:{x:70,y:425,hp:1400},mineR:{x:290,y:425,hp:1400},
+ enemyKing:{x:180,y:35,hp:2400,king:true},enemyL:{x:70,y:135,hp:1400},enemyR:{x:290,y:135,hp:1400}
+};
+var BATTLE_TIME=180,OVERTIME_TIME=60;
+var ELIXIR_REGEN=1/2.8,ELIXIR_REGEN_DOUBLE=1/1.4,ELIXIR_MAX=10;
+var TOWER_RANGE=100,TOWER_DMG=60,TOWER_RATE=1.0;
+var battle=null; /* active battle object (host/bot) or null */
+var battleInterval=null;
+var remoteBattle=null; /* guest-side: last host snapshot */
+var mqClient=null,mqTopic=null,mqConnected=false,lastGuestSeen=0,lastSnapSeen=0;
+
+function towerState(){
+ var t={};
+ Object.keys(TOWER_DEFS).forEach(function(k){
+  t[k]={x:TOWER_DEFS[k].x,y:TOWER_DEFS[k].y,hp:TOWER_DEFS[k].hp,max:TOWER_DEFS[k].hp,king:!!TOWER_DEFS[k].king,dead:false,cd:0};
+ });
+ return t;
+}
+function newBattleState(opts){
+ opts=opts||{};
+ var myDeck=(opts.myDeck||[]).slice();
+ var enDeck=(opts.enemyDeck||[]).slice();
+ if(!myDeck.length)myDeck=STARTER_UNITS.slice();
+ if(!enDeck.length)enDeck=STARTER_UNITS.slice();
+ return {
+  mode:opts.mode||"bot",mySide:"mine",enemyName:opts.enemyName||"Bot Sensei",
+  tick:0,timeLeft:BATTLE_TIME,overtime:false,overTimeLeft:0,otStartDown:null,
+  elixir:{mine:5,enemy:5},
+  decks:{mine:shuffle(myDeck.slice()),enemy:shuffle(enDeck.slice())},
+  hands:{mine:[],enemy:[]},
+  units:[],unitSeq:1,
+  towers:towerState(),
+  towersDown:{mine:0,enemy:0},
+  result:null,winner:null,reason:"",
+  aiTimer:2.5,
+  myLevels:opts.myLevels||{},enemyLevels:opts.enemyLevels||{}
+ };
+}
+function drawHand(st,side){
+ var hand=st.hands[side],deck=st.decks[side];
+ while(hand.length<4&&deck.length){
+  hand.push(deck.shift());
+  if(!deck.length){deck=st["deckBase_"+side].slice();shuffle(deck);}
+ }
+}
+function initBattle(st){
+ st["deckBase_mine"]=st.decks.mine.slice();
+ st["deckBase_enemy"]=st.decks.enemy.slice();
+ drawHand(st,"mine");drawHand(st,"enemy");
+}
+function otherSide(s){return s==="mine"?"enemy":"mine";}
+function sideTowers(st,side){
+ return side==="mine"?["mineKing","mineL","mineR"]:["enemyKing","enemyL","enemyR"];
+}
+function towerOf(st,key){return st.towers[key];}
+function canHit(att,def){
+ /* att = attacker UNIT, def = target UNIT (or "tower").
+    Units carry their own target/speed/range from unitStats() — the roster
+    defs do NOT have those fields, so never read them off `def`. */
+ if(def==="tower")return true; /* towers are hit by ground units; flying units hit towers too */
+ if(att.target==="ground")return !def.flying;
+ if(att.target==="air")return !!def.flying;
+ if(att.target==="both")return true;
+ return false;
+}
+function nearestBridgeX(x){return Math.abs(x-90)<Math.abs(x-270)?90:270;}
+function laneTowerKey(st,side,x){
+ /* the side tower on the lane the unit is in; king if both gone is handled by caller */
+ if(x<180)return side==="mine"?"mineL":"enemyL";
+ return side==="mine"?"mineR":"enemyR";
+}
+function findTarget(st,u){
+ var es=otherSide(u.side);
+ var best=null,bestD=1e9;
+ /* nearest enemy unit in sight that this unit can hit */
+ st.units.forEach(function(v){
+  if(v.side===es&&v.hp>0&&canHit(u,v)){
+   var d=Math.hypot(v.x-u.x,v.y-u.y);
+   if(d<240&&d<bestD){bestD=d;best={kind:"unit",ref:v,dist:d};}
+  }
+ });
+ if(best)return best;
+ /* else the lane tower (or king if the lane tower is down) */
+ var tk=laneTowerKey(st,es,u.x);
+ var tw=st.towers[tk];
+ if(tw.dead)tk=es==="mine"?"mineKing":"enemyKing";
+ tw=st.towers[tk];
+ return {kind:"tower",ref:tw,key:tk,dist:Math.hypot(tw.x-u.x,tw.y-u.y)};
+}
+function deployCard(st,side,handIdx,x,y){
+ if(st.result)return{ok:false,why:"battle over"};
+ var hand=st.hands[side];
+ if(handIdx<0||handIdx>=hand.length)return{ok:false,why:"no card there"};
+ var defId=hand[handIdx],def=UNIT_BY_ID[defId];
+ if(!def)return{ok:false,why:"bad card"};
+ if(st.elixir[side]<def.cost)return{ok:false,why:"not enough elixir"};
+ if(side==="mine"&&y<ARENA.riverY+10)return{ok:false,why:"deploy on your half"};
+ if(side==="enemy"&&y>ARENA.riverY-10)return{ok:false,why:"deploy on your half"};
+ x=clamp(x,20,ARENA.w-20);
+ var levels=side==="mine"?st.myLevels:st.enemyLevels;
+ var stats=unitStats(def,levels[defId]||1);
+ st.elixir[side]-=def.cost;
+ hand.splice(handIdx,1);
+ /* cycle: draw the next card from the deck */
+ var deck=st.decks[side];
+ if(deck.length){hand.push(deck.shift());}
+ if(!deck.length){st.decks[side]=st["deckBase_"+side].slice();shuffle(st.decks[side]);hand.push(st.decks[side].shift());}
+ var u={uid:st.unitSeq++,defId:defId,side:side,x:x,y:y,hp:stats.hp,maxHp:stats.hp,cd:0,
+  dmg:stats.dmg,heal:stats.heal||0,speed:stats.speed,range:stats.range,rate:stats.rate,
+  flying:def.role==="flying",splash:!!def.splash,target:stats.target,meter:0,transformed:false,form:""};
+ st.units.push(u);
+ return{ok:true,unit:u};
+}
+function damageUnit(st,u,amount){
+ u.hp-=amount;
+ if(u.hp<=0)u.hp=0;
+}
+function damageTower(st,key,amount){
+ var tw=st.towers[key];
+ if(!tw||tw.dead)return;
+ tw.hp-=amount;
+ if(tw.hp<=0){
+  tw.hp=0;tw.dead=true;
+  var side=key.indexOf("mine")===0?"mine":"enemy";
+  st.towersDown[side]++;
+  if(tw.king){
+   st.result="done";st.winner=otherSide(side);st.reason="king";
+  }else if(st.overtime){
+   st.result="done";st.winner=otherSide(side);st.reason="overtime-tower";
+  }
+ }
+}
+/* ---- FORMS: in-battle transformation ----
+   When a unit's transform meter hits 100 it can transform into its top
+   listed form (e.g. Goku → Mastered Ultra Instinct, Luffy → Gear 5).
+   Transform = ×1.6 HP & damage, +20% speed, and a 150-damage shockwave
+   burst around the unit. Characters whose table entry is just "Base"
+   transform into "Full Power" — never an invented form name. */
+function transformUnit(st,uid){
+ if(st.result)return false;
+ var u=null;
+ st.units.forEach(function(v){if(v.uid===uid)u=v;});
+ if(!u||u.hp<=0||u.transformed||(u.meter||0)<100)return false;
+ var def=UNIT_BY_ID[u.defId];
+ u.transformed=true;u.form=topForm(def);u.meter=0;
+ u.maxHp=Math.round(u.maxHp*1.6);u.hp=Math.min(u.maxHp,Math.round(u.hp*1.6));
+ u.dmg=Math.round(u.dmg*1.6);u.speed=Math.round(u.speed*1.2);
+ st.units.forEach(function(v){
+  if(v.side!==u.side&&v.hp>0&&Math.hypot(v.x-u.x,v.y-u.y)<=60)damageUnit(st,v,150);
+ });
+ return true;
+}
+function myTransformableUnit(st,mySide){
+ var found=null;
+ st.units.forEach(function(u){
+  if(u.side===mySide&&u.hp>0&&!u.transformed&&(u.meter||0)>=100&&!found)found=u;
+ });
+ return found;
+}
+function battleTick(st,dt){
+ if(st.result)return;
+ st.tick++;
+ st.timeLeft-=dt;
+ var dbl=st.overtime||st.timeLeft<=60;
+ var regen=dbl?ELIXIR_REGEN_DOUBLE:ELIXIR_REGEN;
+ st.elixir.mine=Math.min(ELIXIR_MAX,st.elixir.mine+regen*dt);
+ st.elixir.enemy=Math.min(ELIXIR_MAX,st.elixir.enemy+regen*dt);
+ /* --- bot AI --- */
+ if(st.mode==="bot"&&!st.result){
+  st.aiTimer-=dt;
+  if(st.aiTimer<=0){
+   st.aiTimer=rand(3.0,5.5);
+   var hand=st.hands.enemy;
+   var affordable=[];
+   hand.forEach(function(id,i){if(UNIT_BY_ID[id].cost<=st.elixir.enemy)affordable.push(i);});
+   if(affordable.length){
+    var idx=pick(affordable);
+    var lane=pick([90,270]);
+    deployCard(st,"enemy",idx,clamp(lane+rand(-30,30),30,330),rand(50,230));
+   }
+  }
+  /* bot transforms when a unit's meter is full */
+  st.units.forEach(function(u){
+   if(u.side==="enemy"&&!u.transformed&&u.meter>=100&&Math.random()<0.02)transformUnit(st,u.uid);
+  });
+ }
+ /* --- units act --- */
+ var units=st.units.slice();
+ units.forEach(function(u){
+  if(u.hp<=0)return;
+  u.cd-=dt;
+  /* transform meter: fills over time + on dealing damage */
+  if(!u.transformed)u.meter=Math.min(100,(u.meter||0)+dt*1.0);
+  if(u.heal){
+   /* healer: mend allies in range, no attack */
+   st.units.forEach(function(a){
+    if(a.side===u.side&&a.hp>0&&a.hp<a.maxHp&&Math.hypot(a.x-u.x,a.y-u.y)<=60){
+     a.hp=Math.min(a.maxHp,a.hp+u.heal*dt);
+    }
+   });
+   /* drift toward the nearest ally cluster (stay behind the fight) */
+   var ally=null,ad=1e9;
+   st.units.forEach(function(a){
+    if(a.side===u.side&&a!==u&&a.hp>0){var d=Math.hypot(a.x-u.x,a.y-u.y);if(d<ad){ad=d;ally=a;}}
+   });
+   if(ally&&ad>60){moveToward(u,ally.x,ally.y+20,u.speed,dt);}
+   return;
+  }
+  var tgt=findTarget(st,u);
+  if(!tgt)return;
+  var tx=tgt.kind==="unit"?tgt.ref.x:tgt.ref.x;
+  var ty=tgt.kind==="unit"?tgt.ref.y:tgt.ref.y;
+  var dist=Math.hypot(tx-u.x,ty-u.y);
+  var reach=u.range+(tgt.kind==="tower"?18:14);
+  if(dist<=reach){
+   if(u.cd<=0){
+    u.cd=u.rate;
+    if(!u.transformed)u.meter=Math.min(100,(u.meter||0)+u.dmg*0.05);
+    if(u.splash){
+     var victims=[];
+     if(tgt.kind==="unit")victims.push(tgt.ref);
+     st.units.forEach(function(v){
+      if(v.side!==u.side&&v.hp>0&&Math.hypot(v.x-tx,v.y-ty)<=26)victims.push(v);
+     });
+     victims.forEach(function(v){damageUnit(st,v,u.dmg);});
+     if(tgt.kind==="tower")damageTower(st,tgt.key,u.dmg);
+     else{
+      /* splash also chips a tower standing next to the blast */
+      sideTowers(st,otherSide(u.side)).forEach(function(k){
+       var tw=st.towers[k];
+       if(!tw.dead&&Math.hypot(tw.x-tx,tw.y-ty)<=26)damageTower(st,k,Math.round(u.dmg/2));
+      });
+     }
+    }else if(tgt.kind==="unit"){
+     damageUnit(st,tgt.ref,u.dmg);
+    }else{
+     damageTower(st,tgt.key,u.dmg);
+    }
+   }
+  }else{
+   /* walk: cross the river on a bridge unless flying */
+   var wx=tx,wy=ty;
+   if(!u.flying){
+    var across=(u.side==="mine"&&u.y>ARENA.riverY&&ty<ARENA.riverY)||(u.side==="enemy"&&u.y<ARENA.riverY&&ty>ARENA.riverY);
+    if(across){
+     var bx=nearestBridgeX(u.x);
+     if(Math.abs(u.y-ARENA.riverY)>10||Math.abs(u.x-bx)>14){wx=bx;wy=ARENA.riverY;}
+    }
+   }
+   moveToward(u,wx,wy,u.speed,dt);
+  }
+ });
+ /* --- separation (same plane only) --- */
+ for(var i=0;i<st.units.length;i++){
+  for(var j=i+1;j<st.units.length;j++){
+   var a=st.units[i],b=st.units[j];
+   if(a.hp<=0||b.hp<=0)continue;
+   if(a.flying!==b.flying)continue;
+   var dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);
+   if(d>0.01&&d<22){
+    var push=(22-d)/2,nx=dx/d,ny=dy/d;
+    a.x-=nx*push;a.y-=ny*push;b.x+=nx*push;b.y+=ny*push;
+   }
+  }
+ }
+ /* --- towers shoot --- */
+ Object.keys(st.towers).forEach(function(key){
+  var tw=st.towers[key];
+  if(tw.dead)return;
+  tw.cd-=dt;
+  if(tw.cd>0)return;
+  var side=key.indexOf("mine")===0?"mine":"enemy";
+  var es=otherSide(side);
+  var best=null,bestD=1e9;
+  st.units.forEach(function(u){
+   if(u.side===es&&u.hp>0){
+    var d=Math.hypot(u.x-tw.x,u.y-tw.y);
+    if(d<=TOWER_RANGE&&d<bestD){bestD=d;best=u;}
+   }
+  });
+  if(best){tw.cd=TOWER_RATE;damageUnit(st,best,TOWER_DMG);}
+ });
+ /* --- cleanup + timer --- */
+ st.units=st.units.filter(function(u){return u.hp>0;});
+ if(st.result)return;
+ if(st.timeLeft<=0&&!st.overtime){
+  st.overtime=true;st.overTimeLeft=OVERTIME_TIME;
+  st.otStartDown={mine:st.towersDown.mine,enemy:st.towersDown.enemy};
+  toast("⏱️ Overtime! First tower wins!");
+ }else if(st.overtime){
+  st.overTimeLeft-=dt;
+  if(st.overTimeLeft<=0){
+   st.result="done";
+   var dm=st.towersDown.enemy-st.towersDown.mine; /* enemy towers I destroyed minus mine lost */
+   if(dm>0){st.winner="mine";st.reason="towers";}
+   else if(dm<0){st.winner="enemy";st.reason="towers";}
+   else{
+    var mk=st.towers.mineKing.hp,ek=st.towers.enemyKing.hp;
+    if(mk>ek){st.winner="mine";st.reason="king-hp";}
+    else if(ek>mk){st.winner="enemy";st.reason="king-hp";}
+    else{st.winner="draw";st.reason="draw";}
+   }
+  }
+ }
+}
+function moveToward(u,tx,ty,speed,dt){
+ var dx=tx-u.x,dy=ty-u.y,d=Math.hypot(dx,dy);
+ if(d<0.5)return;
+ var step=Math.min(d,speed*dt);
+ u.x+=dx/d*step;u.y+=dy/d*step;
+ u.x=clamp(u.x,10,ARENA.w-10);u.y=clamp(u.y,10,ARENA.h-10);
+}
+function battleScore(st,side){
+ /* towers destroyed by `side` */
+ return side==="mine"?st.towersDown.enemy:st.towersDown.mine;
+}
+
+/* ---------- battle lifecycle (client) ---------- */
+function startBotBattle(){
+ if(battle){toast("You're already in a battle.");return;}
+ var st=newBattleState({mode:"bot",enemyName:"Bot Sensei 🤖",
+  myDeck:ownedUnits(),enemyDeck:randomDeck(8),
+  myLevels:unitLevelsMap(),enemyLevels:{}});
+ initBattle(st);
+ battle=st;
+ showBattleView();
+ runBattleLoop();
+ toast("🤖 Tutorial battle vs Bot Sensei — good luck!");
+}
+function unitLevelsMap(){
+ var m={};
+ Object.keys(S.units||{}).forEach(function(id){m[id]=S.units[id].level||1;});
+ return m;
+}
+function runBattleLoop(){
+ stopBattleLoop();
+ battleInterval=setInterval(function(){
+  if(!battle){stopBattleLoop();return;}
+  battleTick(battle,0.1);
+  renderBattle(battle);
+  if(battle.mode==="pvp-host")publishSnapshot();
+  if(battle.result){finishBattle(battle);}
+ },100);
+}
+function stopBattleLoop(){if(battleInterval){clearInterval(battleInterval);battleInterval=null;}}
+function leaveBattle(){
+ stopBattleLoop();
+ if(battle&&!battle.result){
+  battle.result="done";battle.winner="enemy";battle.reason="left";
+  finishBattle(battle,true);
+ }
+ battle=null;remoteBattle=null;
+ mqLeave();
+ showPlayMenu();
+}
+function finishBattle(st,left){
+ stopBattleLoop();
+ /* winner is host-centric ("mine" = the host/bottom side). The guest
+    sees the same state flipped, so for a guest "enemy" winning = I won. */
+ var iWon=st.mode==="pvp-guest"?st.winner==="enemy":st.winner==="mine";
+ var draw=st.winner==="draw";
+ var win=iWon;
+ var coins=draw?50:(win?100:20);
+ var troph=draw?0:(win?10:-5);
+ var xp=draw?25:(win?50:15);
+ S.coins+=coins;
+ S.trophies=Math.max(0,S.trophies+troph);
+ S.xp+=xp;S.level=levelFromXp(S.xp);
+ var gemsBonus=0;
+ if(win){S.wins++;S.winStreak++;if(S.winStreak>=3&&S.winStreak%3===0){gemsBonus=5;S.gems+=gemsBonus;}}
+ else if(!draw){S.losses++;S.winStreak=0;}
+ S.tutorialDone=true;
+ saveCloud();renderHud();renderProfile();
+ var res=$("battleResult");
+ if(res){
+  res.classList.remove("hidden");
+  res.innerHTML=draw?"<h2>🤝 Draw!</h2><p>+50 🪙 · +25 XP</p>"
+   :win?"<h2>👑 VICTORY!</h2><p>+"+coins+" 🪙 · +"+troph+" 🏆 · +"+xp+" XP"+(gemsBonus?" · +"+gemsBonus+" 💎 streak bonus!":"")+"</p>"
+   :"<h2>💀 Defeat</h2><p>+"+coins+" 🪙 · "+troph+" 🏆 · +"+xp+" XP — run it back!</p>";
+ }
+ if(win)sndWin();else if(!draw)sndLose();
+ if(st.mode==="pvp-host"&&fbDb&&currentRoomCode){
+  /* only the host writes the room result: winner uid from the host's view */
+  var winnerUid=st.winner==="mine"?fbUser.uid:(st.winner==="enemy"?roomOpponentUid:null);
+  fbDb.collection("rooms").doc(currentRoomCode).update({state:"done",winner:winnerUid}).catch(function(){});
+ }
+ if(st.mode==="pvp-host")publishResult(st);
+ if(!left)toast(win?"👑 Victory! +"+coins+" coins, +"+troph+" trophies!":(draw?"🤝 Draw — +50 coins.":"💀 Defeat — +20 coins. Run it back!"));
+}
+
+/* ---------- PvP: rooms + MQTT ---------- */
+var currentRoomCode=null,roomOpponentUid=null,roomOpponentName="";
+var roomUnsub=null;
+function mqStatus(msg){var el=$("playStatus");if(el)el.textContent=msg;}
+function mqConnect(code,onMsg){
+ if(typeof mqtt==="undefined"){mqStatus("Room "+code+" is ready — the live network could not load in this browser, so you're solo for now.");return null;}
+ try{
+  var client=mqtt.connect("wss://broker.emqx.io:8084/mqtt",{clientId:"animeclash-"+getDeviceId().slice(0,8)+"-"+uid2(),reconnectPeriod:4000,connectTimeout:8000});
+  mqTopic="animeclash/room/"+code;
+  client.on("connect",function(){mqConnected=true;try{client.subscribe(mqTopic);}catch(e){}});
+  client.on("message",function(topic,msg){try{onMsg(JSON.parse(msg.toString()));}catch(e){}});
+  client.on("close",function(){mqConnected=false;});
+  client.on("error",function(){mqConnected=false;});
+  mqClient=client;
+  return client;
+ }catch(e){mqStatus("Couldn't reach the live network — try again.");return null;}
+}
+function mqPublish(obj){
+ if(!mqClient||!mqConnected||!mqTopic)return;
+ try{mqClient.publish(mqTopic,JSON.stringify(obj));}catch(e){}
+}
+function mqLeave(){
+ if(mqClient){try{mqClient.end();}catch(e){}}
+ mqClient=null;mqTopic=null;mqConnected=false;
+ if(roomUnsub){try{roomUnsub();}catch(e){}roomUnsub=null;}
+ currentRoomCode=null;roomOpponentUid=null;
+}
+function publishSnapshot(){
+ if(!battle||battle.mode!=="pvp-host")return;
+ mqPublish({type:"snap",tick:battle.tick,timeLeft:battle.timeLeft,overtime:battle.overtime,overTimeLeft:battle.overTimeLeft,
+  elixir:battle.elixir,hands:battle.hands,
+  units:battle.units.map(function(u){return{uid:u.uid,defId:u.defId,side:u.side,x:Math.round(u.x*10)/10,y:Math.round(u.y*10)/10,hp:u.hp,maxHp:u.maxHp,flying:u.flying,meter:Math.round(u.meter||0),transformed:!!u.transformed,form:u.form||""};}),
+  towers:JSON.parse(JSON.stringify(battle.towers)),towersDown:battle.towersDown,result:battle.result,winner:battle.winner,reason:battle.reason});
+}
+function publishResult(st){
+ mqPublish({type:"result",winner:st.winner,reason:st.reason});
+}
+function createRoom(){
+ if(!fbDb||!fbUser){toast("⚠️ Sign in first — rooms need an account.");return;}
+ if(battle){toast("You're already in a battle.");return;}
+ var code=makeRoomCode();
+ currentRoomCode=code;roomOpponentUid=null;
+ fbDb.collection("rooms").doc(code).set({code:code,host:fbUser.uid,hostName:displayName(),guest:null,guestName:"",
+  state:"waiting",createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
+  $("myRoomCode").textContent="🏷️ Your room code: "+code+" — share it with your friend!";
+  mqStatus("Room "+code+" created — waiting for an opponent…");
+  mqConnect(code,onHostMessage);
+  roomUnsub=fbDb.collection("rooms").doc(code).onSnapshot(function(doc){
+   if(!doc.exists)return;
+   var d=doc.data();
+   if(d.guest&&d.state==="playing"&&!battle){
+    roomOpponentUid=d.guest;roomOpponentName=d.guestName||"Opponent";
+    startPvpAsHost(d);
+   }
+  });
+ }).catch(function(err){noteFbError(err,"createRoom");toast(fbErrText(err.code||"permission-denied"));});
+}
+function onHostMessage(msg){
+ if(!msg||!battle)return;
+ if(msg.type==="spawn"&&battle.mode==="pvp-host"){
+  lastGuestSeen=Date.now();
+  var r=deployCard(battle,"enemy",msg.handIdx,msg.x,msg.y);
+  if(!r.ok){/* guest sent a bad spawn — ignore, host is truth */}
+ }else if(msg.type==="transform"&&battle.mode==="pvp-host"){
+  lastGuestSeen=Date.now();
+  transformUnit(battle,msg.uid);
+ }else if(msg.type==="ping"){
+  lastGuestSeen=Date.now();
+ }else if(msg.type==="hello"){
+  lastGuestSeen=Date.now();
+ }
+}
+function startPvpAsHost(roomDoc){
+ var st=newBattleState({mode:"pvp-host",enemyName:roomOpponentName,
+  myDeck:ownedUnits(),enemyDeck:randomDeck(8),
+  myLevels:unitLevelsMap(),enemyLevels:roomDoc.guestLevels||{}});
+ initBattle(st);
+ battle=st;lastGuestSeen=Date.now();
+ showBattleView();
+ runBattleLoop();
+ /* guest disconnect watch */
+ setInterval(function(){
+  if(!battle||battle.mode!=="pvp-host"||battle.result)return;
+  if(Date.now()-lastGuestSeen>15000){
+   battle.result="done";battle.winner="mine";battle.reason="opponent-left";
+   toast("👋 Opponent left — you win by default!");
+  }
+ },2000);
+ toast("⚔️ "+roomOpponentName+" joined! Battle on!");
+}
+function joinRoom(code){
+ code=String(code||"").trim().toUpperCase();
+ if(!code||code.length!==6){sndErr();toast("Type a 6-letter room code.");return;}
+ if(!fbDb||!fbUser){toast("⚠️ Sign in first — rooms need an account.");return;}
+ if(battle){toast("You're already in a battle.");return;}
+ currentRoomCode=code;
+ fbDb.collection("rooms").doc(code).get().then(function(doc){
+  if(!doc.exists){sndErr();toast("No room with that code — check it and try again.");currentRoomCode=null;return;}
+  var d=doc.data();
+  if(d.state!=="waiting"){sndErr();toast("That room already started or finished.");currentRoomCode=null;return;}
+  if(d.host===fbUser.uid){toast("That's your own room — wait for your friend to join it.");return;}
+  roomOpponentUid=d.host;roomOpponentName=d.hostName||"Opponent";
+  return fbDb.collection("rooms").doc(code).update({guest:fbUser.uid,guestName:displayName(),state:"playing",
+   guestDeck:ownedUnits(),guestLevels:unitLevelsMap()}).then(function(){
+   mqStatus("Joined room "+code+" — connecting to "+roomOpponentName+"…");
+   mqConnect(code,onGuestMessage);
+   mqPublish({type:"hello",name:displayName(),deck:ownedUnits(),levels:unitLevelsMap()});
+   lastSnapSeen=Date.now();
+   setInterval(function(){
+    if(!battle&&!remoteBattle)return;
+    if(Date.now()-lastSnapSeen>15000){
+     /* host gone: claim the win */
+     var st=remoteBattle||battle;
+     if(st&&!st.result){
+      st.result="done";st.winner="mine";st.reason="opponent-left";
+      if(!battle)battle=st;
+      finishBattle(st);
+     }
+    }
+   },2000);
+   setInterval(function(){mqPublish({type:"ping"});},2000);
+  });
+ }).catch(function(err){noteFbError(err,"joinRoom");toast(fbErrText(err.code||"permission-denied"));});
+}
+function onGuestMessage(msg){
+ if(!msg)return;
+ if(msg.type==="snap"){
+  lastSnapSeen=Date.now();
+  if(!remoteBattle){
+   remoteBattle={mode:"pvp-guest",tick:0,timeLeft:180,overtime:false,overTimeLeft:0,
+    elixir:{mine:5,enemy:5},hands:{mine:[],enemy:[]},units:[],towers:towerState(),towersDown:{mine:0,enemy:0},result:null,winner:null,reason:"",enemyName:roomOpponentName};
+   battle=remoteBattle;
+   showBattleView();
+  }
+  remoteBattle.tick=msg.tick;remoteBattle.timeLeft=msg.timeLeft;remoteBattle.overtime=msg.overtime;
+  remoteBattle.overTimeLeft=msg.overTimeLeft;remoteBattle.elixir=msg.elixir;remoteBattle.hands=msg.hands;
+  remoteBattle.units=msg.units;remoteBattle.towers=msg.towers;remoteBattle.towersDown=msg.towersDown;
+  remoteBattle.result=msg.result;remoteBattle.winner=msg.winner;remoteBattle.reason=msg.reason;
+  /* guest's own side is the "enemy" side in the host sim — flip for display */
+  renderBattle(remoteBattle,true);
+  if(msg.result)finishBattle(remoteBattle);
+ }else if(msg.type==="result"){
+  if(remoteBattle&&!remoteBattle.result){
+   remoteBattle.result="done";remoteBattle.winner=msg.winner;remoteBattle.reason=msg.reason;
+   finishBattle(remoteBattle);
+  }
+ }
+}
+function guestDeploy(handIdx,x,y){
+ if(!battle||!remoteBattle||battle.result)return;
+ if(x==null||y==null)return;
+ mqPublish({type:"spawn",handIdx:handIdx,x:x,y:y});
+ sndDeploy();
+}
+function guestTransform(uid){
+ if(!battle||!remoteBattle||battle.result)return;
+ mqPublish({type:"transform",uid:uid});
+}
+function tryTransform(){
+ /* host/bot: transform locally. Guest: ask the host via MQTT. */
+ if(!battle||battle.result)return false;
+ if(battle.mode==="pvp-guest"){
+  var u=myTransformableUnit(battle,"enemy");
+  if(!u)return false;
+  guestTransform(u.uid);
+  return true;
+ }
+ var mine=myTransformableUnit(battle,"mine");
+ if(!mine)return false;
+ var ok=transformUnit(battle,mine.uid);
+ if(ok){var def=UNIT_BY_ID[mine.defId];toast("✨ "+def.name+" transformed — "+mine.form+"!");sndWin();}
+ return ok;
+}
+function quickMatch(){
+ if(!fbDb||!fbUser){toast("⚠️ Sign in first — quick match needs an account.");return;}
+ if(battle){toast("You're already in a battle.");return;}
+ mqStatus("🔍 Finding an opponent…");
+ fbDb.collection("rooms").where("state","==","waiting").limit(5).get().then(function(snap){
+  var mine=null;
+  snap.forEach(function(d){
+   var r=d.data();
+   if(r.host!==fbUser.uid&&!mine)mine=r;
+  });
+  if(mine){joinRoom(mine.code);}
+  else{createRoom();}
+ }).catch(function(err){
+  noteFbError(err,"quickMatch");
+  createRoom(); /* fallback: host a room */
+ });
+}
+
+/* ===== js_35_upload.js ===== */
+/* ---- v2.5.3: in-game GIF shrinker (free — no Storage needed) ----
+   Tenor GIFs are almost never under 300 KB, and Firebase Storage can't
+   be enabled on the free Spark plan — so big GIFs are shrunk right here
+   in the browser: decode the frames (omggif, vendored), re-encode
+   smaller (gifenc, vendored). Animation is preserved — this is a real
+   decode/re-encode, never a canvas snapshot (which would keep only the
+   first frame). Ladder: smaller dims, fewer colours, fewer frames,
+   until the file fits under 290 KB (its base64 stays under the 400 KB
+   the profile renderer accepts). If no step fits, null — the caller
+   shows an honest toast, never a broken save.
+   Speed note: gifenc quantize() on a full noisy frame takes ~1.2s, so
+   each attempt derives ONE shared palette from a ~2,304-pixel sample
+   of up to 3 frames (~60ms) and each frame is pre-rounded to 16-step
+   colours before applyPalette (~6ms/frame). A typical 30-frame Tenor
+   GIF shrinks in under a second. */
+var FB_IMG_TARGET=290000; /* shrunk GIF bytes — base64 stays < 400 KB */
+var GIF_SHRINK_LADDER=[
+ {maxSide:256,colors:256,step:1},
+ {maxSide:256,colors:128,step:1},
+ {maxSide:192,colors:128,step:1},
+ {maxSide:192,colors:64,step:2},
+ {maxSide:160,colors:64,step:2},
+ {maxSide:160,colors:64,step:3},
+ {maxSide:128,colors:64,step:2},
+ {maxSide:128,colors:32,step:3},
+ {maxSide:128,colors:32,step:4},
+ {maxSide:96,colors:32,step:4}
+];
+function yieldFrame(){return new Promise(function(r){setTimeout(r,0);});}
+function readFileBuf(file){
+ if(file.arrayBuffer)return file.arrayBuffer();
+ return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result);};r.onerror=function(){rej(new Error("read"));};r.readAsArrayBuffer(file);});
+}
+function b64encode(bytes){
+ var s="",CHUNK=8192,i;
+ for(i=0;i<bytes.length;i+=CHUNK){s+=String.fromCharCode.apply(null,bytes.subarray(i,i+CHUNK));}
+ return btoa(s);
+}
+function gifClearRect(buf,w,x,y,rw,rh){
+ var yy,xx,o;
+ for(yy=y;yy<y+rh;yy++)for(xx=x;xx<x+rw;xx++){o=(yy*w+xx)*4;buf[o]=buf[o+1]=buf[o+2]=buf[o+3]=0;}
+}
+function decodeGifFrames(buf){
+ var reader=new GifReader(new Uint8Array(buf));
+ var w=reader.width,h=reader.height,n=reader.numFrames();
+ var comp=new Uint8Array(w*h*4);
+ var prevSnap=null,prevInfo=null,hasAlpha=false,frames=[],i,info,snap,p;
+ for(i=0;i<n;i++){
+  info=reader.frameInfo(i);
+  if(prevInfo){
+   if(prevInfo.disposal===2)gifClearRect(comp,w,prevInfo.x,prevInfo.y,prevInfo.width,prevInfo.height);
+   else if(prevInfo.disposal===3&&prevSnap)comp.set(prevSnap);
+  }
+  if(info.disposal===3)prevSnap=comp.slice();
+  reader.decodeAndBlitFrameRGBA(i,comp);
+  snap=comp.slice();
+  if(!hasAlpha){for(p=3;p<snap.length;p+=4){if(snap[p]<128){hasAlpha=true;break;}}}
+  frames.push({rgba:snap,delay:(info.delay||0)*10});
+  prevInfo=info;
+ }
+ return {width:w,height:h,frames:frames,loop:reader.loopCount(),hasAlpha:hasAlpha};
+}
+function resizeRGBA16(src,sw,sh,tw,th){
+ /* Nearest-neighbour downscale + round RGB to 16-steps (clamped, so 255
+    never wraps to 0). The rounding is what makes applyPalette fast:
+    at most 4,096 distinct colours per frame instead of tens of thousands. */
+ var out=new Uint8Array(tw*th*4),y,x,sy,sx,si,oi;
+ for(y=0;y<th;y++){
+  sy=Math.min(sh-1,(y*sh/th)|0);
+  for(x=0;x<tw;x++){
+   sx=Math.min(sw-1,(x*sw/tw)|0);
+   si=(sy*sw+sx)*4;oi=(y*tw+x)*4;
+   out[oi]=Math.min(255,Math.round(src[si]/16)*16);
+   out[oi+1]=Math.min(255,Math.round(src[si+1]/16)*16);
+   out[oi+2]=Math.min(255,Math.round(src[si+2]/16)*16);
+   out[oi+3]=src[si+3];
+  }
+ }
+ return out;
+}
+function encodeGifAttempt(dec,st){
+ var ge=window.gifenc;
+ var w=dec.width,h=dec.height,frames=dec.frames,loop=dec.loop,hasAlpha=dec.hasAlpha;
+ var scale=Math.min(1,st.maxSide/Math.max(w,h));
+ var tw=Math.max(1,Math.round(w*scale)),th=Math.max(1,Math.round(h*scale));
+ var sampleIdx=[0,Math.floor(frames.length/2),frames.length-1].filter(function(v,i,a){return a.indexOf(v)===i;});
+ var perFrame=Math.ceil(2304/sampleIdx.length);
+ var sample=new Uint8Array(sampleIdx.length*perFrame*4),sp=0,fi,small,stride,p2,c;
+ for(fi=0;fi<sampleIdx.length;fi++){
+  small=resizeRGBA16(frames[sampleIdx[fi]].rgba,w,h,tw,th);
+  stride=Math.max(1,Math.floor((tw*th)/perFrame));
+  for(p2=0,c=0;p2<tw*th&&c<perFrame;p2+=stride,c++){sample.set(small.subarray(p2*4,p2*4+4),sp*4);sp++;}
+ }
+ var qOpts=hasAlpha?{format:"rgba4444",oneBitAlpha:true}:{format:"rgb565"};
+ var palette=ge.quantize(sample.subarray(0,sp*4),st.colors,qOpts);
+ var transparentIndex=-1,ti;
+ if(hasAlpha){
+  for(ti=0;ti<palette.length;ti++){if(palette[ti].length>=4&&palette[ti][3]===0){transparentIndex=ti;break;}}
+  if(transparentIndex<0){
+   if(palette.length>=256){palette[palette.length-1]=[0,0,0,0];transparentIndex=palette.length-1;}
+   else{palette.unshift([0,0,0,0]);transparentIndex=0;}
+  }
+ }
+ var enc=ge.GIFEncoder(),kept=0,i,j,delay,index,opts;
+ for(i=0;i<frames.length;i+=st.step){
+  delay=0;
+  for(j=i;j<Math.min(frames.length,i+st.step);j++)delay+=frames[j].delay;
+  small=resizeRGBA16(frames[i].rgba,w,h,tw,th);
+  index=hasAlpha?ge.applyPalette(small,palette,"rgba4444"):ge.applyPalette(small,palette);
+  opts={palette:palette,delay:delay||100,repeat:(loop!=null&&loop>=0)?loop:0};
+  if(hasAlpha&&transparentIndex>=0){opts.transparent=true;opts.transparentIndex=transparentIndex;}
+  enc.writeFrame(index,tw,th,opts);
+  kept++;
+ }
+ enc.finish();
+ return {bytes:enc.bytes(),width:tw,height:th,frames:kept};
+}
+function shrinkGifSteps(dec,onProgress,targetBytes){
+ var i=0;
+ function next(){
+  if(i>=GIF_SHRINK_LADDER.length)return Promise.resolve(null);
+  var st=GIF_SHRINK_LADDER[i++];
+  if(onProgress)onProgress(Math.round(10+90*i/GIF_SHRINK_LADDER.length));
+  var out;
+  try{out=encodeGifAttempt(dec,st);}catch(e){out=null;}
+  if(out&&out.bytes.length<=targetBytes)return Promise.resolve("data:image/gif;base64,"+b64encode(out.bytes));
+  return yieldFrame().then(next);
+ }
+ return next();
+}
+function shrinkGifFile(file,onProgress,targetBytes){
+ targetBytes=targetBytes||FB_IMG_TARGET;
+ if(typeof GifReader==="undefined"||!window.gifenc)return Promise.resolve(null);
+ return readFileBuf(file).then(function(buf){
+  if(onProgress)onProgress(10);
+  var dec;
+  try{dec=decodeGifFrames(new Uint8Array(buf));}catch(e){return null;}
+  if(!dec.frames.length)return null;
+  return shrinkGifSteps(dec,onProgress,targetBytes);
+ }).catch(function(){return null;});
+}
+function shrinkStillFile(file,onProgress){
+ return new Promise(function(resolve){
+  var rd=new FileReader();
+  rd.onload=function(){
+   var img=new Image();
+   img.onload=function(){
+    var w=img.width||0,h=img.height||0;
+    if(!w||!h){resolve(null);return;}
+    /* PNG first (keeps transparency) when the source is a PNG, then
+       JPEG steps. Accept the first output whose data URL stays under
+       the 400 KB the profile renderer accepts. */
+    var isPng=/png/i.test(file.type);
+    var steps=[
+     {maxSide:512,fmt:"png"},
+     {maxSide:512,fmt:"jpeg",q:0.85},
+     {maxSide:384,fmt:"jpeg",q:0.8},
+     {maxSide:256,fmt:"jpeg",q:0.75},
+     {maxSide:192,fmt:"jpeg",q:0.7}
+    ];
+    var i=0;
+    function attempt(){
+     if(i>=steps.length){resolve(null);return;}
+     var st=steps[i++];
+     if(!isPng&&st.fmt==="png"){attempt();return;}
+     if(onProgress)onProgress(Math.round(100*i/steps.length));
+     try{
+      var scale=Math.min(1,st.maxSide/Math.max(w,h));
+      var tw=Math.max(1,Math.round(w*scale)),th=Math.max(1,Math.round(h*scale));
+      var c=document.createElement("canvas");c.width=tw;c.height=th;
+      var ctx=c.getContext("2d");ctx.drawImage(img,0,0,tw,th);
+      var url=st.fmt==="png"?c.toDataURL("image/png"):c.toDataURL("image/jpeg",st.q);
+      if(url&&url.length<=395000){resolve(url);return;}
+     }catch(e){}
+     setTimeout(attempt,0);
+    }
+    attempt();
+   };
+   img.onerror=function(){resolve(null);};
+   img.src=rd.result;
+  };
+  rd.onerror=function(){resolve(null);};
+  rd.readAsDataURL(file);
+ });
+}
+function saveBase64File(file,onDone){
+ if(file.size>FB_IMG_SMALL){toast("☁️ Big-image uploads need Firebase Storage — it isn't turned on yet. Small images (under 300 KB) still work.");return;}
+ var r=new FileReader();
+ r.onload=function(){onDone(r.result);};
+ r.onerror=function(){toast("Couldn't read that file — try again.");};
+ r.readAsDataURL(file);
+}
+function uploadToStorage(file,kind,onDone){
+ /* v2.5.2 Storage path, unchanged — now the overflow for files the
+    shrinker couldn't fit, instead of the first stop for every file. */
+ var ext=(String(file.name||"").split(".").pop()||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+ if(ext==="jpeg")ext="jpg";
+ if(["png","jpg","gif","webp"].indexOf(ext)<0)ext=(file.type==="image/gif")?"gif":(file.type==="image/png")?"png":(file.type==="image/webp")?"webp":"jpg";
+ var path="users/"+fbUser.uid+"/profile/"+kind+"-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8)+"."+ext;
+ setUploadBusy(kind,true,0);
+ var ref=fbStorage.ref(path);
+ var task=ref.put(file,{contentType:file.type});
+ var done=false;
+ function finish(url){if(done)return;done=true;setUploadBusy(kind,false,0);onDone(url);}
+ function fail(err){
+  if(done)return;done=true;setUploadBusy(kind,false,0);
+  if(file.size<=FB_IMG_SMALL){toast("☁️ Cloud upload hiccup — saved it small instead.");saveBase64File(file,onDone);return;}
+  var code=err&&err.code||"";
+  noteFbError(err,"storageUpload");
+  if(code==="storage/unauthorized")toast("☁️ Upload not allowed — sign in and try again.");
+  else if(code==="storage/bucket-not-found"||code==="storage/unknown")toast("☁️ Big-image uploads need Firebase Storage — it isn't turned on yet.");
+  else toast("☁️ Upload didn't go through — check your connection and try again.");
+ }
+ try{
+  var ev=(firebase.storage&&firebase.storage.TaskEvent&&firebase.storage.TaskEvent.STATE_CHANGED)||"state_changed";
+  if(task&&task.on){
+   task.on(ev,function(snap){var pct=0;if(snap&&snap.totalBytes)pct=100*snap.bytesTransferred/snap.totalBytes;setUploadBusy(kind,true,pct);},fail,function(){ref.getDownloadURL().then(finish).catch(fail);});
+  }else if(task&&task.then){
+   task.then(function(){return ref.getDownloadURL();}).then(finish).catch(fail);
+  }else{fail(new Error("no upload task"));}
+ }catch(e){fail(e);}
+}
+function uploadImageFile(file,kind,onDone){
+ if(!file)return;
+ if(!/^image\/(png|jpe?g|gif|webp)$/i.test(file.type)){sndErr();toast("That file isn't an image — pick a PNG, JPG, GIF or WebP.");return;}
+ if(file.size>FB_IMG_MAX){sndErr();toast("🚫 That image is too big — max 5 MB. Tenor GIFs are usually under that — try a smaller one.");return;}
+ if(file.size<=FB_IMG_SMALL){
+  /* Small file: Storage-first when it's there (v2.5.2), instant base64 otherwise. */
+  if(fbUser&&fbStorage){uploadToStorage(file,kind,onDone);return;}
+  saveBase64File(file,onDone);return;
+ }
+ /* Big file: shrink first — free, no Storage needed. Storage is only the
+    overflow when shrinking can't fit; without it, an honest toast. */
+ var isGif=/gif/i.test(file.type)||/\.gif$/i.test(file.name||"");
+ setUploadBusy(kind,true,0,"Shrinking");
+ var shrinkP=isGif?shrinkGifFile(file,function(p){setUploadBusy(kind,true,p,"Shrinking");}):shrinkStillFile(file,function(p){setUploadBusy(kind,true,p,"Shrinking");});
+ shrinkP.then(function(dataUrl){
+  setUploadBusy(kind,false,0);
+  if(dataUrl){onDone(dataUrl);return;}
+  if(fbUser&&fbStorage){uploadToStorage(file,kind,onDone);return;}
+  if(isGif){sndErr();toast("😿 Couldn't shrink this GIF small enough — try a shorter one.");}
+  else toast("☁️ Big-image uploads need Firebase Storage — it isn't turned on yet. Small images (under 300 KB) still work.");
+ }).catch(function(){
+  setUploadBusy(kind,false,0);
+  if(fbUser&&fbStorage){uploadToStorage(file,kind,onDone);return;}
+  if(isGif){sndErr();toast("😿 Couldn't shrink this GIF — try a different one.");}
+  else toast("☁️ Big-image uploads need Firebase Storage — it isn't turned on yet. Small images (under 300 KB) still work.");
+ });
+}
+
+
+/* ===== js_40_staff.js ===== */
+/* ================= Anime Clash — owner panel, admins, bans =================
+   Owner immunity is HARD-CODED and non-negotiable: no admin can EVER ban,
+   mute, or act on the Owner, no matter the toggles. Enforced in the UI,
+   in every action function, AND in the Firestore rules. */
+var BAN_MAX_TS_MS=253402300799999; /* Firestore max Timestamp: 9999-12-31 */
+var panelPlayers=[],panelSelectedUid=null,panelSearch="";
+var lastRoleSig="";
+
+/* toolInput defaults to TEXT — the Pig Clicker v2.5.3 bug was a number
+   input by default. Numeric fields must pass false explicitly. */
+function toolInput(ph,isText){
+ var i=document.createElement("input");
+ i.type=isText===false?"number":"text";
+ if(isText===false)i.min="1";
+ i.placeholder=ph;i.setAttribute("aria-label",ph);
+ return i;
+}
+function toolBtn(label,cls){
+ var b=document.createElement("button");b.type="button";b.className="btn small "+(cls||"");b.textContent=label;return b;
+}
+function toolCard(title,desc){
+ var d=document.createElement("div");d.className="toolCard";
+ d.innerHTML="<b>"+esc(title)+"</b><p class='sub'>"+esc(desc)+"</p>";
+ return d;
+}
+function auditGrant(action,target,details){
+ if(!fbDb||!fbUser)return;
+ fbDb.collection("grants").add({action:action,actorUid:fbUser.uid,actorName:displayName(),
+  targetUid:target._uid||target.uid||"",targetName:target.name||target.username||"",
+  details:details||{},at:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(err){noteFbError(err,"audit");});
+}
+function targetIsOwner(p){return roleOfUid(p._uid,p.role)==="owner";}
+function guardOwnerTarget(p,action){
+ if(p._uid===fbUser.uid){toast("You can't "+action+" yourself.");return true;}
+ if(targetIsOwner(p)){toast("🛡️ No admin can "+action+" the Owner — ever.");return true;}
+ return false;
+}
+function claimOwner(){
+ if(!fbUser||!fbDb)return;
+ /* Claim-time backstop for the "drippy" first-owner exception: if an
+    owner already exists, nobody named Drippy can claim the crown — the
+    transaction below would reject it anyway, this just says why. */
+ var claimName=(fbUser&&fbUser.displayName)||displayName();
+ if(ownerLoaded&&ownerInfo&&ownerInfo.ownerUid&&ownerInfo.ownerUid!==fbUser.uid&&nameIsDrippy(claimName)){
+  toast("That name belongs to the Owner — only the first Drippy can claim the crown.");return;
+ }
+ var btn=$("btnClaimOwner");if(btn)btn.disabled=true;
+ var ref=fbDb.collection("config").doc("owner");
+ fbDb.runTransaction(function(tx){
+  return tx.get(ref).then(function(doc){
+   if(doc.exists&&doc.data().ownerUid)throw{code:"already-claimed"};
+   tx.set(ref,{ownerUid:fbUser.uid,ownerName:displayName(),claimedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  });
+ }).then(function(){
+  fbDb.collection("users").doc(fbUser.uid).update({role:"owner"}).catch(function(err){noteFbError(err,"claimRole");});
+  toast("👑 YOU ARE THE OWNER! Gold tag and owner panel are yours.");
+  sndWin();
+  ownerInfo={ownerUid:fbUser.uid,ownerName:displayName()};refreshRole();
+ }).catch(function(err){
+  if(err&&err.code==="already-claimed"){toast("Too late — the Owner crown was just claimed by someone else.");refreshRole();}
+  else{noteFbError(err,"claim");toast(fbErrText(err&&err.code||"permission-denied"));}
+  var b=$("btnClaimOwner");if(b)b.disabled=false;
+ });
+}
+function renderRolePanel(){
+ var area=$("roleArea");if(!area)return;
+ var sig=(fbReady?"1":"0")+"|"+(fbUser?fbUser.uid:"guest")+"|"+(ownerLoaded?"1":"0")+"|"+(ownerInfo?ownerInfo.ownerUid:"none")+"|"+myRole;
+ if(sig===lastRoleSig&&area.dataset.built)return;
+ lastRoleSig=sig;area.dataset.built="1";
+ var html="";
+ if(ownerInfo&&ownerInfo.ownerUid){
+  html+='<p class="sub" style="margin-bottom:8px">👑 Owner: <b>'+esc(ownerInfo.ownerName||"")+'</b>'+(fbUser&&ownerInfo.ownerUid===fbUser.uid?" — that's you. The crown never changes hands.":"")+'</p>';
+ }else{
+  html+='<p class="sub" style="margin-bottom:8px">👑 No Owner yet — the first player to claim it keeps the crown forever.</p>';
+  if(fbUser)html+='<button class="btn small" id="btnClaimOwner" type="button">👑 Claim Owner</button>';
+ }
+ html+='<p class="sub" style="margin:8px 0">Your role: <b>'+(myRole==="owner"?"👑 Owner":myRole==="admin"?"🛡️ Admin":"Player")+'</b>'+roleTag(myRole,{customTitle:myCustomTitle})+'</p>';
+ area.innerHTML=html;
+ var cb=$("btnClaimOwner");
+ if(cb)cb.addEventListener("click",claimOwner);
+ renderStaffArea();
+}
+function renderStaffArea(){
+ var area=$("staffArea");if(!area)return;
+ if(myRole!=="owner"&&myRole!=="admin"){area.innerHTML="";return;}
+ area.innerHTML='<h3>🛡️ Staff panel</h3><div class="sub">Tap a player, then use the tools. The Owner can never be touched by an admin.</div>'
+  +'<input type="text" id="panelSearch" placeholder="Search players…" value="'+esc(panelSearch)+'">'
+  +'<div id="panelList"></div><div id="playerTools"></div>';
+ var inp=$("panelSearch");
+ if(inp)inp.addEventListener("input",function(){panelSearch=inp.value;renderPanelList();});
+ loadPanelPlayers();
+}
+function loadPanelPlayers(){
+ if(!fbDb)return;
+ fbDb.collection("users").orderBy("trophies","desc").limit(30).get().then(function(snap){
+  panelPlayers=[];
+  snap.forEach(function(d){var o=d.data();o._uid=d.id;panelPlayers.push(o);});
+  renderPanelList();
+ }).catch(function(err){noteFbError(err,"panelLoad");});
+}
+function renderPanelList(){
+ var el=$("panelList");if(!el)return;
+ var q=panelSearch.trim().toLowerCase();
+ var list=panelPlayers.filter(function(p){
+  if(!q)return true;
+  return ((p.name||"")+" "+(p.username||"")).toLowerCase().indexOf(q)>-1;
+ });
+ el.innerHTML="";
+ list.forEach(function(p){
+  var row=document.createElement("div");row.className="playerRow player";
+  var banned=isBanActive(p);
+  row.innerHTML='<div style="flex:1"><b>'+esc(p.name||p.username||"?")+'</b> '+roleTag(p.role||"player",p)
+   +'<div class="sub">🏆 '+(p.trophies||0)+' · Lv '+(p.level||1)+' · 💎 '+(p.gems||0)+' · 🪙 '+(p.coins||0)
+   +(banned?' · <b style="color:#ff4d5e">🔨 BANNED</b>':"")+'</div></div>';
+  var b=document.createElement("button");b.type="button";b.className="btn small";b.textContent="Manage";
+  b.addEventListener("click",function(){openStaffPanelFor(p);});
+  row.appendChild(b);
+  el.appendChild(row);
+ });
+}
+function openStaffPanel(){
+ if(myRole!=="owner"&&myRole!=="admin"){toast("Staff only.");return;}
+ switchView("profile");
+ renderStaffArea();
+}
+function openStaffPanelFor(p){
+ panelSelectedUid=p._uid;
+ var t=$("playerTools");if(!t)return;
+ t.innerHTML="";
+ var head=document.createElement("div");
+ head.innerHTML="<h3>"+esc(p.name||p.username||"?")+" "+roleTag(p.role||"player",p)+"</h3>";
+ t.appendChild(head);
+ var isOwnerTarget=targetIsOwner(p);
+ var isSelf=p._uid===fbUser.uid;
+
+ /* --- give gems --- */
+ if(myRole==="owner"||canAdmin("give")){
+  var cG=toolCard("💎 Give gems","Owner-grantable premium currency.");
+  var inG=toolInput("Gems",false);var bG=toolBtn("Give gems","blue");
+  bG.addEventListener("click",function(){
+   var n=Math.floor(Number(inG.value)||0);
+   if(n<=0){toast("Type how many gems first.");return;}
+   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   panelGiveCurrency(p,"gems",n);
+  });
+  cG.appendChild(inG);cG.appendChild(bG);t.appendChild(cG);
+  /* --- give coins --- */
+  var cC=toolCard("🪙 Give coins","Battle currency.");
+  var inC=toolInput("Coins",false);var bC=toolBtn("Give coins","blue");
+  bC.addEventListener("click",function(){
+   var n=Math.floor(Number(inC.value)||0);
+   if(n<=0){toast("Type how many coins first.");return;}
+   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   panelGiveCurrency(p,"coins",n);
+  });
+  cC.appendChild(inC);cC.appendChild(bC);t.appendChild(cC);
+  /* --- give unit --- */
+  var cU=toolCard("🃏 Give unit","Grant a unit straight into their deck.");
+  var sel=document.createElement("select");
+  UNITS.forEach(function(u){var o=document.createElement("option");o.value=u.id;o.textContent=u.icon+" "+u.name;sel.appendChild(o);});
+  var bU=toolBtn("Give unit","blue");
+  bU.addEventListener("click",function(){
+   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   grantUnitTo(p._uid,sel.value).then(function(){
+    auditGrant("give_unit",p,{unit:sel.value});
+    toast("🃏 Gave "+(UNIT_BY_ID[sel.value].name)+" to "+(p.name||p.username)+".");
+    loadPanelPlayers();
+   }).catch(function(err){noteFbError(err,"giveUnit");toast(fbErrText(err.code||"permission-denied"));});
+  });
+  cU.appendChild(sel);cU.appendChild(bU);t.appendChild(cU);
+ }
+ /* --- custom title (text input — never a number field) --- */
+ if(myRole==="owner"){
+  var cCT=toolCard("✨ Custom title","Give this admin a Discord-style custom title (shows next to their name everywhere).");
+  var inCT=toolInput("Custom title (max 24 chars)",true);inCT.maxLength=24;var bCT=toolBtn("Set title","pink");
+  bCT.addEventListener("click",function(){panelSetCustomTitle(p,inCT.value);});
+  cCT.appendChild(inCT);cCT.appendChild(bCT);t.appendChild(cCT);
+ }
+ /* --- ban --- */
+ if(myRole==="owner"||canAdmin("ban")||canAdmin("unban")){
+  var bannedNow=isBanActive(p);
+  var cB=toolCard(bannedNow?"🔓 Unban":"🔨 Ban","Ban locks the account out (full-screen banned screen). Unban restores it.");
+  var inReason=toolInput("Reason for ban (optional)",true);inReason.id="panelBanReason";
+  var durSel=document.createElement("select");
+  [["1h",3600000,"1 hour"],["24h",86400000,"24 hours"],["7d",604800000,"7 days"],["perm",0,"Permanent"]].forEach(function(o){
+   var op=document.createElement("option");op.value=o[0];op.textContent=o[2];durSel.appendChild(op);
+  });
+  var bB=toolBtn(bannedNow?"🔓 Unban":"🔨 Ban",bannedNow?"green":"");
+  bB.addEventListener("click",function(){
+   if(bannedNow){
+    bB.disabled=true;bB.textContent="🔓 Unbanning…";
+    if(!panelSetBan(p,false)){bB.disabled=false;bB.textContent="🔓 Unban";}
+    return;
+   }
+   var opt=durSel.options[durSel.selectedIndex];
+   var ms=opt.value==="perm"?0:{ "1h":3600000,"24h":86400000,"7d":604800000 }[opt.value];
+   bB.disabled=true;bB.textContent="🔨 Banning…";
+   if(!panelSetBan(p,true,{durationMs:ms,durationLabel:opt.textContent,reason:inReason.value})){bB.disabled=false;bB.textContent="🔨 Ban";}
+  });
+  cB.appendChild(inReason);cB.appendChild(durSel);cB.appendChild(bB);t.appendChild(cB);
+  /* --- hard ban --- */
+  if(myRole==="owner"||canAdmin("hardban")){
+   var cHB=toolCard("🔨 Hard Ban","Account ban + device ban. Any account on that device stays locked out.");
+   var bHB=toolBtn("🔨 Hard Ban","");
+   bHB.addEventListener("click",function(){
+    if(bHB.dataset.arm){delete bHB.dataset.arm;bHB.disabled=true;bHB.textContent="🔨 Hard-banning…";
+     if(!panelSetBan(p,true,{hard:true,durationMs:0,durationLabel:"Permanent",reason:inReason.value})){bHB.disabled=false;bHB.textContent="🔨 Hard Ban";}
+    }else{bHB.dataset.arm="1";bHB.textContent="⚠️ Tap again to HARD BAN";}
+   });
+   cHB.appendChild(bHB);t.appendChild(cHB);
+  }
+ }
+ /* --- mute --- */
+ if(myRole==="owner"||canAdmin("mute")){
+  var cM=toolCard(p.muted?"🔊 Unmute":"🔇 Mute","Muted players can't use chat features.");
+  var bM=toolBtn(p.muted?"🔊 Unmute":"🔇 Mute","");
+  bM.addEventListener("click",function(){
+   if(guardOwnerTarget(p,"mute"))return;
+   fbDb.collection("users").doc(p._uid).update({muted:!p.muted}).then(function(){
+    p.muted=!p.muted;auditGrant(p.muted?"mute":"unmute",p,{});
+    toast((p.muted?"🔇 Muted ":"🔊 Unmuted ")+(p.name||p.username)+".");renderPanelList();openStaffPanelFor(p);
+   }).catch(function(err){noteFbError(err,"mute");toast(fbErrText(err.code||"permission-denied"));});
+  });
+  cM.appendChild(bM);t.appendChild(cM);
+ }
+ /* --- admin grant/revoke + perms (owner only) --- */
+ if(myRole==="owner"&&!isSelf&&!isOwnerTarget){
+  var isAdmin=(p.role||"player")==="admin";
+  var cA=toolCard(isAdmin?"🛡️ Remove admin":"🛡️ Make admin","Admins get the tools the Owner toggles on for them.");
+  var bA=toolBtn(isAdmin?"Remove admin":"Make admin",isAdmin?"":"blue");
+  bA.addEventListener("click",function(){panelSetAdmin(p,!isAdmin);});
+  cA.appendChild(bA);t.appendChild(cA);
+  if(isAdmin){
+   var cP=toolCard("🛡️ Admin permissions","Toggle which tools this admin gets. Nothing here can ever touch the Owner.");
+   var perms=adminPermsFor(p._uid);
+   [["ban","Ban players"],["hardban","Hard ban (device)"],["unban","Unban players"],["mute","Mute / unmute"],["give","Give gems & coins"],["giveUnits","Give units"]].forEach(function(pr){
+    var row=document.createElement("label");row.className="permRow";
+    row.innerHTML="<span>"+esc(pr[1])+"</span>";
+    var cb=document.createElement("input");cb.type="checkbox";cb.checked=!!perms[pr[0]];
+    cb.addEventListener("change",function(){
+     var np=adminPermsFor(p._uid);np[pr[0]]=cb.checked;
+     panelSetAdminPerms(p._uid,np);
+    });
+    row.appendChild(cb);cP.appendChild(row);
+   });
+   t.appendChild(cP);
+  }
+ }
+}
+function panelGiveCurrency(p,field,amount){
+ if(!fbDb||!fbUser)return;
+ if(guardOwnerTarget(p,"give "+field+" to"))return;
+ var upd={};upd[field]=firebase.firestore.FieldValue.increment(amount);
+ fbDb.collection("users").doc(p._uid).update(upd).then(function(){
+  auditGrant("give_"+field,p,{amount:amount});
+  toast((field==="gems"?"💎 ":"🪙 ")+"Gave "+amount+" "+field+" to "+(p.name||p.username)+".");
+  loadPanelPlayers();
+ }).catch(function(err){noteFbError(err,"giveCurrency");toast(fbErrText(err.code||"permission-denied"));});
+}
+function panelSetCustomTitle(p,title){
+ if(!fbDb||!fbUser||myRole!=="owner")return;
+ if(p._uid===fbUser.uid){toast("The Owner's title is fixed.");return;}
+ title=String(title||"").trim().slice(0,24);
+ fbDb.collection("users").doc(p._uid).update({customTitle:title}).then(function(){
+  p.customTitle=title;
+  auditGrant(title?"set_title":"remove_title",p,{title:title});
+  toast(title?("✨ Custom title set: "+title):("✨ Custom title removed."));
+  renderPanelList();
+ }).catch(function(err){noteFbError(err,"setTitle");toast(fbErrText(err.code||"permission-denied"));});
+}
+function panelSetAdmin(p,make){
+ if(!fbDb||!fbUser||myRole!=="owner")return;
+ if(p._uid===fbUser.uid){toast("You're the Owner — you don't need admin.");return;}
+ if(ownerInfo&&p._uid===ownerInfo.ownerUid){toast("The Owner's role can't change.");return;}
+ var ref=fbDb.collection("config").doc("admins");
+ var setOp=make?ref.set({uids:firebase.firestore.FieldValue.arrayUnion(p._uid)},{merge:true})
+               :ref.set({uids:firebase.firestore.FieldValue.arrayRemove(p._uid)},{merge:true});
+ setOp.then(function(){
+  return fbDb.collection("users").doc(p._uid).update({role:make?"admin":"player"});
+ }).then(function(){
+  p.role=make?"admin":"player";
+  auditGrant(make?"grant_admin":"revoke_admin",p,{});
+  toast(make?("🛡️ "+(p.name||p.username)+" is now an Admin."):("🛡️ "+(p.name||p.username)+"'s admin removed."));
+  refreshRole();renderPanelList();openStaffPanelFor(p);
+ }).catch(function(err){noteFbError(err,"setAdmin");toast(fbErrText(err.code||"permission-denied"));});
+}
+function panelSetAdminPerms(uid,perms){
+ if(!fbDb||!fbUser||myRole!=="owner")return;
+ adminPermsByUid[uid]=perms;
+ fbDb.collection("config").doc("admins").set({perms:adminPermsByUid},{merge:true}).catch(function(err){noteFbError(err,"adminPerms");});
+ fbDb.collection("users").doc(uid).update({adminPerms:perms}).catch(function(){});
+ auditGrant("set_admin_perms",{_uid:uid,name:uid},{});
+ toast("🛡️ Permissions updated.");
+}
+function panelSetBan(p,ban,opts){
+ opts=opts||{};
+ if(!fbDb||!fbUser||(myRole!=="owner"&&myRole!=="admin")){toast("Only the Owner and Admins can ban.");return false;}
+ if(myRole==="admin"){
+  if(ban&&opts.hard&&!canAdmin("hardban")){toast("🛡️ The Owner hasn't given you the Hard ban permission.");return false;}
+  if(ban&&!opts.hard&&!canAdmin("ban")){toast("🛡️ The Owner hasn't given you the Ban permission.");return false;}
+  if(!ban&&!canAdmin("unban")){toast("🛡️ The Owner hasn't given you the Unban permission.");return false;}
+  if(guardOwnerTarget(p,ban?"ban":"unban"))return false;
+ }
+ if(p._uid===fbUser.uid){toast("You can't ban yourself.");return false;}
+ var role=roleOfUid(p._uid,p.role);
+ if(myRole==="admin"){
+  if(role==="owner"){toast("🛡️ Admins can't ban the Owner.");return false;}
+  if(role==="admin"){toast("🛡️ Admins can't ban other admins.");return false;}
+  if(!ban&&p.bannedByOwner){toast("🛡️ Only the Owner can lift an Owner ban.");return false;}
+ }
+ var hard=!!opts.hard;
+ var reason=String(opts.reason||"").trim().slice(0,120);
+ var label=String(opts.durationLabel||"").slice(0,40);
+ var untilTs=null;
+ if(ban&&opts.durationMs){try{var targetMs=Date.now()+opts.durationMs;if(targetMs>BAN_MAX_TS_MS)targetMs=BAN_MAX_TS_MS;untilTs=firebase.firestore.Timestamp.fromMillis(targetMs);}catch(e){untilTs=null;}}
+ var upd=ban?{banned:true,bannedBy:fbUser.uid,bannedByOwner:myRole==="owner",bannedUntil:untilTs,banReason:reason,hardBanned:hard,banLengthLabel:label}
+           :{banned:false,bannedBy:"",bannedByOwner:false,bannedUntil:null,banReason:"",hardBanned:false,banLengthLabel:""};
+ var jobs;
+ try{
+  jobs=[fbDb.collection("users").doc(p._uid).update(upd)];
+  if(ban&&hard&&(p.deviceIds||[]).length){
+   p.deviceIds.forEach(function(dev){
+    jobs.push(fbDb.collection("deviceBans").doc(dev).set({deviceId:dev,bannedUid:p._uid,bannedBy:fbUser.uid,bannedAt:firebase.firestore.FieldValue.serverTimestamp(),bannedUntil:untilTs,reason:reason,banLengthLabel:label}).catch(function(){}));
+   });
+  }
+  if(!ban&&(p.deviceIds||[]).length){
+   p.deviceIds.forEach(function(dev){
+    jobs.push(fbDb.collection("deviceBans").doc(dev).delete().catch(function(){}));
+   });
+  }
+ }catch(e){noteFbError(e,"ban");toast(fbErrText(e.code||"permission-denied"));renderPanelList();return false;}
+ Promise.all(jobs).then(function(){
+  p.banned=ban;p.bannedUntil=untilTs;p.banReason=reason;p.hardBanned=ban&&hard;p.banLengthLabel=ban?label:"";
+  if(ban){p.bannedBy=fbUser.uid;p.bannedByOwner=myRole==="owner";}else{p.bannedBy="";p.bannedByOwner=false;}
+  var durTxt=ban?(label?(" for "+label):(untilTs?(" for "+banRemainingText({bannedUntil:untilTs})):" permanently")):"";
+  auditGrant(ban?(hard?"hard_ban":"ban"):"unban",p,{reason:reason,duration:ban?(label||"Permanent"):""});
+  toast(ban?((hard?"🔨 Hard-banned ":"🔨 Banned ")+(p.name||p.username)+durTxt+(hard&&!(p.deviceIds||[]).length?" (No device recorded yet — account ban only for now.)":"")+"."):(("🔓 Unbanned "+(p.name||p.username)+".")));
+  renderPanelList();
+ }).catch(function(err){noteFbError(err,"ban");toast(fbErrText(err.code||"permission-denied"));renderPanelList();});
+ return true;
+}
+
+/* ===== js_50_ui.js ===== */
+/* ================= Anime Clash — UI, rendering, boot ================= */
+var FB_IMG_MAX=5*1024*1024; /* 5 MB */
+var FB_IMG_SMALL=300000; /* base64 fallback cap */
+var UPDATE_LOG=[
+ {v:"v1.0.0",tag:"LAUNCH — real PvP, bot tutorial, owner panel",date:"November 11, 2026",
+  highlights:["⚔️ Real PvP battles — room codes + quick match","🤖 Tutorial vs bots","🃏 100 anime characters — buy them in the shop","✨ Forms: transform mid-battle into the top form","🎞️ GIF profile pics & banners (big GIFs shrink to fit)","👑 Owner panel — give gems, ban, manage admins"],
+  groups:[
+   {t:"Roster — 100 characters, 50 series",items:["Dragon Ball, Naruto, One Piece, Bleach, JJK, MHA, Demon Slayer, AoT, OPM, Chainsaw Man, Black Clover, Fairy Tail, FMA, JoJo, Solo Leveling, Slime, Overlord, Fire Force, Soul Eater, Yu Yu Hakusho, Gurren Lagann, Berserk, Seven Deadly Sins, Frieren, Kaiju No. 8, Dandadan, Mashle, and more"]},
+   {t:"Battle",items:["Elixir, deploy on your half, towers, 3-minute timer, overtime sudden death","Transform meter — transform into the top form mid-battle","Trophies, coins, win streaks, XP & levels"]},
+   {t:"Accounts & owner",items:["Username + password accounts (no email needed)","GIF pfp & banner for everyone","Owner panel: give gems/coins/units, ban/unban, hard ban, per-admin permissions","Owner can never be touched by an admin — enforced in UI, code, and rules"]}]}];
+var currentView="play";
+var selectedHandIdx=null;
+var battleEls={towers:{},units:{}};
+
+function switchView(name){
+ currentView=name;
+ ["play","units","shop","ranks","profile"].forEach(function(v){
+  var el=$("view"+v.charAt(0).toUpperCase()+v.slice(1));
+  if(el)el.classList.toggle("hidden",v!==name);
+  var nav=$("nav"+v.charAt(0).toUpperCase()+v.slice(1));
+  if(nav)nav.classList.toggle("on",v===name);
+ });
+ if(name==="units")renderUnits();
+ if(name==="shop")renderShop();
+ if(name==="ranks")renderLeaderboard();
+ if(name==="profile"){renderProfile();renderRolePanel();}
+}
+function renderHud(){
+ if(!S)return;
+ var av=$("hudAvatar");
+ if(av){
+  if(S.avatarImg)av.innerHTML='<img src="'+S.avatarImg+'" alt="">';
+  else av.textContent="⚔️";
+ }
+ $("hudName").textContent=displayName();
+ $("hudRole").innerHTML="Lv "+(S.level||1)+" · "+(S.trophies||0)+" 🏆 "+roleTag(myRole,{customTitle:myCustomTitle});
+ $("hudGems").textContent="💎 "+fmtNum(S.gems||0);
+ $("hudCoins").textContent="🪙 "+fmtNum(S.coins||0);
+ $("hudTroph").textContent="🏆 "+fmtNum(S.trophies||0);
+}
+function renderAll(){renderHud();renderProfile();renderUnits();renderShop();renderLeaderboard();renderUpdateLog();}
+function renderUpdateLog(){
+ var el=$("updateLogList");if(!el)return;
+ el.innerHTML=UPDATE_LOG.map(function(e){
+  return "<h3>"+esc(e.v)+" — "+esc(e.tag)+"</h3><p class='sub'>"+esc(e.date)+"</p>"
+   +"<ul style='margin:6px 0;padding-left:18px'>"+e.highlights.map(function(h){return "<li style='font-size:13px'>"+esc(h)+"</li>";}).join("")+"</ul>"
+   +e.groups.map(function(g){return "<p style='font-size:13px;margin:8px 0 2px'><b>"+esc(g.t)+"</b></p><ul style='margin:2px 0;padding-left:18px'>"+g.items.map(function(i){return "<li style='font-size:12px;color:var(--muted)'>"+esc(i)+"</li>";}).join("")+"</ul>";}).join("");
+ }).join("");
+}
+function renderProfile(){
+ if(!S)return;
+ var av=$("profileAvatar");
+ if(av){
+  if(S.avatarImg)av.innerHTML='<img src="'+S.avatarImg+'" alt="">';
+  else av.textContent="⚔️";
+ }
+ var bn=$("profileBanner");
+ if(bn){
+  if(S.bannerGif)bn.innerHTML='<img src="'+S.bannerGif+'" alt="">';
+  else bn.innerHTML="";
+ }
+ $("profileName").textContent=displayName();
+ $("profileTags").innerHTML=roleTag(myRole,{customTitle:myCustomTitle});
+ $("stTroph").textContent=fmtNum(S.trophies||0);
+ $("stWins").textContent=S.wins||0;
+ $("stLevel").textContent=S.level||1;
+ $("stGems").textContent=fmtNum(S.gems||0);
+ $("stCoins").textContent=fmtNum(S.coins||0);
+ $("stStreak").textContent=S.winStreak||0;
+ var note=$("shopGemsNote");
+ if(note)note.textContent="You have "+fmtNum(S.gems||0)+" 💎 and "+fmtNum(S.coins||0)+" 🪙.";
+}
+function renderUnits(){
+ var el=$("unitsList");if(!el||!S)return;
+ var owned=Object.keys(S.units||{}).map(function(id){return UNIT_BY_ID[id];}).filter(Boolean);
+ owned.sort(function(a,b){return (RARITY_ORDER[b.rarity]-RARITY_ORDER[a.rarity])||a.name.localeCompare(b.name);});
+ var html="<p class='sub'>Deck: <b>"+(S.deck||[]).length+"/8</b> — tap a unit to add or remove it from your deck. Tap a unit's name to see its forms.</p>";
+ el.innerHTML=html;
+ owned.forEach(function(def){
+  var lvl=unitLevel(def.id);
+  var st=unitStats(def,lvl);
+  var inDeck=deckHas(def.id);
+  var row=document.createElement("div");row.className="unitRow";
+  row.innerHTML='<div class="ic" style="color:'+def.color+'">'+def.icon+'</div>'
+   +'<div style="flex:1"><div class="nm">'+esc(def.name)+' <span class="pill '+def.rarity+'">'+def.rarity+'</span></div>'
+   +'<div class="st">'+esc(def.series)+' · Lv '+lvl+' · HP '+st.hp+' · DMG '+st.dmg+' · '+def.role+' · '+def.cost+' elixir</div>'
+   +'<div class="st">✨ '+esc(def.ability)+'</div>'
+   +'<details><summary style="font-size:12px;color:var(--muted);cursor:pointer">Forms ('+def.forms.length+')</summary><div class="st">'+def.forms.map(esc).join(" → ")+'</div></details></div>'
+   +'<div class="acts"><button class="btn small '+(inDeck?"green":"")+'" type="button">'+(inDeck?"✓ In deck":"＋ Deck")+'</button><br>'
+   +'<button class="btn small blue" type="button">⬆️ Lv '+(lvl+1)+' ('+upgradeCost(def.id)+' 🪙)</button></div>';
+  var btns=row.querySelectorAll("button");
+  btns[0].addEventListener("click",function(){toggleDeck(def.id);});
+  btns[1].addEventListener("click",function(){upgradeUnit(def.id);});
+  el.appendChild(row);
+ });
+ if(!owned.length)el.innerHTML+="<p class='sub'>No units yet — buy some in the Shop.</p>";
+}
+var shopFilter={q:"",series:"",rarity:""};
+function renderShop(){
+ var el=$("shopList");if(!el||!S)return;
+ var card=el.parentElement;
+ var filt=$("shopFilters");
+ if(!filt){
+  filt=document.createElement("div");filt.id="shopFilters";
+  filt.innerHTML='<input type="text" id="shopSearch" placeholder="🔍 Search characters…">'
+   +'<div style="display:flex;gap:6px"><select id="shopSeries" style="flex:1"><option value="">All series</option></select>'
+   +'<select id="shopRarity" style="flex:1"><option value="">All rarities</option><option value="common">Common</option><option value="rare">Rare</option><option value="epic">Epic</option><option value="legendary">Legendary</option><option value="mythic">Mythic</option></select></div>';
+  card.insertBefore(filt,el);
+  var sel=$("shopSeries");
+  SERIES_LIST.forEach(function(s){var o=document.createElement("option");o.value=s;o.textContent=s;sel.appendChild(o);});
+  $("shopSearch").addEventListener("input",function(){shopFilter.q=this.value;renderShop();});
+  sel.addEventListener("change",function(){shopFilter.series=this.value;renderShop();});
+  $("shopRarity").addEventListener("change",function(){shopFilter.rarity=this.value;renderShop();});
+ }else{
+  var s=$("shopSearch");if(s&&s.value!==shopFilter.q)s.value=shopFilter.q;
+ }
+ var q=shopFilter.q.trim().toLowerCase();
+ var list=UNITS.filter(function(def){
+  if(shopFilter.series&&def.series!==shopFilter.series)return false;
+  if(shopFilter.rarity&&def.rarity!==shopFilter.rarity)return false;
+  if(q&&(def.name+" "+def.series+" "+def.ability).toLowerCase().indexOf(q)<0)return false;
+  return true;
+ });
+ list.sort(function(a,b){return (RARITY_ORDER[a.rarity]-RARITY_ORDER[b.rarity])||a.name.localeCompare(b.name);});
+ el.innerHTML="";
+ list.forEach(function(def){
+  var owned=ownsUnit(def.id);
+  var price=SHOP_PRICE[def.rarity];
+  var priceTxt=price.coins>0?price.coins+" 🪙":price.gems+" 💎";
+  var row=document.createElement("div");row.className="shopRow";
+  row.innerHTML='<div class="ic" style="color:'+def.color+'">'+def.icon+'</div>'
+   +'<div style="flex:1"><div class="nm">'+esc(def.name)+' <span class="pill '+def.rarity+'">'+def.rarity+'</span></div>'
+   +'<div class="st">'+esc(def.series)+' · '+def.role+' · '+def.cost+' elixir · HP '+unitStats(def,1).hp+' · DMG '+unitStats(def,1).dmg+'</div>'
+   +'<div class="st">✨ '+esc(def.ability)+'</div>'
+   +'<div class="st">Forms: '+def.forms.map(esc).join(" → ")+'</div></div>'
+   +'<div class="acts">'+(owned?'<span class="pill">✓ Owned</span>':'<button class="btn small" type="button">Buy · '+priceTxt+'</button>')+'</div>';
+  if(!owned){
+   var b=row.querySelector("button");
+   b.addEventListener("click",function(){buyUnit(def.id);});
+  }
+  el.appendChild(row);
+ });
+ if(!list.length)el.innerHTML="<p class='sub'>No characters match that search.</p>";
+}
+function renderLeaderboard(){
+ var el=$("lbList");if(!el)return;
+ if(!fbDb){el.innerHTML="<p class='sub'>Leaderboard needs an account connection.</p>";return;}
+ fbDb.collection("users").orderBy("trophies","desc").limit(20).get().then(function(snap){
+  var rows=[];
+  snap.forEach(function(d){var o=d.data();o._uid=d.id;rows.push(o);});
+  rows=rows.filter(function(p){
+   if(ownerInfo&&ownerInfo.ownerUid===p._uid)return false;
+   if((p.role||"player")!=="player")return false;
+   return true;
+  });
+  el.innerHTML="";
+  if(!rows.length){el.innerHTML="<p class='sub'>No players yet — be the first to climb!</p>";return;}
+  rows.forEach(function(p,i){
+   var row=document.createElement("div");row.className="lbRow";
+   row.innerHTML='<div class="rank">'+(i+1)+'</div><div style="flex:1"><b>'+esc(p.name||p.username||"?")+'</b> '+roleTag(p.role||"player",p)
+    +'<div class="sub">Lv '+(p.level||1)+' · '+(p.wins||0)+' wins</div></div><div><b>🏆 '+(p.trophies||0)+'</b></div>';
+   el.appendChild(row);
+  });
+ }).catch(function(err){noteFbError(err,"lb");el.innerHTML="<p class='sub'>Couldn't load the leaderboard.</p>";});
+}
+
+/* ---------- battle view ---------- */
+function showBattleView(){
+ $("playMenu").classList.add("hidden");
+ $("battleCard").classList.remove("hidden");
+ $("battleResult").classList.add("hidden");$("battleResult").innerHTML="";
+ battleEls={towers:{},units:{}};
+ selectedHandIdx=null;
+ buildArena();
+}
+function showPlayMenu(){
+ $("playMenu").classList.remove("hidden");
+ $("battleCard").classList.add("hidden");
+}
+function buildArena(){
+ var arena=$("battleArena");
+ arena.innerHTML='<div class="river"></div><div class="bridge" style="left:17.5%"></div><div class="bridge" style="left:67.5%"></div>';
+ battleEls.towers={};battleEls.units={};
+}
+function towerEl(key,tw,flipped){
+ var el=battleEls.towers[key];
+ var x=tw.x,y=flipped?ARENA.h-tw.y:tw.y;
+ if(!el){
+  el=document.createElement("div");
+  el.className="tower "+(key.indexOf("mine")===0?"mine":"enemy")+(tw.king?" king":"");
+  el.innerHTML='<div class="hpbar"><i></i></div>👑';
+  if(!tw.king)el.textContent="";
+  el.innerHTML='<div class="hpbar"><i></i></div>'+(tw.king?"👑":"🏰");
+  $("battleArena").appendChild(el);
+  battleEls.towers[key]=el;
+ }
+ el.style.left=(x/ARENA.w*100)+"%";
+ el.style.top=(y/ARENA.h*100)+"%";
+ el.style.transform="translate(-50%,-50%)";
+ el.style.opacity=tw.dead?0.25:1;
+ var bar=el.querySelector(".hpbar i");
+ if(bar)bar.style.width=Math.max(0,tw.hp/tw.max*100)+"%";
+ return el;
+}
+function unitEl(u,flipped){
+ var el=battleEls.units[u.uid];
+ var def=UNIT_BY_ID[u.defId];
+ var y=flipped?ARENA.h-u.y:u.y;
+ var sideCls=flipped?(u.side==="enemy"?"mine":"enemy"):u.side;
+ if(!el){
+  el=document.createElement("div");
+  el.className="unit "+sideCls+(u.flying?" fly":"");
+  el.innerHTML='<div class="uhp"><i></i></div><span class="uic"></span><div class="umeter" style="position:absolute;left:-2px;right:-2px;bottom:-6px;height:3px;background:#0008;border-radius:2px;overflow:hidden"><i style="display:block;height:100%;background:#c084fc;width:0%"></i></div>';
+  $("battleArena").appendChild(el);
+  battleEls.units[u.uid]=el;
+ }
+ el.style.left=(u.x/ARENA.w*100)+"%";
+ el.style.top=(y/ARENA.h*100)+"%";
+ el.className="unit "+sideCls+(u.flying?" fly":"")+(u.transformed?" sel":"");
+ var ic=el.querySelector(".uic");
+ if(ic)ic.textContent=def?def.icon:"❓";
+ var bar=el.querySelector(".uhp i");
+ if(bar)bar.style.width=Math.max(0,u.hp/u.maxHp*100)+"%";
+ var mb=el.querySelector(".umeter i");
+ if(mb)mb.style.width=Math.min(100,u.meter||0)+"%";
+ el.title=def?def.name+(u.transformed?" — "+u.form:""):"";
+ return el;
+}
+function renderBattle(st,flipped){
+ if(!st)return;
+ var arena=$("battleArena");
+ if(!arena)return;
+ /* towers */
+ Object.keys(st.towers).forEach(function(k){towerEl(k,st.towers[k],!!flipped);});
+ /* units: create/update, drop the gone */
+ var seen={};
+ st.units.forEach(function(u){seen[u.uid]=1;unitEl(u,!!flipped);});
+ Object.keys(battleEls.units).forEach(function(uid){
+  if(!seen[uid]){var el=battleEls.units[uid];if(el&&el.parentNode)el.parentNode.removeChild(el);delete battleEls.units[uid];}
+ });
+ /* timer */
+ var t=st.overtime?st.overTimeLeft:Math.max(0,st.timeLeft);
+ var mm=Math.floor(t/60),ss=Math.floor(t%60);
+ $("battleTimer").textContent=(st.overtime?"⏱️ OT ":"")+mm+":"+(ss<10?"0":"")+ss;
+ /* elixir + hand (flipped: my side is the sim "enemy" side) */
+ var mySide=flipped?"enemy":"mine";
+ var elix=st.elixir?st.elixir[mySide]:0;
+ $("elixirBar").style.width=(elix/ELIXIR_MAX*100)+"%";
+ $("elixirNum").textContent="Elixir "+Math.floor(elix)+"/10"+(st.overtime||st.timeLeft<=60?" — ⚡ DOUBLE ELIXIR":"");
+ renderHand(st,mySide,!!flipped);
+ /* transform button */
+ var tb=$("btnTransform");
+ if(tb){
+  var tu=myTransformableUnit(st,mySide);
+  tb.classList.toggle("hidden",!tu);
+  if(tu){var def=UNIT_BY_ID[tu.defId];tb.textContent="✨ TRANSFORM — "+def.name+" → "+tu.form||"✨ TRANSFORM";}
+ }
+}
+function renderHand(st,mySide,flipped){
+ var wrap=$("handCards");if(!wrap)return;
+ var hand=(st.hands||{})[mySide]||[];
+ var elix=st.elixir?st.elixir[mySide]:0;
+ var next=(st.decks&&st.decks[mySide]&&st.decks[mySide][0])||null;
+ wrap.innerHTML="";
+ hand.forEach(function(id,i){
+  var def=UNIT_BY_ID[id];if(!def)return;
+  var b=document.createElement("button");b.type="button";
+  b.className="handCard"+(selectedHandIdx===i?" sel":"");
+  b.disabled=def.cost>elix;
+  b.innerHTML='<div class="e">'+def.icon+'</div><div>'+esc(def.name.split(" ")[0])+'</div><div class="cost">⬡ '+def.cost+'</div>';
+  b.addEventListener("click",function(){
+   selectedHandIdx=selectedHandIdx===i?null:i;
+   sndClick();renderBattle(st,flipped);
+  });
+  wrap.appendChild(b);
+ });
+ if(next){
+  var def=UNIT_BY_ID[next];
+  if(def){
+   var nb=document.createElement("div");nb.className="handCard next";
+   nb.innerHTML='<div class="e">'+def.icon+'</div><div>Next</div><div class="cost">⬡ '+def.cost+'</div>';
+   wrap.appendChild(nb);
+  }
+ }
+}
+function arenaTap(e){
+ if(!battle||battle.result)return;
+ var arena=$("battleArena");
+ var r=arena.getBoundingClientRect();
+ var x=(e.clientX-r.left)/r.width*ARENA.w;
+ var y=(e.clientY-r.top)/r.height*ARENA.h;
+ if(selectedHandIdx==null){toast("Tap a card first, then tap the arena to deploy.");return;}
+ var idx=selectedHandIdx;
+ if(battle.mode==="pvp-guest"){
+  /* guest view is flipped: screen bottom = sim top half */
+  guestDeploy(idx,x,ARENA.h-y);
+  selectedHandIdx=null;
+  return;
+ }
+ var res=deployCard(battle,"mine",idx,x,y);
+ if(res.ok){sndDeploy();selectedHandIdx=null;renderBattle(battle,false);}
+ else{sndErr();toast(res.why||"Can't deploy there.");}
+}
+
+/* ---------- GIF pickers (shrinker in js_35_upload.js) ---------- */
+function uploadLabelEl(kind){
+ return kind==="avatar"?$("avatarLabel"):$("bannerLabel");
+}
+function setUploadBusy(kind,busy,pct,verb){
+ var id=kind==="avatar"?"gifAvatarFile":"gifBannerFile";
+ var inp=$(id);if(inp)inp.disabled=!!busy;
+ var lab=uploadLabelEl(kind);if(!lab)return;
+ if(!lab.dataset.orig)lab.dataset.orig=lab.textContent;
+ lab.textContent=busy?("⏳ "+(verb||"Uploading")+"… "+Math.round(pct||0)+"%"):lab.dataset.orig;
+}
+function readGifFile(file,kind){
+ uploadImageFile(file,kind,function(url){
+  if(kind==="avatar"){S.avatarImg=url;profile.avatarImg=url;toast("🎞️ GIF profile picture set!");}
+  else{S.bannerGif=url;profile.bannerGif=url;toast("🎞️ GIF banner set!");}
+  saveCloud();renderProfile();renderHud();
+ });
+}
+
+/* ---------- boot ---------- */
+function enterOfflineMode(){
+ fbUser={uid:"offline-"+getDeviceId(),email:"offline@local"};
+ if(!loadLocal())S=defaultSave();
+ renderAuth();switchView("play");
+ toast("🤖 Offline mode — bot battles work, accounts need Firebase.");
+}
+function boot(){
+ S=defaultSave();
+ if(loadLocal()){
+  /* migrate any pre-roster save (old placeholder units) to the starter set */
+  if(S.units&&S.units.ronin){
+   S.units={};STARTER_UNITS.forEach(function(id){S.units[id]={level:1};});
+   S.deck=STARTER_UNITS.slice();
+  }
+  if(!S.deck||!S.deck.length)S.deck=STARTER_UNITS.slice();
+ }
+ /* transform button (created once, lives in the battle card) */
+ var tb=document.createElement("button");
+ tb.id="btnTransform";tb.type="button";tb.className="btn small hidden";
+ tb.textContent="✨ TRANSFORM";
+ tb.addEventListener("click",function(){tryTransform();});
+ var en=$("elixirNum");
+ if(en&&en.parentNode)en.parentNode.insertBefore(tb,en.nextSibling);
+ /* wire buttons */
+ $("btnLogin").addEventListener("click",doSignIn);
+ $("btnRegister").addEventListener("click",doSignUp);
+ $("btnSignOut").addEventListener("click",doSignOut);
+ $("btnBannedLogout").addEventListener("click",doSignOut);
+ $("btnTutorial").addEventListener("click",startBotBattle);
+ $("btnQuickMatch").addEventListener("click",quickMatch);
+ $("btnCreateRoom").addEventListener("click",createRoom);
+ $("btnJoinRoom").addEventListener("click",function(){joinRoom($("roomCodeInput").value);});
+ $("btnBattleExit").addEventListener("click",leaveBattle);
+ $("battleArena").addEventListener("click",arenaTap);
+ var avIn=$("gifAvatarFile");
+ if(avIn)avIn.addEventListener("change",function(){if(avIn.files&&avIn.files[0])readGifFile(avIn.files[0],"avatar");avIn.value="";});
+ var bnIn=$("gifBannerFile");
+ if(bnIn)bnIn.addEventListener("change",function(){if(bnIn.files&&bnIn.files[0])readGifFile(bnIn.files[0],"banner");bnIn.value="";});
+ [["navPlay","play"],["navUnits","units"],["navShop","shop"],["navRanks","ranks"],["navProfile","profile"]].forEach(function(pair){
+  var b=$(pair[0]);if(b)b.addEventListener("click",function(){switchView(pair[1]);});
+ });
+ if(!FIREBASE_CONFIGURED){
+  var off=document.createElement("button");
+  off.className="btn green";off.type="button";off.textContent="🤖 Play offline — bots only";
+  off.addEventListener("click",enterOfflineMode);
+  var reg=$("btnRegister");
+  if(reg&&reg.parentNode)reg.parentNode.insertBefore(off,reg.nextSibling);
+ }
+ renderUpdateLog();
+ renderAll();
+ fbInit();
+ if(!FIREBASE_CONFIGURED)showAuthGate();
+ try{
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(function(){});
+ }catch(e){}
+}
+boot();
+
+</script>
+</body>
+</html>
