@@ -1845,7 +1845,7 @@ window.gifenc=exports;})();
     <div class="logo">⚔️🌸</div>
     <h1>ANIME CLASH</h1>
     <p>Anime battle arena — deploy units, smash towers, climb the ranks.</p>
-    <div class="gate-version"><span class="ver-badge">v2.0</span> <b>v2.0 — spirit orbs replace the old bar</b></div>
+    <div class="gate-version"><span class="ver-badge">v2.0.1</span> <b>v2.0.1 — owner panel fix</b></div>
   </div>
   <div class="gate-card">
     <h2>Play Anime Clash</h2>
@@ -2044,7 +2044,7 @@ window.gifenc=exports;})();
 /* ===== js_10_core.js ===== */
 "use strict";
 /* ================= Anime Clash v1.1 — core ================= */
-var CURRENT_VERSION="v2.0";
+var CURRENT_VERSION="v2.0.1";
 /* FIREBASE_CONFIG — PLACEHOLDER. The parent creates the real Firebase
    project ("anime-clash") and swaps these values in before deploy.
    DO NOT ship with invented keys: with the placeholder, the game runs
@@ -3770,7 +3770,10 @@ function auditGrant(action,target,details){
   targetUid:target._uid||target.uid||"",targetName:target.name||target.username||"",
   details:details||{},at:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(err){noteFbError(err,"audit");});
 }
-function targetIsOwner(p){return roleOfUid(p._uid,p.role)==="owner";}
+function targetIsOwner(p){
+ if(ownerInfo&&ownerInfo.ownerUid)return p._uid===ownerInfo.ownerUid;
+ return roleOfUid(p._uid,p.role)==="owner";
+}
 function guardOwnerTarget(p,action){
  var isSelf = p._uid===fbUser.uid;
  if(isSelf && myRole!=="owner"){toast("You can't "+action+" yourself.");return true;}
@@ -4243,7 +4246,7 @@ function openStaffPanelFor(p){
   bG.addEventListener("click",function(){
    var n=Math.floor(Number(inG.value)||0);
    if(n<=0){toast("Type how many gems first.");return;}
-   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   if(myRole!=="owner"&&isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
    panelGiveCurrency(p,"gems",n);
   });
   cG.appendChild(inG);cG.appendChild(bG);t.appendChild(cG);
@@ -4253,7 +4256,7 @@ function openStaffPanelFor(p){
   bC.addEventListener("click",function(){
    var n=Math.floor(Number(inC.value)||0);
    if(n<=0){toast("Type how many coins first.");return;}
-   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   if(myRole!=="owner"&&isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
    panelGiveCurrency(p,"coins",n);
   });
   cC.appendChild(inC);cC.appendChild(bC);t.appendChild(cC);
@@ -4263,7 +4266,7 @@ function openStaffPanelFor(p){
   bT.addEventListener("click",function(){
    var n=Math.floor(Number(inT.value)||0);
    if(n<=0){toast("Type how many trophies first.");return;}
-   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   if(myRole!=="owner"&&isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
    panelGiveCurrency(p,"trophies",n);
   });
   cT.appendChild(inT);cT.appendChild(bT);t.appendChild(cT);
@@ -4273,7 +4276,7 @@ function openStaffPanelFor(p){
   bL.addEventListener("click",function(){
    var n=Math.floor(Number(inL.value)||0);
    if(n<1||n>99999){toast("Level must be 1–99999.");return;}
-   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   if(myRole!=="owner"&&isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
    panelSetLevel(p,n);
   });
   cL.appendChild(inL);cL.appendChild(bL);t.appendChild(cL);
@@ -4283,7 +4286,7 @@ function openStaffPanelFor(p){
   bX.addEventListener("click",function(){
    var n=Math.floor(Number(inX.value)||0);
    if(n<=0){toast("Type how much XP first.");return;}
-   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   if(myRole!=="owner"&&isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
    panelGiveXp(p,n);
   });
   cX.appendChild(inX);cX.appendChild(bX);t.appendChild(cX);
@@ -4303,7 +4306,7 @@ function openStaffPanelFor(p){
   });
   var bU=toolBtn("Give unit","blue");
   bU.addEventListener("click",function(){
-   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   if(myRole!=="owner"&&isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
    if(!sel.value){toast("No unit matches that search.");return;}
    grantUnitTo(p._uid,sel.value).then(function(){
     auditGrant("give_unit",p,{unit:sel.value});
@@ -4316,7 +4319,7 @@ function openStaffPanelFor(p){
   var cA100=toolCard("🃏 Grant all 100 units","One tap — every character in the game, keeping any levels they already have.");
   var bA100=toolBtn("🃏 Grant all 100 units","blue");
   bA100.addEventListener("click",function(){
-   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   if(myRole!=="owner"&&isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
    bA100.disabled=true;bA100.textContent="🃏 Granting…";
    panelGrantAllUnits(p).then(function(){
     bA100.disabled=false;bA100.textContent="🃏 Grant all 100 units";
@@ -4770,6 +4773,10 @@ function exportAuditLog(){
 var FB_IMG_MAX=5*1024*1024; /* 5 MB */
 var FB_IMG_SMALL=300000; /* base64 fallback cap */
 var UPDATE_LOG=[
+ {v:"v2.0.1",tag:"Owner panel fix — the Inspector works for the Owner now",date:"November 12, 2026",
+  highlights:["👑 The Owner can use every Inspector tool on himself — give gems/coins/trophies, set level, give XP, grant units","🛡️ Admins still can never act on the Owner"],
+  groups:[
+   {t:"Owner panel fix",items:["The Inspector's give buttons no longer block the Owner from his own account","Admin immunity is unchanged — only the Owner himself gets through"]}]},
  {v:"v2.0",tag:"Spirit Orbs — the old bar is gone",date:"November 12, 2026",
   highlights:["💠 Spirit Orbs rain onto the arena — tap them to collect spirit","🎨 All 100 characters now have custom 3D art — no more emoji faces","⚔️ Kills drop orbs, smashing a tower pays +2 spirit","⚡ Last minute: orbs spawn twice as fast","🔮 Towers are now Guardians + the Spirit Nexus","🔎 Big high-contrast Spirit meter, bigger units with name labels","🏝️ New home menu — Spirit Island, daily rewards, big BATTLE button"],
   groups:[
