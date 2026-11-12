@@ -1,6 +1,6 @@
-// Anime Clash service worker — v1.0.0
+// Anime Clash service worker — v1.1
 // Network-first for the game page (so updates always land), cache-first for local icons/manifest.
-var CACHE = "anime-clash-v1";
+var CACHE = "anime-clash-v1.1";
 var ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(ASSETS); }).then(function () { return self.skipWaiting(); }));

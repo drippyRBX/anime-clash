@@ -118,9 +118,28 @@ label.fl{display:inline-block;background:#2c1e55;border:1px solid var(--line);bo
 .permRow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #ffffff10;font-size:14px}
 .permRow input{width:auto;margin:0}
 .chip-btn{display:inline-block;background:#2c1e55;border:1px solid var(--line);color:var(--text);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:700;margin:4px 4px 0 0}
+.chip-btn.on{background:var(--violet);border-color:var(--violet);color:#fff}
 .toolCard{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
 .toolCard b{font-size:14px}
 .toolCard p{margin:4px 0 8px}
+/* ---------- v1.1: announcement banner + floating staff panel ---------- */
+#announceBanner{display:flex;align-items:center;gap:8px;background:#3a2a00;border:1px solid var(--gold);color:#ffe9a8;border-radius:12px;padding:10px 12px;margin:10px 12px 0;font-size:14px;font-weight:700}
+#announceBanner button{margin-left:auto;background:none;border:0;color:#ffe9a8;font-size:16px;font-weight:900;padding:2px 6px;flex:0 0 auto}
+#eventBadge{color:#3ddc84}
+#adminFloatBtn{position:fixed;right:12px;top:64px;z-index:80;width:52px;height:52px;border-radius:50%;border:2px solid var(--gold);background:linear-gradient(135deg,#7c3aed,#ff4d8d);color:#fff;font-size:24px;box-shadow:0 8px 24px rgba(0,0,0,.5);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:0}
+#adminFloatBtn:active{cursor:grabbing}
+@media (max-width:560px){#adminFloatBtn{top:auto;bottom:76px}}
+#staffFloat{position:fixed;left:12px;top:88px;z-index:90;width:min(94vw,560px);max-height:82vh;background:var(--card);border:2px solid var(--line);border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden}
+.staff-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--card2);border-bottom:2px solid var(--line);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.staff-head h3{flex:1;margin:0;font-size:1.1rem}
+.staff-x{border:2px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;width:34px;height:34px;font-weight:900;font-size:1rem;flex:0 0 34px}
+.staff-body{overflow:auto;padding:12px;flex:1;min-height:0}
+#staffFloat.min .staff-body{display:none}
+.statCard{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;font-size:13px;line-height:1.5}
+.insp{background:var(--card2);border:1px solid var(--gold);border-radius:12px;padding:10px;margin-bottom:8px}
+.inspGrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:13px;margin:6px 0}
+.feedRow{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:13px;margin-bottom:6px}
+#auditExportBox{width:100%;height:120px;background:#150e2a;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px;font-size:11px;margin-top:8px}
 </style>
 </head>
 <body>
@@ -130,7 +149,7 @@ label.fl{display:inline-block;background:#2c1e55;border:1px solid var(--line);bo
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script>
-/* Anime Clash v1: vendored GIF libraries (inlined — no CDN, no worker, no WASM):
+/* Anime Clash v1.1: vendored GIF libraries (inlined — no CDN, no worker, no WASM):
    omggif 1.0.10 (MIT, decode) + gifenc 1.0.3 (MIT, encode).
    Same shrinker as Pig Clicker v2.5.3 — big Tenor GIFs shrink in the
    browser so they fit the 300 KB save-doc cap, animation preserved. */
@@ -1781,7 +1800,7 @@ window.gifenc=exports;})();
     <div class="logo">⚔️🌸</div>
     <h1>ANIME CLASH</h1>
     <p>Anime battle arena — deploy units, smash towers, climb the ranks.</p>
-    <div class="gate-version"><span class="ver-badge">v1.0.0</span> <b>LAUNCH — real PvP, bot tutorial, owner panel</b></div>
+    <div class="gate-version"><span class="ver-badge">v1.1</span> <b>v1.1 — floating admin panel + 30 staff tools</b></div>
   </div>
   <div class="gate-card">
     <h2>Play Anime Clash</h2>
@@ -1799,7 +1818,7 @@ window.gifenc=exports;})();
     <li>🎞️ <b>GIF profile pics &amp; banners</b> — big Tenor GIFs shrink to fit, free</li>
     <li>👑 <b>Owner panel</b> — give gems, ban, manage admins</li>
   </ul>
-  <p class="foot">Anime Clash v1.0.0 — original characters only. No accounts yet? Hit “Create account”.</p>
+  <p class="foot">Anime Clash v1.1 — original characters only. No accounts yet? Hit “Create account”.</p>
 </div>
 
 <!-- ============ BANNED SCREEN ============ -->
@@ -1828,6 +1847,9 @@ window.gifenc=exports;})();
     </div>
   </div>
 
+  <!-- v1.1: global announcement banner (staff posts it, every player sees it) -->
+  <div id="announceBanner" class="hidden"><span id="announceText"></span><button id="announceDismiss" type="button" aria-label="Dismiss announcement">✕</button></div>
+
   <!-- PLAY -->
   <div class="view" id="viewPlay">
     <div class="card" id="playMenu">
@@ -1841,6 +1863,7 @@ window.gifenc=exports;})();
       <button class="btn ghost" id="btnJoinRoom" type="button">🚪 Join room</button>
       <p class="sub" id="playStatus"></p>
       <p class="sub" id="myRoomCode"></p>
+      <p class="sub hidden" id="eventBadge">🎉 2x COINS EVENT is live — battle rewards are doubled!</p>
     </div>
     <div class="card hidden" id="battleCard">
       <div id="battleTimer">3:00</div>
@@ -1852,7 +1875,7 @@ window.gifenc=exports;})();
       <button class="btn ghost" id="btnBattleExit" type="button">Leave battle</button>
     </div>
     <div class="card">
-      <h3>📰 Update Log — v1.0.0</h3>
+      <h3>📰 Update Log — v1.1</h3>
       <div id="updateLogList"></div>
     </div>
   </div>
@@ -1933,13 +1956,24 @@ window.gifenc=exports;})();
     <button id="navRanks" type="button"><span class="ic">🏆</span>Ranks</button>
     <button id="navProfile" type="button"><span class="ic">👤</span>Profile</button>
   </div>
+
+  <!-- v1.1: floating staff button + floating staff panel (Pig Clicker-style:
+       drag the button anywhere, tap to open; drag the panel by its header,
+       minimize it, close it — position is saved per account) -->
+  <button id="adminFloatBtn" class="hidden" type="button" aria-label="Open admin panel">🛡️</button>
+  <div id="staffFloat" class="hidden">
+    <div class="staff-head" id="staffHead"><h3 id="staffFloatTitle">🛡️ Admin Panel</h3>
+      <button type="button" class="staff-x" id="staffMin" aria-label="Minimize panel">—</button>
+      <button type="button" class="staff-x" id="staffClose" aria-label="Close panel">✕</button></div>
+    <div class="staff-body" id="staffFloatBody"></div>
+  </div>
 </div>
 <script>
 
 /* ===== js_10_core.js ===== */
 "use strict";
-/* ================= Anime Clash v1.0.0 — core ================= */
-var CURRENT_VERSION="v1.0.0";
+/* ================= Anime Clash v1.1 — core ================= */
+var CURRENT_VERSION="v1.1";
 /* FIREBASE_CONFIG — PLACEHOLDER. The parent creates the real Firebase
    project ("anime-clash") and swaps these values in before deploy.
    DO NOT ship with invented keys: with the placeholder, the game runs
@@ -2080,7 +2114,7 @@ function fbInit(){
   fbAuth.onAuthStateChanged(function(u){
    fbUser=u||null;
    renderAuth();
-   if(u){onSignedIn(u);}else{teardownCloudListeners();stopBanWatch();showAuthGate();}
+   if(u){onSignedIn(u);}else{teardownCloudListeners();stopBanWatch();stopPresence();stopPublicConfig();showAuthGate();}
   });
  }catch(e){fbReady=false;noteFbError(e,"fbInit");}
 }
@@ -2101,6 +2135,33 @@ function banRemainingText(d){
  if(s<86400)return Math.floor(s/3600)+"h";
  return Math.floor(s/86400)+"d";
 }
+/* ---------- v1.1: timestamps, presence, mute state ---------- */
+function tsMs(v){
+ if(v==null)return 0;
+ if(typeof v==="number")return v;
+ if(typeof v.toMillis==="function")return v.toMillis();
+ if(typeof v.seconds==="number")return v.seconds*1000;
+ return 0;
+}
+/* Online = heartbeat (lastSeen) within the last 2 minutes. */
+function isOnline(p){
+ if(!p)return false;
+ var ms=tsMs(p.lastSeen);
+ return ms>0&&(Date.now()-ms)<120000;
+}
+/* A mute is ACTIVE while muted==true AND (no expiry OR expiry in future). */
+function isMutedActive(p){
+ if(!p||p.muted!==true)return false;
+ if(p.mutedUntil==null)return true;
+ return tsMs(p.mutedUntil)>Date.now();
+}
+var presenceInt=null;
+function pokePresence(){
+ if(!fbDb||!fbUser||banLock)return;
+ fbDb.collection("users").doc(fbUser.uid).update({lastSeen:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});
+}
+function startPresence(){stopPresence();pokePresence();presenceInt=setInterval(pokePresence,30000);}
+function stopPresence(){if(presenceInt){clearInterval(presenceInt);presenceInt=null;}}
 
 /* ---------- ban lock (live listener + device check) ---------- */
 var banLock=false,banInfo=null,banWatchUnsub=null,banCountInt=null;
@@ -2171,6 +2232,8 @@ function renderAuth(){
 function onSignedIn(user){
  if(banLock)return;
  watchOwnDoc();
+ startPresence();
+ subscribePublicConfig();
  checkDeviceBan().then(function(devBan){
   if(devBan){applyBanLock({reason:devBan.reason||"Device ban",until:devBan.bannedUntil||null});return;}
   loadProfile(user);
@@ -2196,7 +2259,7 @@ function applyDocToState(d){
  fields.forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
  profile.avatar=S.avatar||"";profile.avatarImg=S.avatarImg||"";profile.banner=S.banner||"";profile.bannerGif=S.bannerGif||"";
  myCustomTitle=S.customTitle||"";
- myMuted=!!d.muted;myDocRole=d.role||"player";
+ myMuted=isMutedActive(d);myDocRole=d.role||"player";
  S.level=levelFromXp(S.xp);
  saveLocal();
 }
@@ -2266,7 +2329,7 @@ function doSignIn(){
 }
 function doSignOut(){
  if(fbAuth)fbAuth.signOut().catch(function(){});
- banLock=false;clearBanState();stopBanWatch();
+ banLock=false;clearBanState();stopBanWatch();stopPresence();stopPublicConfig();
  S=defaultSave();profile={avatar:"",avatarImg:"",banner:"",bannerGif:""};
  try{localStorage.removeItem("animeclash.save.v1");}catch(e){}
  showAuthGate();
@@ -2892,6 +2955,8 @@ function finishBattle(st,left){
  var draw=st.winner==="draw";
  var win=iWon;
  var coins=draw?50:(win?100:20);
+ /* v1.1: 2x coins event (config/events) doubles the coin reward. */
+ if(typeof coins2xActive!=="undefined"&&coins2xActive)coins*=2;
  var troph=draw?0:(win?10:-5);
  var xp=draw?25:(win?50:15);
  S.coins+=coins;
@@ -2905,9 +2970,10 @@ function finishBattle(st,left){
  var res=$("battleResult");
  if(res){
   res.classList.remove("hidden");
-  res.innerHTML=draw?"<h2>🤝 Draw!</h2><p>+50 🪙 · +25 XP</p>"
-   :win?"<h2>👑 VICTORY!</h2><p>+"+coins+" 🪙 · +"+troph+" 🏆 · +"+xp+" XP"+(gemsBonus?" · +"+gemsBonus+" 💎 streak bonus!":"")+"</p>"
-   :"<h2>💀 Defeat</h2><p>+"+coins+" 🪙 · "+troph+" 🏆 · +"+xp+" XP — run it back!</p>";
+  var evTxt=(typeof coins2xActive!=="undefined"&&coins2xActive)?" 🎉 2x event!":"";
+  res.innerHTML=draw?"<h2>🤝 Draw!</h2><p>+"+coins+" 🪙 · +25 XP"+evTxt+"</p>"
+   :win?"<h2>👑 VICTORY!</h2><p>+"+coins+" 🪙 · +"+troph+" 🏆 · +"+xp+" XP"+(gemsBonus?" · +"+gemsBonus+" 💎 streak bonus!":"")+evTxt+"</p>"
+   :"<h2>💀 Defeat</h2><p>+"+coins+" 🪙 · "+troph+" 🏆 · +"+xp+" XP — run it back!"+evTxt+"</p>";
  }
  if(win)sndWin();else if(!draw)sndLose();
  if(st.mode==="pvp-host"&&fbDb&&currentRoomCode){
@@ -2916,7 +2982,23 @@ function finishBattle(st,left){
   fbDb.collection("rooms").doc(currentRoomCode).update({state:"done",winner:winnerUid}).catch(function(){});
  }
  if(st.mode==="pvp-host")publishResult(st);
- if(!left)toast(win?"👑 Victory! +"+coins+" coins, +"+troph+" trophies!":(draw?"🤝 Draw — +50 coins.":"💀 Defeat — +20 coins. Run it back!"));
+ /* v1.1: count the battle for the server stats card (config/stats). */
+ if(fbDb&&fbUser)recordBattleStat();
+ if(!left)toast(win?"👑 Victory! +"+coins+" coins, +"+troph+" trophies!":(draw?"🤝 Draw — +"+coins+" coins.":"💀 Defeat — +"+coins+" coins. Run it back!"));
+}
+/* ---------- v1.1: server stats counter (battles today) ---------- */
+function recordBattleStat(){
+ if(!fbDb||!fbUser)return;
+ var today=new Date().toISOString().slice(0,10);
+ var ref=fbDb.collection("config").doc("stats");
+ ref.get().then(function(doc){
+  var d=doc.exists?doc.data():{};
+  if(d.date===today){
+   ref.set({battlesToday:firebase.firestore.FieldValue.increment(1)},{merge:true}).catch(function(){});
+  }else{
+   ref.set({date:today,battlesToday:1},{merge:true}).catch(function(){});
+  }
+ }).catch(function(){});
 }
 
 /* ---------- PvP: rooms + MQTT ---------- */
@@ -3363,12 +3445,19 @@ function uploadImageFile(file,kind,onDone){
 
 
 /* ===== js_40_staff.js ===== */
-/* ================= Anime Clash — owner panel, admins, bans =================
+/* ================= Anime Clash v1.1 — staff panel, admins, bans =================
    Owner immunity is HARD-CODED and non-negotiable: no admin can EVER ban,
    mute, or act on the Owner, no matter the toggles. Enforced in the UI,
-   in every action function, AND in the Firestore rules. */
+   in every action function, AND in the Firestore rules.
+   v1.1: the panel is a FLOATING window (Pig Clicker-style) opened by a
+   draggable 🛡️ button, plus 30 new staff tools. */
 var BAN_MAX_TS_MS=253402300799999; /* Firestore max Timestamp: 9999-12-31 */
-var panelPlayers=[],panelSelectedUid=null,panelSearch="";
+var panelPlayers=[],panelAllPlayers=[],panelSelectedUid=null,panelSearch="",panelFilter="all";
+var grantsCache=[],auditSearchQ="";
+var coins2xActive=false;
+var announceUnsub=null,eventsUnsub=null,announceDoc=null,announceDismissed="";
+var lastBtnDragEnd=0;
+var staffMinByBattle=false;
 var lastRoleSig="";
 
 /* toolInput defaults to TEXT — the Pig Clicker v2.5.3 bug was a number
@@ -3387,6 +3476,11 @@ function toolCard(title,desc){
  var d=document.createElement("div");d.className="toolCard";
  d.innerHTML="<b>"+esc(title)+"</b><p class='sub'>"+esc(desc)+"</p>";
  return d;
+}
+function fmtTime(v){
+ var ms=tsMs(v);
+ if(!ms)return "";
+ try{return new Date(ms).toLocaleString();}catch(e){return "";}
 }
 function auditGrant(action,target,details){
  if(!fbDb||!fbUser)return;
@@ -3427,6 +3521,192 @@ function claimOwner(){
   var b=$("btnClaimOwner");if(b)b.disabled=false;
  });
 }
+
+/* ---------- v1.1: floating staff window (Pig Clicker-style) ---------- */
+function staffPosKey(){return "animeclash.staffPos."+(fbUser?fbUser.uid:"guest");}
+function staffBtnPosKey(){return "animeclash.staffBtnPos."+(fbUser?fbUser.uid:"guest");}
+function staffFloatSetPos(x,y){
+ var win=$("staffFloat");if(!win)return;
+ var w=win.offsetWidth||560;
+ win.style.left=clamp(x,0,Math.max(0,window.innerWidth-w))+"px";
+ win.style.top=clamp(y,0,Math.max(0,window.innerHeight-64))+"px";
+}
+function adminBtnSetPos(x,y){
+ var btn=$("adminFloatBtn");if(!btn)return;
+ btn.style.left=clamp(x,0,Math.max(0,window.innerWidth-52))+"px";
+ btn.style.top=clamp(y,0,Math.max(0,window.innerHeight-52))+"px";
+ btn.style.right="auto";btn.style.bottom="auto";
+}
+function saveStaffPos(){
+ var win=$("staffFloat");if(!win)return;
+ try{localStorage.setItem(staffPosKey(),JSON.stringify({left:win.style.left,top:win.style.top,min:win.classList.contains("min")}));}catch(e){}
+}
+function saveBtnPos(){
+ var btn=$("adminFloatBtn");if(!btn)return;
+ try{localStorage.setItem(staffBtnPosKey(),JSON.stringify({left:btn.style.left,top:btn.style.top}));}catch(e){}
+}
+function restoreStaffPos(){
+ var win=$("staffFloat");if(!win)return;
+ try{var d=JSON.parse(localStorage.getItem(staffPosKey())||"null");if(!d)return;
+  if(d.left)win.style.left=d.left;if(d.top)win.style.top=d.top;
+  if(d.min){win.classList.add("min");var m=$("staffMin");if(m)m.textContent="+";}
+ }catch(e){}
+}
+function restoreBtnPos(){
+ var btn=$("adminFloatBtn");if(!btn)return;
+ try{var d=JSON.parse(localStorage.getItem(staffBtnPosKey())||"null");if(!d)return;
+  if(d.left&&d.top){btn.style.left=d.left;btn.style.top=d.top;btn.style.right="auto";btn.style.bottom="auto";}
+ }catch(e){}
+}
+function buildStaffFloat(){
+ var win=$("staffFloat");if(!win)return;
+ var head=$("staffHead"),drag=null;
+ head.addEventListener("pointerdown",function(e){
+  if(e.target.closest("button"))return;
+  if(!win.style.left){win.style.left=win.offsetLeft+"px";win.style.top=win.offsetTop+"px";}
+  drag={dx:e.clientX-(parseInt(win.style.left,10)||0),dy:e.clientY-(parseInt(win.style.top,10)||0)};
+  try{head.setPointerCapture(e.pointerId);}catch(err){}
+  e.preventDefault();
+ });
+ head.addEventListener("pointermove",function(e){
+  if(!drag)return;
+  staffFloatSetPos(e.clientX-drag.dx,e.clientY-drag.dy);
+ });
+ ["pointerup","pointercancel"].forEach(function(ev){head.addEventListener(ev,function(){
+  if(drag){drag=null;saveStaffPos();}
+ });});
+ $("staffMin").addEventListener("click",function(){
+  var min=win.classList.toggle("min");
+  $("staffMin").textContent=min?"+":"—";
+  staffMinByBattle=false; /* a manual minimize/un-minimize takes over */
+  saveStaffPos();
+ });
+ $("staffClose").addEventListener("click",function(){win.classList.add("hidden");});
+ /* Floating button: drag it anywhere (position saved), tap it to open.
+    A click right after a drag is ignored so a drag never opens the panel. */
+ var btn=$("adminFloatBtn"),bDrag=null,bMoved=false;
+ btn.addEventListener("pointerdown",function(e){
+  if(!btn.style.left){btn.style.left=btn.offsetLeft+"px";btn.style.top=btn.offsetTop+"px";}
+  bDrag={dx:e.clientX-(parseInt(btn.style.left,10)||0),dy:e.clientY-(parseInt(btn.style.top,10)||0)};bMoved=false;
+  try{btn.setPointerCapture(e.pointerId);}catch(err){}
+  e.preventDefault();
+ });
+ btn.addEventListener("pointermove",function(e){
+  if(!bDrag)return;
+  var nx=e.clientX-bDrag.dx,ny=e.clientY-bDrag.dy;
+  if(Math.abs(nx-(parseInt(btn.style.left,10)||0))+Math.abs(ny-(parseInt(btn.style.top,10)||0))>6)bMoved=true;
+  if(bMoved)adminBtnSetPos(nx,ny);
+ });
+ ["pointerup","pointercancel"].forEach(function(ev){btn.addEventListener(ev,function(){
+  if(!bDrag)return;
+  if(bMoved)lastBtnDragEnd=Date.now();
+  bDrag=null;
+  if(bMoved)saveBtnPos();
+ });});
+ btn.addEventListener("click",function(){
+  if(Date.now()-lastBtnDragEnd<300)return;
+  openStaffPanel();
+ });
+ var dis=$("announceDismiss");
+ if(dis)dis.addEventListener("click",function(){
+  announceDismissed=$("announceText").textContent.replace(/^📢 /,"");
+  $("announceBanner").classList.add("hidden");
+ });
+ restoreStaffPos();restoreBtnPos();
+}
+/* The button hides during an active battle so it can never cover the
+   deploy/tap area; if the panel is open when a battle starts it is
+   minimized to its small header bar instead — and restored to its
+   pre-battle state when the battle ends (unless the user minimized
+   it themself, in which case it stays minimized). */
+function updateAdminFloatVisibility(){
+ var btn=$("adminFloatBtn");if(!btn)return;
+ var show=(myRole==="owner"||myRole==="admin")&&!battle;
+ btn.classList.toggle("hidden",!show);
+ var win=$("staffFloat");if(!win)return;
+ if(battle){
+  if(!win.classList.contains("hidden")&&!win.classList.contains("min")){
+   staffMinByBattle=true;
+   win.classList.add("min");var m=$("staffMin");if(m)m.textContent="+";
+  }
+ }else if(staffMinByBattle){
+  staffMinByBattle=false;
+  if(!win.classList.contains("hidden")){
+   win.classList.remove("min");var m2=$("staffMin");if(m2)m2.textContent="—";
+  }
+ }
+}
+
+/* ---------- v1.1: public config listeners (announcements + events) ---------- */
+function subscribePublicConfig(){
+ if(!fbDb||!fbUser)return;
+ try{if(announceUnsub)announceUnsub();}catch(e){}
+ try{if(eventsUnsub)eventsUnsub();}catch(e){}
+ announceUnsub=fbDb.collection("config").doc("announcements").onSnapshot(function(doc){
+  announceDoc=doc.exists?doc.data():null;renderAnnouncement(announceDoc);renderAnnounceCurrent();
+ });
+ eventsUnsub=fbDb.collection("config").doc("events").onSnapshot(function(doc){
+  eventCfg=doc.exists?doc.data():{};renderEventState(eventCfg);
+ });
+}
+function stopPublicConfig(){
+ try{if(announceUnsub)announceUnsub();}catch(e){}
+ try{if(eventsUnsub)eventsUnsub();}catch(e){}
+ announceUnsub=null;eventsUnsub=null;
+}
+function renderAnnouncement(d){
+ var bar=$("announceBanner");if(!bar)return;
+ var text=(d&&d.active&&d.text)?String(d.text):"";
+ if(!text){bar.classList.add("hidden");return;}
+ if(text===announceDismissed){bar.classList.add("hidden");return;}
+ $("announceText").textContent="📢 "+text;
+ bar.classList.remove("hidden");
+}
+function renderAnnounceCurrent(){
+ var el=$("announceCurrent");if(!el)return;
+ el.textContent=(announceDoc&&announceDoc.active&&announceDoc.text)
+  ?("Live now: “"+announceDoc.text+"” — posted by "+(announceDoc.by||"staff"))
+  :"No announcement live right now.";
+}
+function renderEventState(d){
+ coins2xActive=!!(d&&d.coins2x);
+ var badge=$("eventBadge");if(badge)badge.classList.toggle("hidden",!coins2xActive);
+ var b=$("btnEvent2x");if(b)b.textContent=coins2xActive?"⏸️ Stop 2x coins":"🎉 Start 2x coins";
+ var st=$("eventState");if(st)st.textContent=coins2xActive?"2x coins is LIVE right now — every battle pays double coins.":"No event running.";
+}
+function postAnnouncement(){
+ if(!fbDb||!fbUser)return;
+ if(myRole!=="owner"&&!canAdmin("events")){toast("🛡️ The Owner hasn't given you the Events permission.");return;}
+ var inp=$("panelAnnounceText");if(!inp)return;
+ var text=inp.value.trim().slice(0,280);
+ if(!text){toast("Type the announcement first.");return;}
+ fbDb.collection("config").doc("announcements").set({text:text,by:displayName(),byUid:fbUser.uid,
+  at:firebase.firestore.FieldValue.serverTimestamp(),active:true},{merge:true}).then(function(){
+  auditGrant("announce",{_uid:"ALL",name:"all players"},{text:text});
+  toast("📢 Announcement posted — every player will see it.");
+  inp.value="";
+ }).catch(function(err){noteFbError(err,"announce");toast(fbErrText(err.code||"permission-denied"));});
+}
+function clearAnnouncement(){
+ if(!fbDb||!fbUser)return;
+ if(myRole!=="owner"&&!canAdmin("events")){toast("🛡️ The Owner hasn't given you the Events permission.");return;}
+ fbDb.collection("config").doc("announcements").set({text:"",active:false},{merge:true}).then(function(){
+  auditGrant("announce_clear",{_uid:"ALL",name:"all players"},{});
+  toast("📢 Announcement cleared.");
+ }).catch(function(err){noteFbError(err,"announceClear");toast(fbErrText(err.code||"permission-denied"));});
+}
+function setCoins2x(on,btn){
+ if(!fbDb||!fbUser)return;
+ if(myRole!=="owner"&&!canAdmin("events")){toast("🛡️ The Owner hasn't given you the Events permission.");return;}
+ if(btn)btn.disabled=true;
+ fbDb.collection("config").doc("events").set({coins2x:!!on,by:displayName(),
+  at:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).then(function(){
+  auditGrant(on?"event_2x_on":"event_2x_off",{_uid:"ALL",name:"all players"},{});
+  toast(on?"🎉 2x coins event is LIVE — battle rewards doubled!":"🎉 2x coins event ended.");
+  if(btn)btn.disabled=false;
+ }).catch(function(err){noteFbError(err,"event2x");toast(fbErrText(err.code||"permission-denied"));if(btn)btn.disabled=false;});
+}
+
 function renderRolePanel(){
  var area=$("roleArea");if(!area)return;
  var sig=(fbReady?"1":"0")+"|"+(fbUser?fbUser.uid:"guest")+"|"+(ownerLoaded?"1":"0")+"|"+(ownerInfo?ownerInfo.ownerUid:"none")+"|"+myRole;
@@ -3444,16 +3724,64 @@ function renderRolePanel(){
  var cb=$("btnClaimOwner");
  if(cb)cb.addEventListener("click",claimOwner);
  renderStaffArea();
+ updateAdminFloatVisibility();
 }
 function renderStaffArea(){
- var area=$("staffArea");if(!area)return;
- if(myRole!=="owner"&&myRole!=="admin"){area.innerHTML="";return;}
- area.innerHTML='<h3>🛡️ Staff panel</h3><div class="sub">Tap a player, then use the tools. The Owner can never be touched by an admin.</div>'
-  +'<input type="text" id="panelSearch" placeholder="Search players…" value="'+esc(panelSearch)+'">'
-  +'<div id="panelList"></div><div id="playerTools"></div>';
+ var area=$("staffArea");
+ if(myRole!=="owner"&&myRole!=="admin"){if(area)area.innerHTML="";return;}
+ if(area)area.innerHTML='<p class="sub">🛡️ Your staff panel is the floating button — drag it anywhere, tap it to open. It stays out of the way during battles.</p>';
+ var body=$("staffFloatBody");if(!body)return;
+ var canBulk=myRole==="owner"||canAdmin("bulk");
+ var canEvents=myRole==="owner"||canAdmin("events");
+ var chips=[["all","All players"],["banned","🔨 Banned"],["muted","🔇 Muted"],["admins","🛡️ Admins"],["online","🟢 Online"]];
+ body.innerHTML='<div class="statCard" id="staffStats">📊 Loading server stats…</div>'
+  +'<button class="btn small ghost" id="btnRefreshStats" type="button">↻ Refresh stats</button>'
+  +'<p class="sub">Tap a player, then use the tools. The Owner can never be touched by an admin.</p>'
+  +'<input type="text" id="panelSearch" placeholder="🔎 Search players by name…" value="'+esc(panelSearch)+'" autocomplete="off">'
+  +'<div id="panelFilters">'+chips.map(function(c){return '<button type="button" class="chip-btn'+(panelFilter===c[0]?" on":"")+'" data-f="'+c[0]+'">'+c[1]+'</button>';}).join("")+'</div>'
+  +'<div id="onlineStrip" class="sub" style="margin-top:8px"></div>'
+  +'<div id="panelList" style="margin-top:8px"></div><div id="playerTools"></div>'
+  +(canBulk?'<div class="toolCard"><b>📦 Bulk actions</b><p class="sub">Bulk mute/unmute and bulk gives skip the Owner and yourself (admins can only bulk-act on players).</p>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn small" id="btnBulkMute" type="button">🔇 Mute all online</button>'
+    +'<button class="btn small" id="btnBulkUnmute" type="button">🔊 Unmute all muted</button></div>'
+    +'<div style="display:flex;gap:6px;align-items:center"><input type="number" min="1" id="bulkGemsAmt" placeholder="Gems" style="flex:1"><button class="btn small blue" id="btnBulkGems" type="button">💎 Give gems to ALL</button></div>'
+    +'<div style="display:flex;gap:6px;align-items:center"><input type="number" min="1" id="bulkCoinsAmt" placeholder="Coins" style="flex:1"><button class="btn small blue" id="btnBulkCoins" type="button">🪙 Give coins to ONLINE</button></div></div>':"")
+  +'<h4 style="margin:12px 0 6px">🔨 Recent bans</h4><div id="recentBans"><div class="sub">Loading…</div></div>'
+  +'<h4 style="margin:12px 0 6px">📜 Ban history</h4><div id="banHistory"><div class="sub">Loading…</div></div>'
+  +'<h4 style="margin:12px 0 6px">📋 Staff activity</h4>'
+  +'<div style="display:flex;gap:6px"><input type="text" id="auditSearch" placeholder="🔎 Search audit log by player…" value="'+esc(auditSearchQ)+'" autocomplete="off" style="flex:1">'
+  +'<button class="btn small ghost" id="btnRefreshFeed" type="button">↻</button></div>'
+  +'<button class="btn small" id="btnExportAudit" type="button">📋 Export audit log</button>'
+  +'<div id="staffFeed" style="margin-top:8px"><div class="sub">Loading…</div></div>'
+  +'<textarea id="auditExportBox" class="hidden" readonly></textarea>'
+  +(canEvents?'<div class="toolCard" style="margin-top:12px"><b>📢 Global announcement</b><p class="sub">Every player sees this banner on their screen until you clear it.</p>'
+    +'<input type="text" id="panelAnnounceText" placeholder="Announcement for every player… (max 280 chars)" maxlength="280">'
+    +'<div style="display:flex;gap:6px"><button class="btn small blue" id="btnPostAnnounce" type="button">📢 Post announcement</button>'
+    +'<button class="btn small ghost" id="btnClearAnnounce" type="button">Clear announcement</button></div>'
+    +'<div class="sub" id="announceCurrent"></div></div>'
+    +'<div class="toolCard"><b>🎉 2x coins event</b><p class="sub">While live, every battle pays double coins for every player.</p>'
+    +'<button class="btn small green" id="btnEvent2x" type="button">🎉 Start 2x coins</button>'
+    +'<div class="sub" id="eventState"></div></div>':"");
  var inp=$("panelSearch");
  if(inp)inp.addEventListener("input",function(){panelSearch=inp.value;renderPanelList();});
- loadPanelPlayers();
+ Array.prototype.forEach.call(body.querySelectorAll("#panelFilters .chip-btn"),function(ch){
+  ch.addEventListener("click",function(){panelFilter=ch.getAttribute("data-f");renderStaffArea();});
+ });
+ var aq=$("auditSearch");
+ if(aq)aq.addEventListener("input",function(){auditSearchQ=aq.value;renderActivityFeed();});
+ var ex=$("btnExportAudit");if(ex)ex.addEventListener("click",exportAuditLog);
+ var rf=$("btnRefreshFeed");if(rf)rf.addEventListener("click",function(){loadGrants();});
+ var rs=$("btnRefreshStats");if(rs)rs.addEventListener("click",function(){loadServerStats();});
+ var pa=$("btnPostAnnounce");if(pa)pa.addEventListener("click",postAnnouncement);
+ var ca=$("btnClearAnnounce");if(ca)ca.addEventListener("click",clearAnnouncement);
+ var ev=$("btnEvent2x");if(ev)ev.addEventListener("click",function(){setCoins2x(!coins2xActive,ev);});
+ var bm=$("btnBulkMute");if(bm)bm.addEventListener("click",function(){bulkMuteOnline(bm);});
+ var bu=$("btnBulkUnmute");if(bu)bu.addEventListener("click",function(){bulkUnmuteAll(bu);});
+ var bg=$("btnBulkGems");if(bg)bg.addEventListener("click",function(){bulkGiveGemsAll(bg);});
+ var bc=$("btnBulkCoins");if(bc)bc.addEventListener("click",function(){bulkGiveCoinsOnline(bc);});
+ renderAnnounceCurrent();renderEventState(eventCfg);
+ renderPanelList();renderOnlineStrip();
+ loadPanelPlayers();loadGrants();loadServerStats();
 }
 function loadPanelPlayers(){
  if(!fbDb)return;
@@ -3463,31 +3791,132 @@ function loadPanelPlayers(){
   renderPanelList();
  }).catch(function(err){noteFbError(err,"panelLoad");});
 }
+function loadAllPlayers(){
+ if(!fbDb)return Promise.resolve(panelAllPlayers);
+ return fbDb.collection("users").limit(200).get().then(function(snap){
+  panelAllPlayers=[];
+  snap.forEach(function(d){var o=d.data();o._uid=d.id;panelAllPlayers.push(o);});
+  return panelAllPlayers;
+ }).catch(function(err){noteFbError(err,"allPlayers");return panelAllPlayers;});
+}
+function loadGrants(){
+ if(!fbDb)return Promise.resolve(grantsCache);
+ return fbDb.collection("grants").orderBy("at","desc").limit(50).get().then(function(snap){
+  grantsCache=[];
+  snap.forEach(function(d){var o=d.data();o._id=d.id;grantsCache.push(o);});
+  renderActivityFeed();renderRecentBans();renderBanHistory();
+  return grantsCache;
+ }).catch(function(err){noteFbError(err,"grantsLoad");return grantsCache;});
+}
+function renderActivityFeed(){
+ var el=$("staffFeed");if(!el)return;
+ var q=auditSearchQ.trim().toLowerCase();
+ var list=grantsCache.filter(function(g){
+  if(!q)return true;
+  return ((g.targetName||"")+" "+(g.actorName||"")+" "+(g.targetUid||"")).toLowerCase().indexOf(q)>-1;
+ }).slice(0,30);
+ if(!list.length){el.innerHTML='<div class="sub">No activity yet.</div>';return;}
+ el.innerHTML=list.map(function(g){
+  return '<div class="feedRow"><b>'+esc(g.action||"?")+'</b> '+esc(g.actorName||"")+' → '+esc(g.targetName||g.targetUid||"")
+   +' <span class="sub">'+esc(fmtTime(g.at))+'</span></div>';
+ }).join("");
+}
+function renderRecentBans(){
+ var el=$("recentBans");if(!el)return;
+ var bans=grantsCache.filter(function(g){return g.action==="ban"||g.action==="hard_ban";}).slice(0,10);
+ if(!bans.length){el.innerHTML='<div class="sub">No bans yet.</div>';return;}
+ el.innerHTML="";
+ bans.forEach(function(g){
+  var row=document.createElement("div");row.className="playerRow";
+  row.innerHTML='<div style="flex:1"><b>'+esc(g.targetName||g.targetUid||"?")+'</b><div class="sub">'
+   +(g.action==="hard_ban"?"🔨 Hard ban":"🔨 Ban")+' · '+esc((g.details&&g.details.duration)||"")
+   +' · by '+esc(g.actorName||"")+' · '+esc(fmtTime(g.at))+'</div></div>';
+  var b=document.createElement("button");b.type="button";b.className="btn small green";b.textContent="🔓 Unban";
+  b.addEventListener("click",function(){
+   b.disabled=true;b.textContent="🔓 Unbanning…";
+   fbDb.collection("users").doc(g.targetUid).get().then(function(doc){
+    if(!doc.exists){toast("That player is gone.");b.disabled=false;b.textContent="🔓 Unban";return;}
+    var p=doc.data();p._uid=doc.id;panelSelectedUid=p._uid;
+    if(!panelSetBan(p,false)){b.disabled=false;b.textContent="🔓 Unban";}
+   }).catch(function(err){noteFbError(err,"recentUnban");toast(fbErrText(err.code||"permission-denied"));b.disabled=false;b.textContent="🔓 Unban";});
+  });
+  row.appendChild(b);el.appendChild(row);
+ });
+}
+function renderBanHistory(){
+ var el=$("banHistory");if(!el)return;
+ var hist=grantsCache.filter(function(g){return g.action==="ban"||g.action==="hard_ban"||g.action==="unban";}).slice(0,20);
+ if(!hist.length){el.innerHTML='<div class="sub">No ban history yet.</div>';return;}
+ el.innerHTML=hist.map(function(g){
+  var verb=g.action==="unban"?"🔓 Unban":(g.action==="hard_ban"?"🔨 Hard ban":"🔨 Ban");
+  return '<div class="feedRow">'+verb+' <b>'+esc(g.targetName||g.targetUid||"")+'</b> — '+esc(g.actorName||"")
+   +(g.details&&g.details.reason?(' · “'+esc(g.details.reason)+'”'):"")
+   +(g.details&&g.details.duration?(' · '+esc(g.details.duration)):"")
+   +' <span class="sub">'+esc(fmtTime(g.at))+'</span></div>';
+ }).join("");
+}
+function loadServerStats(){
+ var el=$("staffStats");if(!el)return;
+ Promise.all([loadAllPlayers(),loadGrants()]).then(function(){
+  var total=panelAllPlayers.length;
+  var online=panelAllPlayers.filter(isOnline).length;
+  var today=new Date().toISOString().slice(0,10);
+  var bansToday=grantsCache.filter(function(g){
+   return (g.action==="ban"||g.action==="hard_ban")&&tsMs(g.at)>0
+    &&new Date(tsMs(g.at)).toISOString().slice(0,10)===today;
+  }).length;
+  var done=function(battlesToday){
+   var e2=$("staffStats");if(!e2)return;
+   e2.innerHTML="📊 <b>Server stats</b> · 👥 "+total+" players · 🟢 "+online+" online · ⚔️ "+battlesToday+" battles today · 🔨 "+bansToday+" bans today";
+  };
+  if(!fbDb){done(0);return;}
+  fbDb.collection("config").doc("stats").get().then(function(doc){
+   var n=0;
+   if(doc.exists&&doc.data().date===today)n=doc.data().battlesToday||0;
+   done(n);
+  }).catch(function(){done(0);});
+ });
+}
+function renderOnlineStrip(){
+ var el=$("onlineStrip");if(!el)return;
+ var on=panelPlayers.filter(isOnline);
+ el.innerHTML=on.length?("🟢 Online now ("+on.length+"): "+on.map(function(p){return esc(p.name||p.username||"?");}).join(", "))
+  :"🟢 Nobody else is online right now.";
+}
 function renderPanelList(){
  var el=$("panelList");if(!el)return;
  var q=panelSearch.trim().toLowerCase();
  var list=panelPlayers.filter(function(p){
-  if(!q)return true;
-  return ((p.name||"")+" "+(p.username||"")).toLowerCase().indexOf(q)>-1;
+  if(q&&((p.name||"")+" "+(p.username||"")).toLowerCase().indexOf(q)===-1)return false;
+  if(panelFilter==="banned"&&!isBanActive(p))return false;
+  if(panelFilter==="muted"&&!isMutedActive(p))return false;
+  if(panelFilter==="admins"&&roleOfUid(p._uid,p.role)!=="admin")return false;
+  if(panelFilter==="online"&&!isOnline(p))return false;
+  return true;
  });
  el.innerHTML="";
+ if(!list.length)el.innerHTML='<div class="sub">No players match.</div>';
  list.forEach(function(p){
   var row=document.createElement("div");row.className="playerRow player";
-  var banned=isBanActive(p);
+  var banned=isBanActive(p),muted=isMutedActive(p),on=isOnline(p);
   row.innerHTML='<div style="flex:1"><b>'+esc(p.name||p.username||"?")+'</b> '+roleTag(p.role||"player",p)
-   +'<div class="sub">🏆 '+(p.trophies||0)+' · Lv '+(p.level||1)+' · 💎 '+(p.gems||0)+' · 🪙 '+(p.coins||0)
-   +(banned?' · <b style="color:#ff4d5e">🔨 BANNED</b>':"")+'</div></div>';
+   +'<div class="sub">'+(on?"🟢 ":"⚫ ")+'🏆 '+(p.trophies||0)+' · Lv '+(p.level||1)+' · 💎 '+(p.gems||0)+' · 🪙 '+(p.coins||0)
+   +(banned?' · <b style="color:#ff4d5e">🔨 BANNED</b>':"")
+   +(muted?' · <b style="color:#ffc93c">🔇 MUTED</b>':"")+'</div></div>';
   var b=document.createElement("button");b.type="button";b.className="btn small";b.textContent="Manage";
   b.addEventListener("click",function(){openStaffPanelFor(p);});
   row.appendChild(b);
   el.appendChild(row);
  });
+ renderOnlineStrip();
 }
 function openStaffPanel(){
  if(myRole!=="owner"&&myRole!=="admin"){toast("Staff only.");return;}
- switchView("profile");
+ var win=$("staffFloat");if(!win)return;
+ win.classList.remove("hidden");
  renderStaffArea();
 }
+
 function openStaffPanelFor(p){
  panelSelectedUid=p._uid;
  var t=$("playerTools");if(!t)return;
@@ -3497,6 +3926,31 @@ function openStaffPanelFor(p){
  t.appendChild(head);
  var isOwnerTarget=targetIsOwner(p);
  var isSelf=p._uid===fbUser.uid;
+
+ /* --- v1.1: full player inspector --- */
+ var insp=document.createElement("div");insp.className="insp";insp.id="playerInspector";
+ var unitIds=Object.keys(p.units||{});
+ var unitNames=unitIds.map(function(id){var u=UNIT_BY_ID[id];return u?(u.icon+" "+u.name+" Lv"+((p.units[id]||{}).level||1)):id;});
+ var deckNames=(p.deck||[]).map(function(id){var u=UNIT_BY_ID[id];return u?u.name:id;});
+ insp.innerHTML="<b>👤 Inspector</b><div class='inspGrid'>"
+  +"<div>💎 <b>"+(p.gems||0)+"</b> gems</div><div>🪙 <b>"+(p.coins||0)+"</b> coins</div>"
+  +"<div>🏆 <b>"+(p.trophies||0)+"</b> trophies</div><div>⭐ Lv <b>"+(p.level||1)+"</b> · "+(p.xp||0)+" XP</div>"
+  +"<div>✅ <b>"+(p.wins||0)+"</b> wins</div><div>❌ <b>"+(p.losses||0)+"</b> losses</div>"
+  +"<div>🃏 <b>"+unitIds.length+"</b> units owned</div><div>"+(isBanActive(p)?"🔨 <b style='color:#ff4d5e'>BANNED</b>"+(p.banReason?" — "+esc(p.banReason):""):"✅ Not banned")+"</div>"
+  +"<div>"+(isMutedActive(p)?"🔇 <b style='color:#ffc93c'>MUTED</b>":"🔊 Not muted")+"</div>"
+  +"<div>✨ Title: "+esc(p.customTitle||"—")+"</div></div>"
+  +"<div class='sub'>Deck: "+esc(deckNames.join(", ")||"—")+"</div>"
+  +"<div class='sub'>Units: "+esc(unitNames.slice(0,12).join(", ")||"—")+(unitIds.length>12?" +"+(unitIds.length-12)+" more":"")+"</div>";
+ t.appendChild(insp);
+ /* --- v1.1: ban-this-device shortcut (one tap, hard ban) --- */
+ if((myRole==="owner"||canAdmin("hardban"))&&!isSelf&&!isOwnerTarget){
+  var bDev=toolBtn("📱 Ban this device","small");
+  bDev.addEventListener("click",function(){
+   bDev.disabled=true;bDev.textContent="📱 Banning device…";
+   if(!panelSetBan(p,true,{hard:true,durationMs:0,durationLabel:"Permanent",reason:""})){bDev.disabled=false;bDev.textContent="📱 Ban this device";}
+  });
+  insp.appendChild(bDev);
+ }
 
  /* --- give gems --- */
  if(myRole==="owner"||canAdmin("give")){
@@ -3519,27 +3973,83 @@ function openStaffPanelFor(p){
    panelGiveCurrency(p,"coins",n);
   });
   cC.appendChild(inC);cC.appendChild(bC);t.appendChild(cC);
-  /* --- give unit --- */
-  var cU=toolCard("🃏 Give unit","Grant a unit straight into their deck.");
+  /* --- v1.1: give trophies --- */
+  var cT=toolCard("🏆 Give trophies","Add trophies straight to their rank.");
+  var inT=toolInput("Trophies",false);var bT=toolBtn("Give trophies","blue");
+  bT.addEventListener("click",function(){
+   var n=Math.floor(Number(inT.value)||0);
+   if(n<=0){toast("Type how many trophies first.");return;}
+   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   panelGiveCurrency(p,"trophies",n);
+  });
+  cT.appendChild(inT);cT.appendChild(bT);t.appendChild(cT);
+  /* --- v1.1: set level (exact, 1–99999) --- */
+  var cL=toolCard("⭐ Set level","Set their exact level (1–99999). XP is set to match so it sticks.");
+  var inL=toolInput("Level 1–99999",false);var bL=toolBtn("Set level","blue");
+  bL.addEventListener("click",function(){
+   var n=Math.floor(Number(inL.value)||0);
+   if(n<1||n>99999){toast("Level must be 1–99999.");return;}
+   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   panelSetLevel(p,n);
+  });
+  cL.appendChild(inL);cL.appendChild(bL);t.appendChild(cL);
+  /* --- v1.1: give XP --- */
+  var cX=toolCard("✨ Give XP","Add XP — their level follows from it.");
+  var inX=toolInput("XP",false);var bX=toolBtn("Give XP","blue");
+  bX.addEventListener("click",function(){
+   var n=Math.floor(Number(inX.value)||0);
+   if(n<=0){toast("Type how much XP first.");return;}
+   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   panelGiveXp(p,n);
+  });
+  cX.appendChild(inX);cX.appendChild(bX);t.appendChild(cX);
+ }
+ /* --- give unit (v1.1: search by character name) --- */
+ if(myRole==="owner"||canAdmin("giveUnits")){
+  var cU=toolCard("🃏 Give unit","Grant a unit straight into their deck. Search by character name.");
+  var searchU=toolInput("Search character…",true);
   var sel=document.createElement("select");
   UNITS.forEach(function(u){var o=document.createElement("option");o.value=u.id;o.textContent=u.icon+" "+u.name;sel.appendChild(o);});
+  searchU.addEventListener("input",function(){
+   var q=searchU.value.trim().toLowerCase();
+   sel.innerHTML="";
+   UNITS.filter(function(u){return !q||u.name.toLowerCase().indexOf(q)>-1;}).forEach(function(u){
+    var o=document.createElement("option");o.value=u.id;o.textContent=u.icon+" "+u.name;sel.appendChild(o);
+   });
+  });
   var bU=toolBtn("Give unit","blue");
   bU.addEventListener("click",function(){
    if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   if(!sel.value){toast("No unit matches that search.");return;}
    grantUnitTo(p._uid,sel.value).then(function(){
     auditGrant("give_unit",p,{unit:sel.value});
     toast("🃏 Gave "+(UNIT_BY_ID[sel.value].name)+" to "+(p.name||p.username)+".");
     loadPanelPlayers();
    }).catch(function(err){noteFbError(err,"giveUnit");toast(fbErrText(err.code||"permission-denied"));});
   });
-  cU.appendChild(sel);cU.appendChild(bU);t.appendChild(cU);
+  cU.appendChild(searchU);cU.appendChild(sel);cU.appendChild(bU);t.appendChild(cU);
+  /* --- v1.1: grant all 100 units --- */
+  var cA100=toolCard("🃏 Grant all 100 units","One tap — every character in the game, keeping any levels they already have.");
+  var bA100=toolBtn("🃏 Grant all 100 units","blue");
+  bA100.addEventListener("click",function(){
+   if(isOwnerTarget){toast("🛡️ No admin can act on the Owner — ever.");return;}
+   bA100.disabled=true;bA100.textContent="🃏 Granting…";
+   panelGrantAllUnits(p).then(function(){
+    bA100.disabled=false;bA100.textContent="🃏 Grant all 100 units";
+   }).catch(function(){
+    bA100.disabled=false;bA100.textContent="🃏 Grant all 100 units";
+   });
+  });
+  cA100.appendChild(bA100);t.appendChild(cA100);
  }
  /* --- custom title (text input — never a number field) --- */
  if(myRole==="owner"){
   var cCT=toolCard("✨ Custom title","Give this admin a Discord-style custom title (shows next to their name everywhere).");
   var inCT=toolInput("Custom title (max 24 chars)",true);inCT.maxLength=24;var bCT=toolBtn("Set title","pink");
   bCT.addEventListener("click",function(){panelSetCustomTitle(p,inCT.value);});
-  cCT.appendChild(inCT);cCT.appendChild(bCT);t.appendChild(cCT);
+  var bCTRm=toolBtn("Remove title","ghost");
+  bCTRm.addEventListener("click",function(){panelSetCustomTitle(p,"");});
+  cCT.appendChild(inCT);cCT.appendChild(bCT);cCT.appendChild(bCTRm);t.appendChild(cCT);
  }
  /* --- ban --- */
  if(myRole==="owner"||canAdmin("ban")||canAdmin("unban")){
@@ -3562,7 +4072,43 @@ function openStaffPanelFor(p){
    bB.disabled=true;bB.textContent="🔨 Banning…";
    if(!panelSetBan(p,true,{durationMs:ms,durationLabel:opt.textContent,reason:inReason.value})){bB.disabled=false;bB.textContent="🔨 Ban";}
   });
-  cB.appendChild(inReason);cB.appendChild(durSel);cB.appendChild(bB);t.appendChild(cB);
+  cB.appendChild(inReason);
+  if(!bannedNow){
+   /* v1.1: one-tap quick-ban presets */
+   var presets=document.createElement("div");
+   presets.innerHTML="<p class='sub' style='margin:4px 0'>Quick ban:</p>";
+   [["1h",3600000,"1 hour"],["24h",86400000,"24 hours"],["7d",604800000,"7 days"],["perm",0,"Permanent"]].forEach(function(pr){
+    var pb=toolBtn(pr[0]==="perm"?"♾️ Perm":"⏱ "+pr[0],"small");
+    pb.addEventListener("click",function(){
+     var old=pb.textContent;
+     pb.disabled=true;pb.textContent="⏳ Banning…";
+     if(!panelSetBan(p,true,{durationMs:pr[1],durationLabel:pr[2],reason:inReason.value})){pb.disabled=false;pb.textContent=old;}
+    });
+    presets.appendChild(pb);
+   });
+   cB.appendChild(presets);
+   /* v1.1: custom ban length — any number + unit */
+   var customWrap=document.createElement("div");
+   customWrap.innerHTML="<p class='sub' style='margin:8px 0 0'>Custom length:</p>";
+   var inCustomNum=toolInput("Length (number)",false);inCustomNum.id="panelBanNum";
+   var unitSel=document.createElement("select");unitSel.id="panelBanUnit";
+   [["Minutes",60000],["Hours",3600000],["Days",86400000],["Weeks",604800000],["Years",31536000000]].forEach(function(u){
+    var op=document.createElement("option");op.value=u[1];op.textContent=u[0];unitSel.appendChild(op);
+   });
+   var bCustom=toolBtn("🔨 Ban (custom)","");
+   bCustom.addEventListener("click",function(){
+    var n=Math.floor(Number(inCustomNum.value)||0);
+    if(n<=0){toast("Type a ban length first.");return;}
+    var unitTxt=unitSel.options[unitSel.selectedIndex].textContent;
+    var label=n+" "+(n===1?unitTxt.replace(/s$/,"").toLowerCase():unitTxt.toLowerCase());
+    var ms=n*Number(unitSel.value);
+    bCustom.disabled=true;bCustom.textContent="🔨 Banning…";
+    if(!panelSetBan(p,true,{durationMs:ms,durationLabel:label,reason:inReason.value})){bCustom.disabled=false;bCustom.textContent="🔨 Ban (custom)";}
+   });
+   customWrap.appendChild(inCustomNum);customWrap.appendChild(unitSel);customWrap.appendChild(bCustom);
+   cB.appendChild(customWrap);
+  }
+  cB.appendChild(durSel);cB.appendChild(bB);t.appendChild(cB);
   /* --- hard ban --- */
   if(myRole==="owner"||canAdmin("hardban")){
    var cHB=toolCard("🔨 Hard Ban","Account ban + device ban. Any account on that device stays locked out.");
@@ -3575,18 +4121,46 @@ function openStaffPanelFor(p){
    cHB.appendChild(bHB);t.appendChild(cHB);
   }
  }
- /* --- mute --- */
+ /* --- mute (v1.1: duration presets) --- */
  if(myRole==="owner"||canAdmin("mute")){
-  var cM=toolCard(p.muted?"🔊 Unmute":"🔇 Mute","Muted players can't use chat features.");
-  var bM=toolBtn(p.muted?"🔊 Unmute":"🔇 Mute","");
-  bM.addEventListener("click",function(){
-   if(guardOwnerTarget(p,"mute"))return;
-   fbDb.collection("users").doc(p._uid).update({muted:!p.muted}).then(function(){
-    p.muted=!p.muted;auditGrant(p.muted?"mute":"unmute",p,{});
-    toast((p.muted?"🔇 Muted ":"🔊 Unmuted ")+(p.name||p.username)+".");renderPanelList();openStaffPanelFor(p);
-   }).catch(function(err){noteFbError(err,"mute");toast(fbErrText(err.code||"permission-denied"));});
+  var mutedNow=isMutedActive(p);
+  var cM=toolCard(mutedNow?"🔊 Unmute":"🔇 Mute","Mute with a duration — muted players can't use chat features. Expired mutes lift themselves.");
+  var muteDur=document.createElement("select");muteDur.id="panelMuteDur";
+  [["1h",3600000,"1 hour"],["24h",86400000,"24 hours"],["7d",604800000,"7 days"],["perm",0,"Permanent"]].forEach(function(o){
+   var op=document.createElement("option");op.value=o[0];op.textContent=o[2];muteDur.appendChild(op);
   });
+  var bM=toolBtn(mutedNow?"🔊 Unmute":"🔇 Mute","");
+  bM.addEventListener("click",function(){
+   if(mutedNow){
+    bM.disabled=true;bM.textContent="🔊 Unmuting…";
+    if(!panelSetMute(p,false)){bM.disabled=false;bM.textContent="🔊 Unmute";}
+    return;
+   }
+   var opt=muteDur.options[muteDur.selectedIndex];
+   var ms=opt.value==="perm"?0:{ "1h":3600000,"24h":86400000,"7d":604800000 }[opt.value];
+   bM.disabled=true;bM.textContent="🔇 Muting…";
+   if(!panelSetMute(p,true,{durationMs:ms,durationLabel:opt.textContent})){bM.disabled=false;bM.textContent="🔇 Mute";}
+  });
+  if(!mutedNow)cM.appendChild(muteDur);
   cM.appendChild(bM);t.appendChild(cM);
+ }
+ /* --- v1.1: reset progress / tutorial (two-tap confirm, like Hard Ban) --- */
+ if(myRole==="owner"||canAdmin("reset")){
+  var cR=toolCard("🔄 Reset progress","Wipes their units, deck, coins, gems, trophies, XP and level. The account itself stays — they keep their name and login.");
+  var bR=toolBtn("🔄 Reset progress","");
+  bR.addEventListener("click",function(){
+   if(bR.dataset.arm){delete bR.dataset.arm;bR.disabled=true;bR.textContent="🔄 Resetting…";
+    if(!panelResetProgress(p)){bR.disabled=false;bR.textContent="🔄 Reset progress";}
+   }else{bR.dataset.arm="1";bR.textContent="⚠️ Tap again to RESET progress";}
+  });
+  cR.appendChild(bR);t.appendChild(cR);
+  var cRT=toolCard("📖 Reset tutorial","Makes the tutorial show again for this player.");
+  var bRT=toolBtn("📖 Reset tutorial","");
+  bRT.addEventListener("click",function(){
+   bRT.disabled=true;bRT.textContent="📖 Resetting…";
+   if(!panelResetTutorial(p)){bRT.disabled=false;bRT.textContent="📖 Reset tutorial";}
+  });
+  cRT.appendChild(bRT);t.appendChild(cRT);
  }
  /* --- admin grant/revoke + perms (owner only) --- */
  if(myRole==="owner"&&!isSelf&&!isOwnerTarget){
@@ -3598,7 +4172,7 @@ function openStaffPanelFor(p){
   if(isAdmin){
    var cP=toolCard("🛡️ Admin permissions","Toggle which tools this admin gets. Nothing here can ever touch the Owner.");
    var perms=adminPermsFor(p._uid);
-   [["ban","Ban players"],["hardban","Hard ban (device)"],["unban","Unban players"],["mute","Mute / unmute"],["give","Give gems & coins"],["giveUnits","Give units"]].forEach(function(pr){
+   [["ban","Ban players"],["hardban","Hard ban (device)"],["unban","Unban players"],["mute","Mute / unmute"],["give","Give gems & coins"],["giveUnits","Give units"],["bulk","Bulk actions (mute/give all)"],["reset","Reset progress / tutorial"],["events","Announcements & 2x events"]].forEach(function(pr){
     var row=document.createElement("label");row.className="permRow";
     row.innerHTML="<span>"+esc(pr[1])+"</span>";
     var cb=document.createElement("input");cb.type="checkbox";cb.checked=!!perms[pr[0]];
@@ -3701,8 +4275,210 @@ function panelSetBan(p,ban,opts){
   auditGrant(ban?(hard?"hard_ban":"ban"):"unban",p,{reason:reason,duration:ban?(label||"Permanent"):""});
   toast(ban?((hard?"🔨 Hard-banned ":"🔨 Banned ")+(p.name||p.username)+durTxt+(hard&&!(p.deviceIds||[]).length?" (No device recorded yet — account ban only for now.)":"")+"."):(("🔓 Unbanned "+(p.name||p.username)+".")));
   renderPanelList();
+  if(panelSelectedUid===p._uid)openStaffPanelFor(p);
  }).catch(function(err){noteFbError(err,"ban");toast(fbErrText(err.code||"permission-denied"));renderPanelList();});
  return true;
+}
+/* ---------- v1.1: mute with duration ---------- */
+function panelSetMute(p,mute,opts){
+ opts=opts||{};
+ if(!fbDb||!fbUser||(myRole!=="owner"&&myRole!=="admin")){toast("Only the Owner and Admins can mute.");return false;}
+ if(myRole==="admin"){
+  if(!canAdmin("mute")){toast("🛡️ The Owner hasn't given you the Mute permission.");return false;}
+  if(guardOwnerTarget(p,mute?"mute":"unmute"))return false;
+  if(roleOfUid(p._uid,p.role)==="admin"){toast("🛡️ Admins can't mute other admins.");return false;}
+ }
+ if(p._uid===fbUser.uid){toast("You can't mute yourself.");return false;}
+ var untilTs=null;
+ if(mute&&opts.durationMs){try{untilTs=firebase.firestore.Timestamp.fromMillis(Date.now()+opts.durationMs);}catch(e){untilTs=null;}}
+ var upd=mute?{muted:true,mutedUntil:untilTs}:{muted:false,mutedUntil:null};
+ fbDb.collection("users").doc(p._uid).update(upd).then(function(){
+  p.muted=mute;p.mutedUntil=untilTs;
+  auditGrant(mute?"mute":"unmute",p,{duration:mute?(opts.durationLabel||"Permanent"):""});
+  toast((mute?"🔇 Muted ":"🔊 Unmuted ")+(p.name||p.username)+(mute&&opts.durationLabel?(" for "+opts.durationLabel):"")+".");
+  renderPanelList();if(panelSelectedUid===p._uid)openStaffPanelFor(p);
+ }).catch(function(err){noteFbError(err,"mute");toast(fbErrText(err.code||"permission-denied"));});
+ return true;
+}
+/* ---------- v1.1: set exact level / give XP / grant all units ---------- */
+function panelSetLevel(p,level){
+ if(!fbDb||!fbUser)return false;
+ if(myRole!=="owner"&&!canAdmin("give")){toast("🛡️ The Owner hasn't given you the Give permission.");return false;}
+ if(guardOwnerTarget(p,"set the level of"))return false;
+ level=clamp(Math.floor(Number(level)||0),1,99999);
+ var xp=xpForLevel(level);
+ fbDb.collection("users").doc(p._uid).update({level:level,xp:xp,grantedLevel:level}).then(function(){
+  p.level=level;p.xp=xp;p.grantedLevel=level;
+  auditGrant("set_level",p,{level:level});
+  toast("⭐ Set "+(p.name||p.username)+" to level "+level+".");
+  renderPanelList();if(panelSelectedUid===p._uid)openStaffPanelFor(p);
+ }).catch(function(err){noteFbError(err,"setLevel");toast(fbErrText(err.code||"permission-denied"));});
+ return true;
+}
+function panelGiveXp(p,amount){
+ if(!fbDb||!fbUser)return false;
+ if(myRole!=="owner"&&!canAdmin("give")){toast("🛡️ The Owner hasn't given you the Give permission.");return false;}
+ if(guardOwnerTarget(p,"give XP to"))return false;
+ var newLevel=levelFromXp((p.xp||0)+amount);
+ fbDb.collection("users").doc(p._uid).update({xp:firebase.firestore.FieldValue.increment(amount),level:newLevel}).then(function(){
+  p.xp=(p.xp||0)+amount;p.level=newLevel;
+  auditGrant("give_xp",p,{amount:amount});
+  toast("✨ Gave "+amount+" XP to "+(p.name||p.username)+" (now Lv "+newLevel+").");
+  renderPanelList();if(panelSelectedUid===p._uid)openStaffPanelFor(p);
+ }).catch(function(err){noteFbError(err,"giveXp");toast(fbErrText(err.code||"permission-denied"));});
+ return true;
+}
+function panelGrantAllUnits(p){
+ if(!fbDb||!fbUser)return Promise.reject(new Error("no-fb"));
+ if(myRole!=="owner"&&!canAdmin("giveUnits")){toast("🛡️ The Owner hasn't given you the Give-units permission.");return Promise.reject(new Error("no-perm"));}
+ if(guardOwnerTarget(p,"grant units to"))return Promise.reject(new Error("owner-immune"));
+ return fbDb.collection("users").doc(p._uid).get().then(function(doc){
+  if(!doc.exists)throw new Error("no-player");
+  var units=doc.data().units||{};
+  UNITS.forEach(function(u){units[u.id]={level:Math.max((units[u.id]&&units[u.id].level)||1,1)};});
+  return fbDb.collection("users").doc(p._uid).update({units:units}).then(function(){return units;});
+ }).then(function(units){
+  p.units=units;
+  auditGrant("grant_all_units",p,{count:100});
+  toast("🃏 Granted all 100 units to "+(p.name||p.username)+".");
+  renderPanelList();if(panelSelectedUid===p._uid)openStaffPanelFor(p);
+ }).catch(function(err){noteFbError(err,"grantAll");toast(fbErrText(err.code||"permission-denied"));throw err;});
+}
+/* ---------- v1.1: reset progress / tutorial ---------- */
+function panelResetProgress(p){
+ if(!fbDb||!fbUser)return false;
+ if(myRole!=="owner"&&!canAdmin("reset")){toast("🛡️ The Owner hasn't given you the Reset permission.");return false;}
+ if(guardOwnerTarget(p,"reset"))return false;
+ var upd={units:{},deck:[],coins:0,gems:0,trophies:0,xp:0,level:1,grantedLevel:0,wins:0,losses:0,winStreak:0};
+ fbDb.collection("users").doc(p._uid).update(upd).then(function(){
+  Object.keys(upd).forEach(function(k){p[k]=upd[k];});
+  auditGrant("reset_progress",p,{});
+  toast("🔄 Reset "+(p.name||p.username)+"'s progress — account kept, everything else cleared.");
+  renderPanelList();if(panelSelectedUid===p._uid)openStaffPanelFor(p);
+ }).catch(function(err){noteFbError(err,"resetProgress");toast(fbErrText(err.code||"permission-denied"));});
+ return true;
+}
+function panelResetTutorial(p){
+ if(!fbDb||!fbUser)return false;
+ if(myRole!=="owner"&&!canAdmin("reset")){toast("🛡️ The Owner hasn't given you the Reset permission.");return false;}
+ if(guardOwnerTarget(p,"reset the tutorial for"))return false;
+ fbDb.collection("users").doc(p._uid).update({tutorialDone:false}).then(function(){
+  p.tutorialDone=false;
+  auditGrant("reset_tutorial",p,{});
+  toast("📖 Tutorial reset for "+(p.name||p.username)+" — they'll see it again.");
+  renderPanelList();if(panelSelectedUid===p._uid)openStaffPanelFor(p);
+ }).catch(function(err){noteFbError(err,"resetTutorial");toast(fbErrText(err.code||"permission-denied"));});
+ return true;
+}
+/* ---------- v1.1: bulk actions ---------- */
+function bulkTargets(pred){
+ return panelAllPlayers.filter(function(p){
+  if(!p||p._uid===fbUser.uid)return false;
+  if(targetIsOwner(p))return false;
+  if(myRole==="admin"&&roleOfUid(p._uid,p.role)==="admin")return false;
+  return !pred||pred(p);
+ });
+}
+function bulkMuteOnline(btn){
+ if(!fbDb||!fbUser)return;
+ if(myRole!=="owner"&&!canAdmin("bulk")){toast("🛡️ The Owner hasn't given you the Bulk permission.");return;}
+ btn.disabled=true;btn.textContent="🔇 Muting…";
+ loadAllPlayers().then(function(){
+  var targets=bulkTargets(isOnline);
+  var jobs=targets.map(function(p){
+   return fbDb.collection("users").doc(p._uid).update({muted:true,mutedUntil:null})
+    .then(function(){p.muted=true;p.mutedUntil=null;return true;}).catch(function(){return false;});
+  });
+  return Promise.all(jobs).then(function(res){
+   var ok=res.filter(Boolean).length;
+   auditGrant("bulk_mute",{_uid:"BULK",name:"online players"},{count:ok});
+   toast("🔇 Muted "+ok+" online player"+(ok===1?"":"s")+(ok<targets.length?(" ("+(targets.length-ok)+" failed)"):"")+".");
+   btn.disabled=false;btn.textContent="🔇 Mute all online";
+   loadPanelPlayers();loadServerStats();
+  });
+ });
+}
+function bulkUnmuteAll(btn){
+ if(!fbDb||!fbUser)return;
+ if(myRole!=="owner"&&!canAdmin("bulk")){toast("🛡️ The Owner hasn't given you the Bulk permission.");return;}
+ btn.disabled=true;btn.textContent="🔊 Unmuting…";
+ loadAllPlayers().then(function(){
+  var targets=bulkTargets(function(p){return isMutedActive(p);});
+  var jobs=targets.map(function(p){
+   return fbDb.collection("users").doc(p._uid).update({muted:false,mutedUntil:null})
+    .then(function(){p.muted=false;p.mutedUntil=null;return true;}).catch(function(){return false;});
+  });
+  return Promise.all(jobs).then(function(res){
+   var ok=res.filter(Boolean).length;
+   auditGrant("bulk_unmute",{_uid:"BULK",name:"muted players"},{count:ok});
+   toast("🔊 Unmuted "+ok+" player"+(ok===1?"":"s")+".");
+   btn.disabled=false;btn.textContent="🔊 Unmute all muted";
+   loadPanelPlayers();loadServerStats();
+  });
+ });
+}
+function bulkGiveGemsAll(btn){
+ if(!fbDb||!fbUser)return;
+ if(myRole!=="owner"&&!canAdmin("bulk")){toast("🛡️ The Owner hasn't given you the Bulk permission.");return;}
+ var n=Math.floor(Number(($("bulkGemsAmt")||{}).value)||0);
+ if(n<=0){toast("Type how many gems first.");return;}
+ btn.disabled=true;btn.textContent="💎 Giving…";
+ loadAllPlayers().then(function(){
+  var targets=bulkTargets();
+  var jobs=targets.map(function(p){
+   return fbDb.collection("users").doc(p._uid).update({gems:firebase.firestore.FieldValue.increment(n)})
+    .then(function(){p.gems=(p.gems||0)+n;return true;}).catch(function(){return false;});
+  });
+  return Promise.all(jobs).then(function(res){
+   var ok=res.filter(Boolean).length;
+   auditGrant("bulk_give_gems",{_uid:"BULK",name:"all players"},{amount:n,count:ok});
+   toast("💎 Gave "+n+" gems to "+ok+" player"+(ok===1?"":"s")+".");
+   btn.disabled=false;btn.textContent="💎 Give gems to ALL";
+   loadPanelPlayers();
+  });
+ });
+}
+function bulkGiveCoinsOnline(btn){
+ if(!fbDb||!fbUser)return;
+ if(myRole!=="owner"&&!canAdmin("bulk")){toast("🛡️ The Owner hasn't given you the Bulk permission.");return;}
+ var n=Math.floor(Number(($("bulkCoinsAmt")||{}).value)||0);
+ if(n<=0){toast("Type how many coins first.");return;}
+ btn.disabled=true;btn.textContent="🪙 Giving…";
+ loadAllPlayers().then(function(){
+  var targets=bulkTargets(isOnline);
+  var jobs=targets.map(function(p){
+   return fbDb.collection("users").doc(p._uid).update({coins:firebase.firestore.FieldValue.increment(n)})
+    .then(function(){p.coins=(p.coins||0)+n;return true;}).catch(function(){return false;});
+  });
+  return Promise.all(jobs).then(function(res){
+   var ok=res.filter(Boolean).length;
+   auditGrant("bulk_give_coins",{_uid:"BULK",name:"online players"},{amount:n,count:ok});
+   toast("🪙 Gave "+n+" coins to "+ok+" online player"+(ok===1?"":"s")+".");
+   btn.disabled=false;btn.textContent="🪙 Give coins to ONLINE";
+   loadPanelPlayers();
+  });
+ });
+}
+/* ---------- v1.1: export audit log ---------- */
+function exportAuditLog(){
+ var lines=grantsCache.map(function(g){
+  return [fmtTime(g.at),g.action,g.actorName,"->",g.targetName||g.targetUid,JSON.stringify(g.details||{})].join(" | ");
+ });
+ var text="Anime Clash audit log — "+new Date().toLocaleString()+"\n"+lines.join("\n");
+ window.__lastAuditExport=text;
+ var box=$("auditExportBox");
+ var showFallback=function(){
+  if(box){box.value=text;box.classList.remove("hidden");}
+  toast("📋 Clipboard isn't available here — the audit log is in the box below, ready to copy.");
+ };
+ try{
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+   navigator.clipboard.writeText(text).then(function(){
+    if(box)box.classList.add("hidden");
+    toast("📋 Audit log copied ("+lines.length+" entries).");
+   }).catch(showFallback);
+  }else{showFallback();}
+ }catch(e){showFallback();}
 }
 
 /* ===== js_50_ui.js ===== */
@@ -3710,6 +4486,12 @@ function panelSetBan(p,ban,opts){
 var FB_IMG_MAX=5*1024*1024; /* 5 MB */
 var FB_IMG_SMALL=300000; /* base64 fallback cap */
 var UPDATE_LOG=[
+ {v:"v1.1",tag:"Floating admin panel + 30 staff tools",date:"November 12, 2026",
+  highlights:["🛡️ Admin panel is now a floating, draggable button — it hides during battles","🔍 Player search + filters, live online list, full player inspector","🔨 Quick-ban presets, custom ban lengths, recent bans + ban history","🔇 Mute durations, bulk mute/unmute, bulk gives","🏆 Give trophies, set level, give XP, grant all 100 units","📢 Global announcements + 2x coins events","📊 Server stats card + staff activity feed"],
+  groups:[
+   {t:"Staff panel",items:["Floating 🛡️ button (staff only) — drag it anywhere, tap to open; panel drags by its header, minimizes, and remembers its spot","Player search + filter chips: banned / muted / admins / online","Inspector: units owned, deck, gems/coins/trophies, level/XP, wins/losses, ban & mute state, custom title"]},
+   {t:"Bans & mutes",items:["Quick-ban presets (1h / 24h / 7d / permanent) and custom lengths (minutes to years)","Recent bans with one-tap unban, full ban history from the audit log","Mute durations (1h / 24h / 7d / permanent) — expired mutes lift themselves","Ban-this-device shortcut in the inspector"]},
+   {t:"Bulk & events",items:["Bulk mute all online, bulk unmute, give gems to ALL, give coins to ONLINE","Global announcements — every player sees the banner","2x coins event toggle — battle rewards double while live","Server stats: total players, online now, battles today, bans today"]}]},
  {v:"v1.0.0",tag:"LAUNCH — real PvP, bot tutorial, owner panel",date:"November 11, 2026",
   highlights:["⚔️ Real PvP battles — room codes + quick match","🤖 Tutorial vs bots","🃏 100 anime characters — buy them in the shop","✨ Forms: transform mid-battle into the top form","🎞️ GIF profile pics & banners (big GIFs shrink to fit)","👑 Owner panel — give gems, ban, manage admins"],
   groups:[
@@ -3880,10 +4662,12 @@ function showBattleView(){
  battleEls={towers:{},units:{}};
  selectedHandIdx=null;
  buildArena();
+ if(typeof updateAdminFloatVisibility==="function")updateAdminFloatVisibility();
 }
 function showPlayMenu(){
  $("playMenu").classList.remove("hidden");
  $("battleCard").classList.add("hidden");
+ if(typeof updateAdminFloatVisibility==="function")updateAdminFloatVisibility();
 }
 function buildArena(){
  var arena=$("battleArena");
@@ -4080,6 +4864,7 @@ function boot(){
  }
  renderUpdateLog();
  renderAll();
+ buildStaffFloat();
  fbInit();
  if(!FIREBASE_CONFIGURED)showAuthGate();
  try{
