@@ -68,21 +68,57 @@ h1,h2,h3{margin:0}
 #battleArena{position:relative;width:100%;aspect-ratio:360/560;background:linear-gradient(180deg,#274d2d 0 49.5%,#2a6db0 49.5% 50.5%,#3d7a35 50.5% 100%);border-radius:14px;overflow:hidden;border:2px solid var(--line);touch-action:none;user-select:none}
 #battleArena .river{position:absolute;left:0;right:0;top:49.5%;height:1%;background:#2a6db0}
 .bridge{position:absolute;top:46%;height:8%;width:15%;background:#8a6b45;border:2px solid #6b4f2a;border-radius:4px}
-.tower{position:absolute;width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid rgba(255,255,255,.35)}
+.tower{position:absolute;width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px;border:2px solid rgba(255,255,255,.35)}
 .tower.enemy{background:#7f1d2e} .tower.mine{background:#1d4ed8}
-.tower .hpbar{position:absolute;left:-4px;right:-4px;top:-9px;height:6px;background:#0008;border-radius:3px;overflow:hidden}
+.tower .hpbar{position:absolute;left:-4px;right:-4px;top:-9px;height:8px;background:#0008;border-radius:3px;overflow:hidden}
 .tower .hpbar i{display:block;height:100%;background:var(--green)}
-.tower.king{width:56px;height:56px;font-size:30px}
-.unit{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #fff3;z-index:5}
+.tower.king{width:60px;height:60px;font-size:32px}
+.unit{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;border:3px solid #fff3;z-index:5}
 .unit.mine{border-color:#4dd8ff;background:#1d4ed8cc} .unit.enemy{border-color:#ff8a8a;background:#7f1d2ecc}
 .unit.fly{transform:translateY(-8px);box-shadow:0 6px 10px rgba(0,0,0,.5)}
-.unit .uhp{position:absolute;left:-2px;right:-2px;top:-7px;height:4px;background:#0008;border-radius:2px;overflow:hidden}
+.unit .uhp{position:absolute;left:-4px;right:-4px;top:-10px;height:7px;background:#000c;border-radius:3px;overflow:hidden;border:1px solid #0008}
 .unit .uhp i{display:block;height:100%;background:var(--green)}
+.unit .uname{position:absolute;left:50%;transform:translateX(-50%);top:-26px;font-size:10px;font-weight:900;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000;white-space:nowrap;pointer-events:none;z-index:6}
 .unit.sel{outline:3px solid var(--gold)}
 #battleTimer{font-size:22px;font-weight:900;text-align:center;padding:4px}
-#elixirBarWrap{height:14px;background:#150e2a;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:6px 0 2px}
-#elixirBar{height:100%;width:0%;background:linear-gradient(90deg,#c026d3,#e879f9)}
-#elixirNum{text-align:center;font-size:12px;color:#e879f9;font-weight:800}
+/* v2.0 visibility: the Spirit meter is BIG and high-contrast — Rizz said he could barely see the old bar */
+#spiritBarWrap{height:26px;background:#150e2a;border:2px solid #67e8f9;border-radius:999px;overflow:hidden;margin:8px 0 4px;box-shadow:0 0 10px #22d3ee66}
+#spiritBar{height:100%;width:0%;background:linear-gradient(90deg,#0891b2,#22d3ee,#a5f3fc)}
+#spiritNum{text-align:center;font-size:18px;color:#a5f3fc;font-weight:900;text-shadow:0 1px 3px #000,0 0 8px #22d3ee88}
+.orbDot{display:inline-block;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ecfeff,#22d3ee 55%,#0e7490);vertical-align:-2px;margin-right:6px;box-shadow:0 0 8px #22d3ee}
+/* v2.0: spirit orbs — glowing cyan spheres on the arena (tap to collect) */
+.orb{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ecfeff,#22d3ee 55%,#0e7490);border:2px solid #a5f3fc;box-shadow:0 0 12px #22d3eecc;z-index:6;animation:orbPulse 1.2s ease-in-out infinite}
+.orb.big{width:32px;height:32px;margin:-16px 0 0 -16px}
+.orb.fading{opacity:.35;animation:none}
+.orb .v{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#083344}
+@keyframes orbPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+/* ---------- v2.0: home menu (Spirit Island, daily rewards, big BATTLE) ---------- */
+#menuIsland{text-align:center}
+#menuIslandImg{width:100%;max-width:340px;border-radius:18px;border:2px solid var(--line);box-shadow:0 10px 30px rgba(124,58,237,.45);animation:islandFloat 4s ease-in-out infinite}
+@keyframes islandFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+#menuRankBar{margin-top:10px}
+#menuRankName{font-weight:900;font-size:15px}
+.rankBarWrap{height:14px;background:#150e2a;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:6px 0 4px}
+#menuRankFill{height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,#ffc93c)}
+#menuRewards{margin-top:14px}
+#rewardRow{display:flex;gap:8px;margin-top:8px}
+.rewardSlot{flex:1;background:var(--card2);border:2px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center;font-size:12px;font-weight:800}
+.rewardSlot .rw{font-size:22px;display:block}
+.rewardSlot.claimed{opacity:.55;border-color:var(--green)}
+.rewardSlot.next{border-color:var(--gold);box-shadow:0 0 10px #ffc93c55}
+.rewardSlot button{margin-top:6px;width:100%;padding:6px 2px;font-size:12px}
+#menuBattleRow{display:flex;align-items:center;gap:8px;margin-top:16px}
+.menuDeck{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.menuDeckCard{background:var(--card2);border:2px solid var(--line);border-radius:12px;padding:6px 2px;text-align:center;font-size:11px;font-weight:700;cursor:pointer}
+.menuDeckCard .e{font-size:22px;line-height:1}
+.menuDeckCard .cost{color:#67e8f9;font-weight:800}
+#btnBattleBig{flex:0 0 132px;height:132px;border-radius:50%;margin:0;font-size:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 10px 28px rgba(255,77,141,.45)}
+#btnBattleBig span{font-size:19px;letter-spacing:1px}
+#menuRoundBtns{display:flex;justify-content:center;gap:14px;margin-top:16px}
+.roundBtn{width:64px;height:64px;border-radius:50%;border:2px solid var(--line);background:var(--card2);color:var(--text);font-size:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0}
+.roundBtn span{font-size:10px;font-weight:800}
+#menuMore{margin-top:16px;border-top:1px solid var(--line);padding-top:10px}
+#menuMore summary{cursor:pointer;font-weight:800;font-size:15px}
 .hand{display:flex;gap:6px;margin-top:8px}
 .handCard{flex:1;background:var(--card2);border:2px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;font-size:12px}
 .handCard.sel{border-color:var(--gold);background:#3d2a72}
@@ -95,6 +131,15 @@ h1,h2,h3{margin:0}
 /* ---------- lists ---------- */
 .unitRow,.shopRow,.lbRow,.playerRow{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
 .unitRow .ic,.shopRow .ic{font-size:30px;width:40px;text-align:center}
+/* v2.0: 3D character art — <img> replaces the emoji in every card. object-fit
+   cover crops the square renders into the circle/rounded frames. The emoji is
+   still the onerror fallback inside artImg(), so a failed image never leaves
+   a blank hole. */
+img.uimg{display:block;object-fit:cover;background:var(--card)}
+.unitRow .ic img.uimg,.shopRow .ic img.uimg{width:40px;height:40px;border-radius:10px}
+.menuDeckCard .e img.uimg,.handCard .e img.uimg{width:34px;height:34px;border-radius:8px;margin:0 auto}
+.unit .uic{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.unit .uic img.uimg{width:40px;height:40px;border-radius:50%}
 .unitRow .nm,.shopRow .nm{font-weight:800}
 .unitRow .st,.shopRow .st{font-size:12px;color:var(--muted)}
 .unitRow .acts,.shopRow .acts{margin-left:auto;text-align:right}
@@ -149,7 +194,7 @@ label.fl{display:inline-block;background:#2c1e55;border:1px solid var(--line);bo
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script>
-/* Anime Clash v1.1: vendored GIF libraries (inlined — no CDN, no worker, no WASM):
+/* Anime Clash v2.0: vendored GIF libraries (inlined — no CDN, no worker, no WASM):
    omggif 1.0.10 (MIT, decode) + gifenc 1.0.3 (MIT, encode).
    Same shrinker as Pig Clicker v2.5.3 — big Tenor GIFs shrink in the
    browser so they fit the 300 KB save-doc cap, animation preserved. */
@@ -1800,7 +1845,7 @@ window.gifenc=exports;})();
     <div class="logo">⚔️🌸</div>
     <h1>ANIME CLASH</h1>
     <p>Anime battle arena — deploy units, smash towers, climb the ranks.</p>
-    <div class="gate-version"><span class="ver-badge">v1.1</span> <b>v1.1 — floating admin panel + 30 staff tools</b></div>
+    <div class="gate-version"><span class="ver-badge">v2.0</span> <b>v2.0 — spirit orbs replace the old bar</b></div>
   </div>
   <div class="gate-card">
     <h2>Play Anime Clash</h2>
@@ -1818,7 +1863,7 @@ window.gifenc=exports;})();
     <li>🎞️ <b>GIF profile pics &amp; banners</b> — big Tenor GIFs shrink to fit, free</li>
     <li>👑 <b>Owner panel</b> — give gems, ban, manage admins</li>
   </ul>
-  <p class="foot">Anime Clash v1.1 — original characters only. No accounts yet? Hit “Create account”.</p>
+  <p class="foot">Anime Clash v2.0 — original characters only. No accounts yet? Hit “Create account”.</p>
 </div>
 
 <!-- ============ BANNED SCREEN ============ -->
@@ -1853,29 +1898,55 @@ window.gifenc=exports;})();
   <!-- PLAY -->
   <div class="view" id="viewPlay">
     <div class="card" id="playMenu">
-      <h2>⚔️ Battle</h2>
-      <p class="sub">Elixir builds up — deploy units, break their towers, take the crown.</p>
-      <button class="btn green" id="btnTutorial" type="button">🤖 Tutorial — vs Bot</button>
-      <button class="btn" id="btnQuickMatch" type="button">⚔️ Quick Match — real player</button>
-      <h3 style="margin-top:14px">🏷️ Play with a friend (room code)</h3>
-      <input type="text" id="roomCodeInput" placeholder="Room code (6 letters)" maxlength="6">
-      <button class="btn blue" id="btnCreateRoom" type="button">➕ Create room</button>
-      <button class="btn ghost" id="btnJoinRoom" type="button">🚪 Join room</button>
-      <p class="sub" id="playStatus"></p>
-      <p class="sub" id="myRoomCode"></p>
-      <p class="sub hidden" id="eventBadge">🎉 2x COINS EVENT is live — battle rewards are doubled!</p>
+      <!-- v2.0 home menu: Spirit Island, daily rewards, big BATTLE button -->
+      <div id="menuIsland">
+        <img id="menuIslandImg" src="./art/home-island.webp" alt="Spirit Island">
+        <div id="menuRankBar">
+          <div id="menuRankName">🥉 Bronze</div>
+          <div class="rankBarWrap"><div id="menuRankFill"></div></div>
+          <div id="menuRankNext" class="sub">0 / 100 🏆 to Silver</div>
+        </div>
+      </div>
+      <div id="menuRewards">
+        <h3>🎁 Daily Rewards</h3>
+        <div id="rewardRow"></div>
+        <p class="sub" id="rewardNote">Come back every day to claim the next reward.</p>
+      </div>
+      <div id="menuBattleRow">
+        <div id="menuDeckLeft" class="menuDeck"></div>
+        <button class="btn" id="btnBattleBig" type="button">⚔️<span>BATTLE</span></button>
+        <div id="menuDeckRight" class="menuDeck"></div>
+      </div>
+      <div id="menuRoundBtns">
+        <button type="button" class="roundBtn" id="btnMenuShop" aria-label="Shop">🛒<span>Shop</span></button>
+        <button type="button" class="roundBtn" id="btnMenuRanks" aria-label="Leaderboard">🏆<span>Ranks</span></button>
+        <button type="button" class="roundBtn" id="btnMenuProfile" aria-label="Profile">👤<span>Profile</span></button>
+      </div>
+      <details id="menuMore">
+        <summary>⚔️ More ways to battle</summary>
+        <p class="sub">Spirit orbs rain down — tap them to collect, deploy units, break their Guardians, smash the Spirit Nexus.</p>
+        <button class="btn green" id="btnTutorial" type="button">🤖 Tutorial — vs Bot</button>
+        <button class="btn" id="btnQuickMatch" type="button">⚔️ Quick Match — real player</button>
+        <h3 style="margin-top:14px">🏷️ Play with a friend (room code)</h3>
+        <input type="text" id="roomCodeInput" placeholder="Room code (6 letters)" maxlength="6">
+        <button class="btn blue" id="btnCreateRoom" type="button">➕ Create room</button>
+        <button class="btn ghost" id="btnJoinRoom" type="button">🚪 Join room</button>
+        <p class="sub" id="playStatus"></p>
+        <p class="sub" id="myRoomCode"></p>
+        <p class="sub hidden" id="eventBadge">🎉 2x COINS EVENT is live — battle rewards are doubled!</p>
+      </details>
     </div>
     <div class="card hidden" id="battleCard">
       <div id="battleTimer">3:00</div>
       <div id="battleArena"></div>
-      <div id="elixirBarWrap"><div id="elixirBar"></div></div>
-      <div id="elixirNum">Elixir 0/10</div>
+      <div id="spiritBarWrap"><div id="spiritBar"></div></div>
+      <div id="spiritNum">Spirit 0/10</div>
       <div class="hand" id="handCards"></div>
       <div id="battleResult" class="hidden"></div>
       <button class="btn ghost" id="btnBattleExit" type="button">Leave battle</button>
     </div>
     <div class="card">
-      <h3>📰 Update Log — v1.1</h3>
+      <h3>📰 Update Log — v2.0</h3>
       <div id="updateLogList"></div>
     </div>
   </div>
@@ -1973,7 +2044,7 @@ window.gifenc=exports;})();
 /* ===== js_10_core.js ===== */
 "use strict";
 /* ================= Anime Clash v1.1 — core ================= */
-var CURRENT_VERSION="v1.1";
+var CURRENT_VERSION="v2.0";
 /* FIREBASE_CONFIG — PLACEHOLDER. The parent creates the real Firebase
    project ("anime-clash") and swaps these values in before deploy.
    DO NOT ship with invented keys: with the placeholder, the game runs
@@ -2088,7 +2159,7 @@ function defaultSave(){
   units:{roy:{level:1},josuke:{level:1},light:{level:1},lelouch:{level:1},fern:{level:1},stark:{level:1},momo:{level:1},okarun:{level:1}},
   deck:["roy","josuke","light","lelouch","fern","stark","momo","okarun"],
   avatar:"",avatarImg:"",banner:"",bannerGif:"",customTitle:"",
-  tutorialDone:false,lastSeenVersion:""};
+  tutorialDone:false,lastSeenVersion:"",rewardDay:"",rewardSlot:0};
 }
 function saveLocal(){try{localStorage.setItem("animeclash.save.v1",JSON.stringify({S:S,profile:profile}));}catch(e){}}
 function loadLocal(){try{var raw=localStorage.getItem("animeclash.save.v1");if(!raw)return false;var d=JSON.parse(raw);if(d&&d.S){S=d.S;profile=d.profile||profile;return true;}}catch(e){}return false;}
@@ -2255,7 +2326,7 @@ function loadProfile(user){
 }
 function applyDocToState(d){
  S=S||defaultSave();
- var fields=["name","username","gems","coins","trophies","xp","level","wins","losses","winStreak","units","deck","avatar","avatarImg","banner","bannerGif","customTitle","tutorialDone","lastSeenVersion"];
+ var fields=["name","username","gems","coins","trophies","xp","level","wins","losses","winStreak","units","deck","avatar","avatarImg","banner","bannerGif","customTitle","tutorialDone","lastSeenVersion","rewardDay","rewardSlot"];
  fields.forEach(function(k){if(d[k]!==undefined)S[k]=d[k];});
  profile.avatar=S.avatar||"";profile.avatarImg=S.avatarImg||"";profile.banner=S.banner||"";profile.bannerGif=S.bannerGif||"";
  myCustomTitle=S.customTitle||"";
@@ -2281,7 +2352,7 @@ function saveCloud(){
  if(!fbDb||!fbUser||banLock)return;
  var upd={gems:S.gems,coins:S.coins,trophies:S.trophies,xp:S.xp,level:S.level,wins:S.wins,losses:S.losses,winStreak:S.winStreak,
   units:S.units,deck:S.deck,avatar:S.avatar,avatarImg:S.avatarImg,banner:S.banner,bannerGif:S.bannerGif,customTitle:myCustomTitle,
-  tutorialDone:S.tutorialDone,lastSeenVersion:S.lastSeenVersion,
+  tutorialDone:S.tutorialDone,lastSeenVersion:S.lastSeenVersion,rewardDay:S.rewardDay||"",rewardSlot:S.rewardSlot||0,
   updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
  fbDb.collection("users").doc(fbUser.uid).update(upd).catch(function(err){
   fbDenied=true;noteFbError(err,"saveCloud");
@@ -2372,8 +2443,9 @@ function canAdmin(perm){
    STATS ARE DERIVED BY FORMULA (see unitStats below) — one documented
    formula by rarity tier + role, not 100 hand-tuned stat blocks.
    Rarity tiers: Common / Rare / Epic / Legendary / Mythic.
-   Elixir cost: rarity base (2/3/4/6/8) +1 flying +1 tank, capped at 10.
-   ICONS are emoji + colour only — no official anime art, no screenshots. */
+   Spirit cost: rarity base (2/3/4/6/8) +1 flying +1 tank, capped at 10.
+   ICONS: custom 3D art per character (UNIT_ART, art/<slug>.webp) with the
+   emoji kept as the onerror fallback — no official anime art, no screenshots. */
 var ROSTER=[
 ["goku","Son Goku","Dragon Ball","🔥","#ff7a1a","legendary","melee",0,"Ki manipulation, Kamehameha, Instant Transmission",["Super Saiyan","Super Saiyan 2","Super Saiyan 3","Super Saiyan God","Super Saiyan Blue","Ultra Instinct Sign","Mastered Ultra Instinct"]],
 ["vegeta","Vegeta","Dragon Ball","💥","#7c3aed","legendary","melee",0,"Ki blasts, Galick Gun, Final Flash, Hakai energy",["Super Saiyan","Super Saiyan 2","Super Saiyan God","Super Saiyan Blue","Super Saiyan Blue Evolution","Ultra Ego"]],
@@ -2476,6 +2548,119 @@ var ROSTER=[
 ["zeno","Zeno","Dragon Ball Super","👶","#eab308","mythic","ranged",0,"Erase (instant deletion of timelines, universes, and immortals)",["Base (Omni-King)"]],
 ["kumagawa","Misogi Kumagawa","Medaka Box","📖","#1f2937","mythic","ranged",0,"All Fiction (erases concepts, death, and reality from existence), Book Maker",["Base","All Fiction: April Fiction"]]
 ];
+/* v2.0: 3D character art — roster id -> "art/<slug>.webp".
+   Generated 3D renders (29 MB total); the game references them with
+   relative paths so they ship with the GitHub Pages deploy. The emoji
+   icon stays on each unit as the onerror fallback (see artImg). */
+var UNIT_ART={
+"goku":"art/son-goku.webp",
+"vegeta":"art/vegeta.webp",
+"gohan":"art/gohan.webp",
+"frieza":"art/frieza.webp",
+"naruto":"art/naruto-uzumaki.webp",
+"sasuke":"art/sasuke-uchiha.webp",
+"madara":"art/madara-uchiha.webp",
+"luffy":"art/monkey-d-luffy.webp",
+"zoro":"art/roronoa-zoro.webp",
+"kaido":"art/kaido.webp",
+"ichigo":"art/ichigo-kurosaki.webp",
+"aizen":"art/sosuke-aizen.webp",
+"yhwach":"art/yhwach.webp",
+"gon":"art/gon-freecss.webp",
+"killua":"art/killua-zoldyck.webp",
+"netero":"art/isaac-netero.webp",
+"meruem":"art/meruem.webp",
+"gojo":"art/satoru-gojo.webp",
+"sukuna":"art/sukuna.webp",
+"yuji":"art/yuji-itadori.webp",
+"megumi":"art/megumi-fushiguro.webp",
+"midoriya":"art/izuku-midoriya-deku.webp",
+"bakugo":"art/katsuki-bakugo.webp",
+"todoroki":"art/shoto-todoroki.webp",
+"allmight":"art/all-might.webp",
+"shigaraki":"art/tomura-shigaraki.webp",
+"tanjiro":"art/tanjiro-kamado.webp",
+"nezuko":"art/nezuko-kamado.webp",
+"zenitsu":"art/zenitsu-agatsuma.webp",
+"muzan":"art/muzan-kibutsuji.webp",
+"eren":"art/eren-yeager.webp",
+"levi":"art/levi-ackerman.webp",
+"reiner":"art/reiner-braun.webp",
+"saitama":"art/saitama.webp",
+"genos":"art/genos.webp",
+"garou":"art/garou.webp",
+"tatsumaki":"art/tatsumaki.webp",
+"mob":"art/shigeo-kageyama-mob.webp",
+"denji":"art/denji.webp",
+"makima":"art/makima.webp",
+"power":"art/power.webp",
+"asta":"art/asta.webp",
+"yuno":"art/yuno.webp",
+"natsu":"art/natsu-dragneel.webp",
+"erza":"art/erza-scarlet.webp",
+"gray":"art/gray-fullbuster.webp",
+"edward":"art/edward-elric.webp",
+"roy":"art/roy-mustang.webp",
+"father":"art/father.webp",
+"jotaro":"art/jotaro-kujo.webp",
+"dio":"art/dio.webp",
+"giorno":"art/giorno-giovanna.webp",
+"josuke":"art/josuke-higashikata.webp",
+"light":"art/light-yagami.webp",
+"lelouch":"art/lelouch-vi-britannia.webp",
+"kaneki":"art/ken-kaneki.webp",
+"alucard":"art/alucard.webp",
+"jinwoo":"art/sung-jin-woo.webp",
+"rimuru":"art/rimuru-tempest.webp",
+"anos":"art/anos-voldigoad.webp",
+"ainz":"art/ainz-ooal-gown.webp",
+"naofumi":"art/naofumi-iwatani.webp",
+"kirito":"art/kirito.webp",
+"shinra":"art/shinra-kusakabe.webp",
+"arthur":"art/arthur-boyle.webp",
+"benimaru":"art/benimaru-shinmon.webp",
+"maka":"art/maka-albarn.webp",
+"kid":"art/death-the-kid.webp",
+"yusuke":"art/yusuke-urameshi.webp",
+"hiei":"art/hiei.webp",
+"kurama":"art/kurama.webp",
+"inuyasha":"art/inuyasha.webp",
+"sesshomaru":"art/sesshomaru.webp",
+"kenshin":"art/kenshin-himura.webp",
+"gintoki":"art/gintoki-sakata.webp",
+"usagi":"art/usagi-tsukino-sailor-moon.webp",
+"sakura":"art/sakura-kinomoto.webp",
+"madoka":"art/madoka-kaname.webp",
+"homura":"art/homura-akemi.webp",
+"simon":"art/simon.webp",
+"shinji":"art/shinji-ikari.webp",
+"guts":"art/guts.webp",
+"griffith":"art/griffith.webp",
+"vash":"art/vash-the-stampede.webp",
+"seiya":"art/seiya.webp",
+"kenshiro":"art/kenshiro.webp",
+"meliodas":"art/meliodas.webp",
+"escanor":"art/escanor.webp",
+"ban":"art/ban.webp",
+"frieren":"art/frieren.webp",
+"fern":"art/fern.webp",
+"stark":"art/stark.webp",
+"kafka":"art/kafka-hibino.webp",
+"momo":"art/momo-ayase.webp",
+"okarun":"art/okarun-ken-takakura.webp",
+"mash":"art/mash-burnedead.webp",
+"tanya":"art/tanya-degurechaff.webp",
+"korosensei":"art/koro-sensei.webp",
+"zeno":"art/zeno.webp",
+"kumagawa":"art/kumagawa-misogi.webp",
+};
+/* Renders an <img> for a unit, falling back to the emoji if the art
+   file is missing or slow — a card never goes blank. */
+function artImg(def){
+ if(!def)return "❓";
+ if(!def.art)return esc(def.icon);
+ return '<img class="uimg" src="./'+def.art+'" alt="'+esc(def.name)+'" loading="lazy" onerror="this.outerHTML=\''+def.icon+'\'">';
+}
 var UNIT_BY_ID={};
 var SERIES_LIST=[];
 var RARITY_ORDER={common:0,rare:1,epic:2,legendary:3,mythic:4};
@@ -2483,7 +2668,7 @@ var RARITY_BASE={common:{hp:500,dmg:90},rare:{hp:750,dmg:120},epic:{hp:1100,dmg:
 var RARITY_COST={common:2,rare:3,epic:4,legendary:6,mythic:8};
 var SHOP_PRICE={common:{coins:300,gems:0},rare:{coins:600,gems:0},epic:{coins:1200,gems:0},legendary:{coins:0,gems:120},mythic:{coins:0,gems:300}};
 var STARTER_UNITS=["roy","josuke","light","lelouch","fern","stark","momo","okarun"];
-function elixirCost(def){
+function spiritCost(def){
  var c=RARITY_COST[def.rarity]||3;
  if(def.role==="flying")c+=1;
  if(def.role==="tank")c+=1;
@@ -2491,7 +2676,8 @@ function elixirCost(def){
 }
 var UNITS=ROSTER.map(function(r){
  var u={id:r[0],name:r[1],series:r[2],icon:r[3],color:r[4],rarity:r[5],role:r[6],splash:!!r[7],ability:r[8],forms:r[9]};
- u.cost=elixirCost(u);
+ u.art=UNIT_ART[u.id]||null;
+ u.cost=spiritCost(u);
  return u;
 });
 UNITS.forEach(function(u){UNIT_BY_ID[u.id]=u;});
@@ -2506,7 +2692,7 @@ function unitStats(def,level){
  else if(def.role==="healer"){hp*=0.8;speed=36;range=0;rate=1.0;heal=65;}
  var s=1+0.08*((level||1)-1);
  return {hp:Math.round(hp*s),dmg:Math.round(dmg*s),heal:heal?Math.round(heal*s):0,
-  speed:speed,range:range,rate:rate,target:target,cost:elixirCost(def)};
+  speed:speed,range:range,rate:rate,target:target,cost:spiritCost(def)};
 }
 function topForm(def){
  var f=def.forms||[];
@@ -2596,7 +2782,12 @@ var TOWER_DEFS={
  enemyKing:{x:180,y:35,hp:2400,king:true},enemyL:{x:70,y:135,hp:1400},enemyR:{x:290,y:135,hp:1400}
 };
 var BATTLE_TIME=180,OVERTIME_TIME=60;
-var ELIXIR_REGEN=1/2.8,ELIXIR_REGEN_DOUBLE=1/1.4,ELIXIR_MAX=10;
+/* v2.0: SPIRIT ORBS replace the old regen bar. Orbs rain onto each half — tap them to
+   collect; kills drop orbs for the killer; smashing a tower pays +2 spirit.
+   Nothing fills by itself: every point is earned by playing. */
+var SPIRIT_MAX=10,SPIRIT_START=3;
+var ORB_SPAWN=2.5,ORB_SPAWN_DOUBLE=1.25,ORB_LIFE=8,ORB_FADE=2;
+var ORB_TAP_R=28;
 var TOWER_RANGE=100,TOWER_DMG=60,TOWER_RATE=1.0;
 var battle=null; /* active battle object (host/bot) or null */
 var battleInterval=null;
@@ -2619,7 +2810,8 @@ function newBattleState(opts){
  return {
   mode:opts.mode||"bot",mySide:"mine",enemyName:opts.enemyName||"Bot Sensei",
   tick:0,timeLeft:BATTLE_TIME,overtime:false,overTimeLeft:0,otStartDown:null,
-  elixir:{mine:5,enemy:5},
+  spirit:{mine:SPIRIT_START,enemy:SPIRIT_START},
+  orbs:[],orbSeq:1,orbTimer:{mine:0.8,enemy:0.8},aiOrbTimer:0.5,
   decks:{mine:shuffle(myDeck.slice()),enemy:shuffle(enDeck.slice())},
   hands:{mine:[],enemy:[]},
   units:[],unitSeq:1,
@@ -2687,13 +2879,13 @@ function deployCard(st,side,handIdx,x,y){
  if(handIdx<0||handIdx>=hand.length)return{ok:false,why:"no card there"};
  var defId=hand[handIdx],def=UNIT_BY_ID[defId];
  if(!def)return{ok:false,why:"bad card"};
- if(st.elixir[side]<def.cost)return{ok:false,why:"not enough elixir"};
+ if(st.spirit[side]<def.cost)return{ok:false,why:"not enough spirit"};
  if(side==="mine"&&y<ARENA.riverY+10)return{ok:false,why:"deploy on your half"};
  if(side==="enemy"&&y>ARENA.riverY-10)return{ok:false,why:"deploy on your half"};
  x=clamp(x,20,ARENA.w-20);
  var levels=side==="mine"?st.myLevels:st.enemyLevels;
  var stats=unitStats(def,levels[defId]||1);
- st.elixir[side]-=def.cost;
+ st.spirit[side]-=def.cost;
  hand.splice(handIdx,1);
  /* cycle: draw the next card from the deck */
  var deck=st.decks[side];
@@ -2717,6 +2909,9 @@ function damageTower(st,key,amount){
   tw.hp=0;tw.dead=true;
   var side=key.indexOf("mine")===0?"mine":"enemy";
   st.towersDown[side]++;
+  /* v2.0: smashing a tower pays the attacker +2 spirit instantly */
+  var atk=otherSide(side);
+  st.spirit[atk]=Math.min(SPIRIT_MAX,st.spirit[atk]+2);
   if(tw.king){
    st.result="done";st.winner=otherSide(side);st.reason="king";
   }else if(st.overtime){
@@ -2751,22 +2946,82 @@ function myTransformableUnit(st,mySide){
  });
  return found;
 }
+/* ---- SPIRIT ORBS (v2.0) ----
+   Orbs rain onto each half; tap one to collect 1 spirit (2 for a big orb).
+   Kills drop orbs for the killer's side; orbs expire after ORB_LIFE s.
+   The host sims every orb — guests only ever collect what the host sent. */
+function orbSpawnPos(st,side){
+ for(var tries=0;tries<12;tries++){
+  var x=rand(30,330),y=side==="mine"?rand(300,540):rand(20,260);
+  var clear=true;
+  Object.keys(TOWER_DEFS).forEach(function(k){
+   var t=TOWER_DEFS[k];
+   if(Math.hypot(t.x-x,t.y-y)<50)clear=false;
+  });
+  if(clear)return{x:Math.round(x),y:Math.round(y)};
+ }
+ return{x:180,y:side==="mine"?430:130};
+}
+function spawnOrb(st,side,x,y,value){
+ var o={id:st.orbSeq++,side:side,x:Math.round(x),y:Math.round(y),born:st.tick,value:value||1};
+ st.orbs.push(o);
+ return o;
+}
+function collectOrb(st,side,orbId){
+ if(st.result)return{ok:false,why:"battle over"};
+ var idx=-1;
+ st.orbs.forEach(function(o,i){if(o.id===orbId)idx=i;});
+ if(idx<0)return{ok:false,why:"no orb"};
+ var o=st.orbs[idx];
+ if(o.side!==side)return{ok:false,why:"not your orb"};
+ if(st.spirit[side]>=SPIRIT_MAX)return{ok:false,why:"spirit full"};
+ st.orbs.splice(idx,1);
+ st.spirit[side]=Math.min(SPIRIT_MAX,st.spirit[side]+o.value);
+ return{ok:true,value:o.value};
+}
+function nearestOrb(st,side,x,y){
+ var best=null,bestD=1e9;
+ (st.orbs||[]).forEach(function(o){
+  if(o.side!==side)return;
+  var d=Math.hypot(o.x-x,o.y-y);
+  if(d<=ORB_TAP_R&&d<bestD){bestD=d;best=o;}
+ });
+ return best;
+}
 function battleTick(st,dt){
  if(st.result)return;
  st.tick++;
  st.timeLeft-=dt;
  var dbl=st.overtime||st.timeLeft<=60;
- var regen=dbl?ELIXIR_REGEN_DOUBLE:ELIXIR_REGEN;
- st.elixir.mine=Math.min(ELIXIR_MAX,st.elixir.mine+regen*dt);
- st.elixir.enemy=Math.min(ELIXIR_MAX,st.elixir.enemy+regen*dt);
+ /* --- spirit orbs: rain onto each half, expire after ORB_LIFE seconds --- */
+ var spawnIv=dbl?ORB_SPAWN_DOUBLE:ORB_SPAWN;
+ ["mine","enemy"].forEach(function(side){
+  st.orbTimer[side]-=dt;
+  if(st.orbTimer[side]<=0){
+   st.orbTimer[side]=spawnIv;
+   var p=orbSpawnPos(st,side);
+   spawnOrb(st,side,p.x,p.y,1);
+  }
+ });
+ st.orbs=st.orbs.filter(function(o){return (st.tick-o.born)*0.1<ORB_LIFE;});
  /* --- bot AI --- */
  if(st.mode==="bot"&&!st.result){
+  /* bot collects its own orbs (oldest first, one per ~0.7s while under cap) */
+  st.aiOrbTimer-=dt;
+  if(st.aiOrbTimer<=0){
+   st.aiOrbTimer=0.7;
+   var myOrbs=st.orbs.filter(function(o){return o.side==="enemy";});
+   if(myOrbs.length&&st.spirit.enemy<SPIRIT_MAX){
+    myOrbs.sort(function(a,b){return a.born-b.born;});
+    collectOrb(st,"enemy",myOrbs[0].id);
+   }
+  }
   st.aiTimer-=dt;
   if(st.aiTimer<=0){
    st.aiTimer=rand(3.0,5.5);
    var hand=st.hands.enemy;
    var affordable=[];
-   hand.forEach(function(id,i){if(UNIT_BY_ID[id].cost<=st.elixir.enemy)affordable.push(i);});
+   hand.forEach(function(id,i){if(UNIT_BY_ID[id].cost<=st.spirit.enemy)affordable.push(i);});
    if(affordable.length){
     var idx=pick(affordable);
     var lane=pick([90,270]);
@@ -2874,13 +3129,23 @@ function battleTick(st,dt){
   });
   if(best){tw.cd=TOWER_RATE;damageUnit(st,best,TOWER_DMG);}
  });
- /* --- cleanup + timer --- */
+ /* --- cleanup + spirit orb drops: a kill drops an orb for the killer's
+        side (2 orbs' worth for a 4+ spirit unit), on the killer's half --- */
+ st.units.forEach(function(u){
+  if(u.hp<=0){
+   var killer=otherSide(u.side);
+   var dy=u.y;
+   if(killer==="mine"&&dy<ARENA.riverY+10)dy=ARENA.riverY+rand(30,220);
+   if(killer==="enemy"&&dy>ARENA.riverY-10)dy=ARENA.riverY-rand(30,220);
+   spawnOrb(st,killer,clamp(u.x,30,330),clamp(dy,20,540),UNIT_BY_ID[u.defId].cost>=4?2:1);
+  }
+ });
  st.units=st.units.filter(function(u){return u.hp>0;});
  if(st.result)return;
  if(st.timeLeft<=0&&!st.overtime){
   st.overtime=true;st.overTimeLeft=OVERTIME_TIME;
   st.otStartDown={mine:st.towersDown.mine,enemy:st.towersDown.enemy};
-  toast("⏱️ Overtime! First tower wins!");
+  toast("⏱️ Overtime! First Guardian wins!");
  }else if(st.overtime){
   st.overTimeLeft-=dt;
   if(st.overTimeLeft<=0){
@@ -2944,6 +3209,7 @@ function leaveBattle(){
   finishBattle(battle,true);
  }
  battle=null;remoteBattle=null;
+ pendingOrbs={};
  mqLeave();
  showPlayMenu();
 }
@@ -3031,7 +3297,9 @@ function mqLeave(){
 function publishSnapshot(){
  if(!battle||battle.mode!=="pvp-host")return;
  mqPublish({type:"snap",tick:battle.tick,timeLeft:battle.timeLeft,overtime:battle.overtime,overTimeLeft:battle.overTimeLeft,
-  elixir:battle.elixir,hands:battle.hands,
+  spirit:battle.spirit,
+  orbs:battle.orbs.map(function(o){return{id:o.id,side:o.side,x:o.x,y:o.y,value:o.value,age:Math.round((battle.tick-o.born)*10)/10};}),
+  hands:battle.hands,
   units:battle.units.map(function(u){return{uid:u.uid,defId:u.defId,side:u.side,x:Math.round(u.x*10)/10,y:Math.round(u.y*10)/10,hp:u.hp,maxHp:u.maxHp,flying:u.flying,meter:Math.round(u.meter||0),transformed:!!u.transformed,form:u.form||""};}),
   towers:JSON.parse(JSON.stringify(battle.towers)),towersDown:battle.towersDown,result:battle.result,winner:battle.winner,reason:battle.reason});
 }
@@ -3064,6 +3332,10 @@ function onHostMessage(msg){
   lastGuestSeen=Date.now();
   var r=deployCard(battle,"enemy",msg.handIdx,msg.x,msg.y);
   if(!r.ok){/* guest sent a bad spawn — ignore, host is truth */}
+ }else if(msg.type==="collect"&&battle.mode==="pvp-host"){
+  /* guest tapped an orb: host is truth (orb exists? guest's side? cap?) */
+  lastGuestSeen=Date.now();
+  collectOrb(battle,"enemy",msg.orbId);
  }else if(msg.type==="transform"&&battle.mode==="pvp-host"){
   lastGuestSeen=Date.now();
   transformUnit(battle,msg.uid);
@@ -3131,12 +3403,12 @@ function onGuestMessage(msg){
   lastSnapSeen=Date.now();
   if(!remoteBattle){
    remoteBattle={mode:"pvp-guest",tick:0,timeLeft:180,overtime:false,overTimeLeft:0,
-    elixir:{mine:5,enemy:5},hands:{mine:[],enemy:[]},units:[],towers:towerState(),towersDown:{mine:0,enemy:0},result:null,winner:null,reason:"",enemyName:roomOpponentName};
+    spirit:{mine:SPIRIT_START,enemy:SPIRIT_START},orbs:[],orbSeq:1,orbTimer:{mine:0.8,enemy:0.8},aiOrbTimer:0.5,hands:{mine:[],enemy:[]},units:[],towers:towerState(),towersDown:{mine:0,enemy:0},result:null,winner:null,reason:"",enemyName:roomOpponentName};
    battle=remoteBattle;
    showBattleView();
   }
   remoteBattle.tick=msg.tick;remoteBattle.timeLeft=msg.timeLeft;remoteBattle.overtime=msg.overtime;
-  remoteBattle.overTimeLeft=msg.overTimeLeft;remoteBattle.elixir=msg.elixir;remoteBattle.hands=msg.hands;
+  remoteBattle.overTimeLeft=msg.overTimeLeft;remoteBattle.spirit=msg.spirit;remoteBattle.orbs=msg.orbs;remoteBattle.hands=msg.hands;
   remoteBattle.units=msg.units;remoteBattle.towers=msg.towers;remoteBattle.towersDown=msg.towersDown;
   remoteBattle.result=msg.result;remoteBattle.winner=msg.winner;remoteBattle.reason=msg.reason;
   /* guest's own side is the "enemy" side in the host sim — flip for display */
@@ -3154,6 +3426,16 @@ function guestDeploy(handIdx,x,y){
  if(x==null||y==null)return;
  mqPublish({type:"spawn",handIdx:handIdx,x:x,y:y});
  sndDeploy();
+}
+/* v2.0: guest taps an orb — the host decides (optimistic hide locally,
+   the next snapshot re-adds it if the host said no, e.g. spirit full). */
+var pendingOrbs={};
+function guestCollect(orbId){
+ if(!battle||!remoteBattle||battle.result)return;
+ mqPublish({type:"collect",orbId:orbId});
+ pendingOrbs[orbId]=true;
+ setTimeout(function(){delete pendingOrbs[orbId];},1500);
+ sndClick();
 }
 function guestTransform(uid){
  if(!battle||!remoteBattle||battle.result)return;
@@ -3490,7 +3772,9 @@ function auditGrant(action,target,details){
 }
 function targetIsOwner(p){return roleOfUid(p._uid,p.role)==="owner";}
 function guardOwnerTarget(p,action){
- if(p._uid===fbUser.uid){toast("You can't "+action+" yourself.");return true;}
+ var isSelf = p._uid===fbUser.uid;
+ if(isSelf && myRole!=="owner"){toast("You can't "+action+" yourself.");return true;}
+ if(isSelf) return false; // owner acting on himself is allowed
  if(targetIsOwner(p)){toast("🛡️ No admin can "+action+" the Owner — ever.");return true;}
  return false;
 }
@@ -4486,6 +4770,12 @@ function exportAuditLog(){
 var FB_IMG_MAX=5*1024*1024; /* 5 MB */
 var FB_IMG_SMALL=300000; /* base64 fallback cap */
 var UPDATE_LOG=[
+ {v:"v2.0",tag:"Spirit Orbs — the old bar is gone",date:"November 12, 2026",
+  highlights:["💠 Spirit Orbs rain onto the arena — tap them to collect spirit","🎨 All 100 characters now have custom 3D art — no more emoji faces","⚔️ Kills drop orbs, smashing a tower pays +2 spirit","⚡ Last minute: orbs spawn twice as fast","🔮 Towers are now Guardians + the Spirit Nexus","🔎 Big high-contrast Spirit meter, bigger units with name labels","🏝️ New home menu — Spirit Island, daily rewards, big BATTLE button"],
+  groups:[
+   {t:"Spirit Orbs",items:["One orb every ~2.5s on your half — tap it (big tap target) before it fades in 8s","Killing an enemy unit drops an orb where it fell (worth 2 for a 4+ spirit unit)","Smash a Guardian or the Nexus: +2 spirit instantly","Hold max 10 spirit — a full meter can't collect, the orb stays"]},
+   {t:"Battles",items:["Bot Sensei collects its own orbs and spends them like you do","PvP: the host sims every orb, guests tap to collect — same 10 Hz sync","Last minute is now DOUBLE ORBS, not a faster bar","Units are bigger with thicker health bars and name labels — the Spirit meter is big, bold, and bright"]},
+   {t:"Home menu",items:["Spirit Island art on the home screen, with your trophy rank + progress bar","Daily Rewards — claim one per day (coins & gems), stored on your account","Big BATTLE button in the center, your deck on either side — tap a card to edit your deck","Round buttons for Shop, Ranks, and Profile — everything still one tap away"]}]},
  {v:"v1.1",tag:"Floating admin panel + 30 staff tools",date:"November 12, 2026",
   highlights:["🛡️ Admin panel is now a floating, draggable button — it hides during battles","🔍 Player search + filters, live online list, full player inspector","🔨 Quick-ban presets, custom ban lengths, recent bans + ban history","🔇 Mute durations, bulk mute/unmute, bulk gives","🏆 Give trophies, set level, give XP, grant all 100 units","📢 Global announcements + 2x coins events","📊 Server stats card + staff activity feed"],
   groups:[
@@ -4496,7 +4786,7 @@ var UPDATE_LOG=[
   highlights:["⚔️ Real PvP battles — room codes + quick match","🤖 Tutorial vs bots","🃏 100 anime characters — buy them in the shop","✨ Forms: transform mid-battle into the top form","🎞️ GIF profile pics & banners (big GIFs shrink to fit)","👑 Owner panel — give gems, ban, manage admins"],
   groups:[
    {t:"Roster — 100 characters, 50 series",items:["Dragon Ball, Naruto, One Piece, Bleach, JJK, MHA, Demon Slayer, AoT, OPM, Chainsaw Man, Black Clover, Fairy Tail, FMA, JoJo, Solo Leveling, Slime, Overlord, Fire Force, Soul Eater, Yu Yu Hakusho, Gurren Lagann, Berserk, Seven Deadly Sins, Frieren, Kaiju No. 8, Dandadan, Mashle, and more"]},
-   {t:"Battle",items:["Elixir, deploy on your half, towers, 3-minute timer, overtime sudden death","Transform meter — transform into the top form mid-battle","Trophies, coins, win streaks, XP & levels"]},
+   {t:"Battle",items:["Spirit orbs, deploy on your half, Guardians, 3-minute timer, overtime sudden death","Transform meter — transform into the top form mid-battle","Trophies, coins, win streaks, XP & levels"]},
    {t:"Accounts & owner",items:["Username + password accounts (no email needed)","GIF pfp & banner for everyone","Owner panel: give gems/coins/units, ban/unban, hard ban, per-admin permissions","Owner can never be touched by an admin — enforced in UI, code, and rules"]}]}];
 var currentView="play";
 var selectedHandIdx=null;
@@ -4527,6 +4817,80 @@ function renderHud(){
  $("hudGems").textContent="💎 "+fmtNum(S.gems||0);
  $("hudCoins").textContent="🪙 "+fmtNum(S.coins||0);
  $("hudTroph").textContent="🏆 "+fmtNum(S.trophies||0);
+ renderMenu();
+}
+/* ---------- v2.0 home menu: ranks, daily rewards, deck ---------- */
+var RANKS=[{name:"Bronze",icon:"🥉",at:0},{name:"Silver",icon:"🥈",at:100},{name:"Gold",icon:"🥇",at:300},{name:"Diamond",icon:"💎",at:600},{name:"Master",icon:"👑",at:1000},{name:"Champion",icon:"🔥",at:1500},{name:"Legend",icon:"🌟",at:2500}];
+function rankFor(troph){
+ var cur=RANKS[0],nxt=null;
+ for(var i=0;i<RANKS.length;i++){
+  if(troph>=RANKS[i].at)cur=RANKS[i];
+  else{nxt=RANKS[i];break;}
+ }
+ return{cur:cur,nxt:nxt,pct:nxt?Math.min(100,Math.round((troph-cur.at)/(nxt.at-cur.at)*100)):100};
+}
+var DAILY_REWARDS=[{coins:100,gems:0,label:"100 🪙",icon:"🪙"},{coins:250,gems:0,label:"250 🪙",icon:"🪙"},{coins:0,gems:15,label:"15 💎",icon:"💎"},{coins:500,gems:0,label:"500 🪙",icon:"🪙"}];
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function renderDailyRewards(){
+ var row=$("rewardRow");if(!row||!S)return;
+ var slot=S.rewardSlot||0;
+ var canClaim=(S.rewardDay||"")!==todayStr();
+ row.innerHTML="";
+ DAILY_REWARDS.forEach(function(rw,i){
+  var claimed=i<slot;
+  var isNext=i===slot&&canClaim;
+  var d=document.createElement("div");
+  d.className="rewardSlot"+(claimed?" claimed":"")+(isNext?" next":"");
+  d.innerHTML='<span class="rw">'+(claimed?"✅":rw.icon)+'</span>Day '+(i+1)+'<br>'+rw.label
+   +(isNext?'<br><button class="btn small green" type="button">Claim</button>':claimed?'<br><span style="color:var(--green)">✓ Claimed</span>':"");
+  if(isNext){
+   d.querySelector("button").addEventListener("click",function(){claimDailyReward();});
+  }
+  row.appendChild(d);
+ });
+ var note=$("rewardNote");
+ if(note)note.textContent=canClaim?"Tap Claim on the glowing slot — one reward per day.":"Next reward unlocks tomorrow. Come back daily!";
+}
+function claimDailyReward(){
+ if(!S)return false;
+ if(S.rewardDay===todayStr()){toast("Come back tomorrow for the next reward!");return false;}
+ var slot=S.rewardSlot||0;
+ var rw=DAILY_REWARDS[slot];
+ if(rw.coins)S.coins+=rw.coins;
+ if(rw.gems)S.gems+=rw.gems;
+ S.rewardDay=todayStr();
+ S.rewardSlot=(slot+1)%DAILY_REWARDS.length;
+ saveCloud();renderDailyRewards();renderHud();
+ toast("🎁 Daily reward claimed: "+rw.label+"!");
+ sndBuy();
+ return true;
+}
+function renderMenuDeck(){
+ var L=$("menuDeckLeft"),R=$("menuDeckRight");
+ if(!L||!R||!S)return;
+ var deck=(S.deck||[]).slice(0,8);
+ L.innerHTML="";R.innerHTML="";
+ deck.forEach(function(id,i){
+  var def=UNIT_BY_ID[id];if(!def)return;
+  var c=document.createElement("div");c.className="menuDeckCard";
+  c.title=def.name+" — tap to edit your deck";
+  c.innerHTML='<div class="e" style="color:'+def.color+'">'+artImg(def)+'</div><div class="cost">⬡ '+def.cost+'</div>';
+  c.addEventListener("click",function(){switchView("units");});
+  (i<4?L:R).appendChild(c);
+ });
+ if(!deck.length)L.innerHTML="<p class='sub'>No deck yet — buy units in the Shop.</p>";
+}
+function renderMenu(){
+ if(!S)return;
+ var r=rankFor(S.trophies||0);
+ var rn=$("menuRankName");
+ if(rn)rn.textContent=r.cur.icon+" "+r.cur.name;
+ var fill=$("menuRankFill");
+ if(fill)fill.style.width=r.pct+"%";
+ var nx=$("menuRankNext");
+ if(nx)nx.textContent=r.nxt?((S.trophies||0)+" / "+r.nxt.at+" 🏆 to "+r.nxt.name):"Max rank — Legend! 👑";
+ renderDailyRewards();
+ renderMenuDeck();
 }
 function renderAll(){renderHud();renderProfile();renderUnits();renderShop();renderLeaderboard();renderUpdateLog();}
 function renderUpdateLog(){
@@ -4571,9 +4935,9 @@ function renderUnits(){
   var st=unitStats(def,lvl);
   var inDeck=deckHas(def.id);
   var row=document.createElement("div");row.className="unitRow";
-  row.innerHTML='<div class="ic" style="color:'+def.color+'">'+def.icon+'</div>'
+  row.innerHTML='<div class="ic" style="color:'+def.color+'">'+artImg(def)+'</div>'
    +'<div style="flex:1"><div class="nm">'+esc(def.name)+' <span class="pill '+def.rarity+'">'+def.rarity+'</span></div>'
-   +'<div class="st">'+esc(def.series)+' · Lv '+lvl+' · HP '+st.hp+' · DMG '+st.dmg+' · '+def.role+' · '+def.cost+' elixir</div>'
+   +'<div class="st">'+esc(def.series)+' · Lv '+lvl+' · HP '+st.hp+' · DMG '+st.dmg+' · '+def.role+' · '+def.cost+' spirit</div>'
    +'<div class="st">✨ '+esc(def.ability)+'</div>'
    +'<details><summary style="font-size:12px;color:var(--muted);cursor:pointer">Forms ('+def.forms.length+')</summary><div class="st">'+def.forms.map(esc).join(" → ")+'</div></details></div>'
    +'<div class="acts"><button class="btn small '+(inDeck?"green":"")+'" type="button">'+(inDeck?"✓ In deck":"＋ Deck")+'</button><br>'
@@ -4618,9 +4982,9 @@ function renderShop(){
   var price=SHOP_PRICE[def.rarity];
   var priceTxt=price.coins>0?price.coins+" 🪙":price.gems+" 💎";
   var row=document.createElement("div");row.className="shopRow";
-  row.innerHTML='<div class="ic" style="color:'+def.color+'">'+def.icon+'</div>'
+  row.innerHTML='<div class="ic" style="color:'+def.color+'">'+artImg(def)+'</div>'
    +'<div style="flex:1"><div class="nm">'+esc(def.name)+' <span class="pill '+def.rarity+'">'+def.rarity+'</span></div>'
-   +'<div class="st">'+esc(def.series)+' · '+def.role+' · '+def.cost+' elixir · HP '+unitStats(def,1).hp+' · DMG '+unitStats(def,1).dmg+'</div>'
+   +'<div class="st">'+esc(def.series)+' · '+def.role+' · '+def.cost+' spirit · HP '+unitStats(def,1).hp+' · DMG '+unitStats(def,1).dmg+'</div>'
    +'<div class="st">✨ '+esc(def.ability)+'</div>'
    +'<div class="st">Forms: '+def.forms.map(esc).join(" → ")+'</div></div>'
    +'<div class="acts">'+(owned?'<span class="pill">✓ Owned</span>':'<button class="btn small" type="button">Buy · '+priceTxt+'</button>')+'</div>';
@@ -4659,7 +5023,7 @@ function showBattleView(){
  $("playMenu").classList.add("hidden");
  $("battleCard").classList.remove("hidden");
  $("battleResult").classList.add("hidden");$("battleResult").innerHTML="";
- battleEls={towers:{},units:{}};
+ battleEls={towers:{},units:{},orbs:{}};
  selectedHandIdx=null;
  buildArena();
  if(typeof updateAdminFloatVisibility==="function")updateAdminFloatVisibility();
@@ -4672,7 +5036,7 @@ function showPlayMenu(){
 function buildArena(){
  var arena=$("battleArena");
  arena.innerHTML='<div class="river"></div><div class="bridge" style="left:17.5%"></div><div class="bridge" style="left:67.5%"></div>';
- battleEls.towers={};battleEls.units={};
+ battleEls.towers={};battleEls.units={};battleEls.orbs={};
 }
 function towerEl(key,tw,flipped){
  var el=battleEls.towers[key];
@@ -4680,9 +5044,8 @@ function towerEl(key,tw,flipped){
  if(!el){
   el=document.createElement("div");
   el.className="tower "+(key.indexOf("mine")===0?"mine":"enemy")+(tw.king?" king":"");
-  el.innerHTML='<div class="hpbar"><i></i></div>👑';
-  if(!tw.king)el.textContent="";
-  el.innerHTML='<div class="hpbar"><i></i></div>'+(tw.king?"👑":"🏰");
+  /* v2.0: the King Tower is the Spirit Nexus (🔮), side towers are Guardians (🛡️) */
+  el.innerHTML='<div class="hpbar"><i></i></div>'+(tw.king?"🔮":"🛡️");
   $("battleArena").appendChild(el);
   battleEls.towers[key]=el;
  }
@@ -4690,8 +5053,25 @@ function towerEl(key,tw,flipped){
  el.style.top=(y/ARENA.h*100)+"%";
  el.style.transform="translate(-50%,-50%)";
  el.style.opacity=tw.dead?0.25:1;
+ el.title=tw.king?"Spirit Nexus":"Guardian";
  var bar=el.querySelector(".hpbar i");
  if(bar)bar.style.width=Math.max(0,tw.hp/tw.max*100)+"%";
+ return el;
+}
+function orbEl(o,flipped,st){
+ var el=battleEls.orbs[o.id];
+ var y=flipped?ARENA.h-o.y:o.y;
+ var age=(typeof o.age==="number")?o.age:(st.tick-o.born)*0.1;
+ if(!el){
+  el=document.createElement("div");
+  el.className="orb"+(o.value>=2?" big":"");
+  el.innerHTML='<span class="v">'+(o.value>=2?"×2":"")+'</span>';
+  $("battleArena").appendChild(el);
+  battleEls.orbs[o.id]=el;
+ }
+ el.style.left=(o.x/ARENA.w*100)+"%";
+ el.style.top=(y/ARENA.h*100)+"%";
+ el.classList.toggle("fading",age>=ORB_LIFE-ORB_FADE);
  return el;
 }
 function unitEl(u,flipped){
@@ -4702,15 +5082,17 @@ function unitEl(u,flipped){
  if(!el){
   el=document.createElement("div");
   el.className="unit "+sideCls+(u.flying?" fly":"");
-  el.innerHTML='<div class="uhp"><i></i></div><span class="uic"></span><div class="umeter" style="position:absolute;left:-2px;right:-2px;bottom:-6px;height:3px;background:#0008;border-radius:2px;overflow:hidden"><i style="display:block;height:100%;background:#c084fc;width:0%"></i></div>';
+  el.innerHTML='<div class="uname"></div><div class="uhp"><i></i></div><span class="uic"></span><div class="umeter" style="position:absolute;left:-2px;right:-2px;bottom:-9px;height:5px;background:#0008;border-radius:2px;overflow:hidden"><i style="display:block;height:100%;background:#c084fc;width:0%"></i></div>';
+  /* v2.0 art: set the <img> once at creation — the per-tick code must not touch it */
+  el.querySelector(".uic").innerHTML=artImg(def);
   $("battleArena").appendChild(el);
   battleEls.units[u.uid]=el;
  }
  el.style.left=(u.x/ARENA.w*100)+"%";
  el.style.top=(y/ARENA.h*100)+"%";
  el.className="unit "+sideCls+(u.flying?" fly":"")+(u.transformed?" sel":"");
- var ic=el.querySelector(".uic");
- if(ic)ic.textContent=def?def.icon:"❓";
+ var nm=el.querySelector(".uname");
+ if(nm)nm.textContent=def?def.name:"";
  var bar=el.querySelector(".uhp i");
  if(bar)bar.style.width=Math.max(0,u.hp/u.maxHp*100)+"%";
  var mb=el.querySelector(".umeter i");
@@ -4724,6 +5106,16 @@ function renderBattle(st,flipped){
  if(!arena)return;
  /* towers */
  Object.keys(st.towers).forEach(function(k){towerEl(k,st.towers[k],!!flipped);});
+ /* spirit orbs (v2.0) — guest hides optimistically-collected orbs until the
+    next snapshot proves the host said no */
+ var orbSeen={};
+ (st.orbs||[]).forEach(function(o){
+  if(typeof pendingOrbs!=="undefined"&&pendingOrbs[o.id])return;
+  orbSeen[o.id]=1;orbEl(o,!!flipped,st);
+ });
+ Object.keys(battleEls.orbs||{}).forEach(function(id){
+  if(!orbSeen[id]){var el=battleEls.orbs[id];if(el&&el.parentNode)el.parentNode.removeChild(el);delete battleEls.orbs[id];}
+ });
  /* units: create/update, drop the gone */
  var seen={};
  st.units.forEach(function(u){seen[u.uid]=1;unitEl(u,!!flipped);});
@@ -4734,11 +5126,11 @@ function renderBattle(st,flipped){
  var t=st.overtime?st.overTimeLeft:Math.max(0,st.timeLeft);
  var mm=Math.floor(t/60),ss=Math.floor(t%60);
  $("battleTimer").textContent=(st.overtime?"⏱️ OT ":"")+mm+":"+(ss<10?"0":"")+ss;
- /* elixir + hand (flipped: my side is the sim "enemy" side) */
+ /* spirit meter + hand (flipped: my side is the sim "enemy" side) */
  var mySide=flipped?"enemy":"mine";
- var elix=st.elixir?st.elixir[mySide]:0;
- $("elixirBar").style.width=(elix/ELIXIR_MAX*100)+"%";
- $("elixirNum").textContent="Elixir "+Math.floor(elix)+"/10"+(st.overtime||st.timeLeft<=60?" — ⚡ DOUBLE ELIXIR":"");
+ var sp=st.spirit?st.spirit[mySide]:0;
+ $("spiritBar").style.width=(sp/SPIRIT_MAX*100)+"%";
+ $("spiritNum").innerHTML='<span class="orbDot"></span> Spirit '+Math.floor(sp)+'/10'+(st.overtime||st.timeLeft<=60?" — ⚡ DOUBLE ORBS":"");
  renderHand(st,mySide,!!flipped);
  /* transform button */
  var tb=$("btnTransform");
@@ -4751,15 +5143,15 @@ function renderBattle(st,flipped){
 function renderHand(st,mySide,flipped){
  var wrap=$("handCards");if(!wrap)return;
  var hand=(st.hands||{})[mySide]||[];
- var elix=st.elixir?st.elixir[mySide]:0;
+ var sp=st.spirit?st.spirit[mySide]:0;
  var next=(st.decks&&st.decks[mySide]&&st.decks[mySide][0])||null;
  wrap.innerHTML="";
  hand.forEach(function(id,i){
   var def=UNIT_BY_ID[id];if(!def)return;
   var b=document.createElement("button");b.type="button";
   b.className="handCard"+(selectedHandIdx===i?" sel":"");
-  b.disabled=def.cost>elix;
-  b.innerHTML='<div class="e">'+def.icon+'</div><div>'+esc(def.name.split(" ")[0])+'</div><div class="cost">⬡ '+def.cost+'</div>';
+  b.disabled=def.cost>sp;
+  b.innerHTML='<div class="e">'+artImg(def)+'</div><div>'+esc(def.name.split(" ")[0])+'</div><div class="cost">⬡ '+def.cost+'</div>';
   b.addEventListener("click",function(){
    selectedHandIdx=selectedHandIdx===i?null:i;
    sndClick();renderBattle(st,flipped);
@@ -4770,7 +5162,7 @@ function renderHand(st,mySide,flipped){
   var def=UNIT_BY_ID[next];
   if(def){
    var nb=document.createElement("div");nb.className="handCard next";
-   nb.innerHTML='<div class="e">'+def.icon+'</div><div>Next</div><div class="cost">⬡ '+def.cost+'</div>';
+   nb.innerHTML='<div class="e">'+artImg(def)+'</div><div>Next</div><div class="cost">⬡ '+def.cost+'</div>';
    wrap.appendChild(nb);
   }
  }
@@ -4781,6 +5173,21 @@ function arenaTap(e){
  var r=arena.getBoundingClientRect();
  var x=(e.clientX-r.left)/r.width*ARENA.w;
  var y=(e.clientY-r.top)/r.height*ARENA.h;
+ /* v2.0: tapping a spirit orb collects it — works with no card selected */
+ var flipped=battle.mode==="pvp-guest";
+ var simY=flipped?ARENA.h-y:y;
+ var mySide=flipped?"enemy":"mine";
+ var orb=nearestOrb(battle,mySide,x,simY);
+ if(orb){
+  if(flipped){guestCollect(orb.id);}
+  else{
+   var cres=collectOrb(battle,mySide,orb.id);
+   if(cres.ok){sndClick();}
+   else{sndErr();toast(cres.why==="spirit full"?"Spirit is full (10) — spend some first!":(cres.why||"Can't collect that orb."));}
+  }
+  renderBattle(battle,flipped);
+  return;
+ }
  if(selectedHandIdx==null){toast("Tap a card first, then tap the arena to deploy.");return;}
  var idx=selectedHandIdx;
  if(battle.mode==="pvp-guest"){
@@ -4835,7 +5242,7 @@ function boot(){
  tb.id="btnTransform";tb.type="button";tb.className="btn small hidden";
  tb.textContent="✨ TRANSFORM";
  tb.addEventListener("click",function(){tryTransform();});
- var en=$("elixirNum");
+ var en=$("spiritNum");
  if(en&&en.parentNode)en.parentNode.insertBefore(tb,en.nextSibling);
  /* wire buttons */
  $("btnLogin").addEventListener("click",doSignIn);
@@ -4848,6 +5255,11 @@ function boot(){
  $("btnJoinRoom").addEventListener("click",function(){joinRoom($("roomCodeInput").value);});
  $("btnBattleExit").addEventListener("click",leaveBattle);
  $("battleArena").addEventListener("click",arenaTap);
+ /* v2.0 home menu: big BATTLE button + round nav buttons */
+ $("btnBattleBig").addEventListener("click",quickMatch);
+ [["btnMenuShop","shop"],["btnMenuRanks","ranks"],["btnMenuProfile","profile"]].forEach(function(pair){
+  var b=$(pair[0]);if(b)b.addEventListener("click",function(){switchView(pair[1]);});
+ });
  var avIn=$("gifAvatarFile");
  if(avIn)avIn.addEventListener("change",function(){if(avIn.files&&avIn.files[0])readGifFile(avIn.files[0],"avatar");avIn.value="";});
  var bnIn=$("gifBannerFile");
