@@ -44,19 +44,37 @@ h1,h2,h3{margin:0}
 #bannedScreen h1{font-size:40px}
 #bannedScreen .reason{background:#2a1010;border:1px solid #7a2020;border-radius:12px;padding:12px;margin:12px 0}
 /* ---------- top bar ---------- */
-#topBar{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#1a1233,#150e2a);border-bottom:1px solid var(--line);padding:8px 10px;display:flex;align-items:center;gap:8px}
+/* v2.2 header-overflow fix: the bar must fit 360px with huge numbers.
+   Pills use compact fmtNum (1.0B / 10.0M / 100.0K); the name/level block
+   is the only thing allowed to shrink, truncating with an ellipsis. */
+#topBar{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#1a1233,#150e2a);border-bottom:1px solid var(--line);padding:8px 10px;display:flex;align-items:center;gap:8px;width:100%;max-width:100%;overflow:hidden}
 #hudAvatar{width:42px;height:42px;border-radius:50%;overflow:hidden;flex:0 0 42px;background:#2c1e55;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid var(--gold)}
 #hudAvatar img{width:100%;height:100%;object-fit:cover}
-#hudName{font-weight:800;font-size:15px;line-height:1.1}
-#hudRole{font-size:11px;color:var(--muted)}
-.currencies{margin-left:auto;display:flex;gap:6px}
-.cur{background:#150e2a;border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:13px;font-weight:800;white-space:nowrap}
+.hudId{flex:1 1 auto;min-width:0}
+#hudName{font-weight:800;font-size:15px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hudRole{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.currencies{margin-left:auto;display:flex;gap:6px;flex:0 0 auto;min-width:0}
+.cur{background:#150e2a;border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:13px;font-weight:800;white-space:nowrap;flex:0 0 auto}
 .cur.gems{color:var(--gem)} .cur.coins{color:var(--gold)} .cur.troph{color:var(--pink)}
+@media (max-width:480px){.currencies{gap:4px}.cur{padding:4px 7px;font-size:12px}}
+@media (max-width:380px){#topBar{padding:7px 8px;gap:6px}#hudAvatar{width:34px;height:34px;flex-basis:34px;font-size:18px}#hudName{font-size:14px}#hudRole{font-size:10px}.cur{padding:4px 6px;font-size:11px}}
 .role-tag{display:inline-block;border-radius:999px;padding:1px 7px;font-size:11px;font-weight:800;margin-left:4px}
 .tag-owner{background:gold;color:#3a2a00} .tag-admin{background:#2563eb;color:#fff}
 .title-tag{display:inline-block;border-radius:999px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:4px;background:#3d2a72;color:#e9d5ff}
 /* ---------- views / nav ---------- */
-.view{padding:12px 12px 90px}
+/* v2.2: bottom padding 120px (was 90px) — the fixed bottom nav is ~57px
+   tall, so at max scroll content now ends ~63px clear of it instead of
+   ~33px; the Home Game Modes / Ranked buttons fully clear the nav with a
+   visible gap. Applies to every .view screen (Home, Shop, Profile,
+   Update Log, etc.). */
+.view{padding:12px 12px 120px}
+/* v2.2 floater safe-area: while either floating button (👑/🛡️) is visible
+   (owner/admin only — body.has-floaters is set by updateAdminFloatVisibility),
+   reserve the right-hand strip the buttons rest in, so no text, pill or
+   button can ever scroll underneath them. 44px button + 10px right gap +
+   10px clearance = 64px. Plain players never get this class, so their
+   layout is untouched. */
+body.has-floaters .view{padding-right:64px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
 .card h2{font-size:18px;margin-bottom:6px}
 .card h3{font-size:16px;margin-bottom:6px}
@@ -143,6 +161,40 @@ img.uimg{display:block;object-fit:cover;background:var(--card)}
 .unitRow .nm,.shopRow .nm{font-weight:800}
 .unitRow .st,.shopRow .st{font-size:12px;color:var(--muted)}
 .unitRow .acts,.shopRow .acts{margin-left:auto;text-align:right}
+/* ---------- v2.2: shop is a 2-column grid of cards (was text-heavy rows) ----------
+   .shopRow keeps its class name (harness + buy flow select on it) — only the
+   layout changes: big art on top, name + cost + Owned/Buy at a glance, the
+   ability/forms text lives in a tap-to-expand .detail strip. */
+#shopList{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#shopList .shopRow{display:block;padding:10px;margin-bottom:0;cursor:pointer;text-align:left}
+#shopList .shopRow .ic{width:100%;font-size:44px;text-align:center}
+#shopList .shopRow .ic img.uimg{width:100%;height:96px;border-radius:10px}
+#shopList .shopRow .nm{font-size:14px;line-height:1.25;margin-top:6px}
+#shopList .shopRow .st{font-size:12px}
+#shopList .shopRow .acts{margin:8px 0 0;text-align:left}
+#shopList .shopRow .acts .btn{width:100%;margin:4px 0 0;text-align:center}
+#shopList .shopRow .acts .pill{margin-top:4px}
+#shopList .shopRow .detail{margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+#shopList .shopRow .detail .st{font-size:12px;margin-top:2px}
+/* ---------- v2.2: update log collapses per version (was a multi-screen wall) ----------
+   Default view: only the latest version's one-line summary + an "Older updates"
+   toggle. Each version is a <details> — tap its header to read that version. */
+.logEntry{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden;background:var(--card2)}
+.logEntry.latest{border-color:var(--gold)}
+.logEntry summary{cursor:pointer;padding:10px 12px;font-weight:800;font-size:14px;line-height:1.35;list-style:none}
+.logEntry summary::-webkit-details-marker{display:none}
+.logEntry summary .chev{float:right;color:var(--muted)}
+.logEntry .logBody{padding:0 12px 10px}
+.logEntry .logBody ul{margin:6px 0;padding-left:18px}
+.logEntry .logBody li{font-size:13px}
+.logEntry .logBody .logGroup{font-size:13px;margin:8px 0 2px}
+.logEntry .logBody .logGroupItems li{font-size:12px;color:var(--muted)}
+.logOlder{border:1px solid var(--line);border-radius:12px;background:var(--card2);overflow:hidden}
+.logOlder>summary{cursor:pointer;padding:10px 12px;font-weight:800;font-size:14px;list-style:none}
+.logOlder>summary::-webkit-details-marker{display:none}
+.logOlder .logOlderBody{padding:0 8px 8px}
+.logOlder .logOlderBody .logEntry{margin-bottom:8px}
+.logOlder .logOlderBody .logEntry:last-child{margin-bottom:0}
 .pill{display:inline-block;background:#150e2a;border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:11px;font-weight:800;margin:2px 2px 0 0}
 .pill.common{color:#cbd5e1}.pill.rare{color:#4dd8ff}.pill.epic{color:#c084fc}
 #lbList .lbRow .rank{font-weight:900;width:28px;text-align:center}
@@ -171,7 +223,12 @@ label.fl{display:inline-block;background:#2c1e55;border:1px solid var(--line);bo
 #announceBanner{display:flex;align-items:center;gap:8px;background:#3a2a00;border:1px solid var(--gold);color:#ffe9a8;border-radius:12px;padding:10px 12px;margin:10px 12px 0;font-size:14px;font-weight:700}
 #announceBanner button{margin-left:auto;background:none;border:0;color:#ffe9a8;font-size:16px;font-weight:900;padding:2px 6px;flex:0 0 auto}
 #eventBadge{color:#3ddc84}
-#adminFloatBtn{position:fixed;right:12px;top:64px;z-index:80;width:52px;height:52px;border-radius:50%;border:2px solid var(--gold);background:linear-gradient(135deg,#7c3aed,#ff4d8d);color:#fff;font-size:24px;box-shadow:0 8px 24px rgba(0,0,0,.5);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:0}
+/* v2.2: floaters shrunk 52px -> 44px and tightened to right:10px so they
+   cover less; resting spot is a vertical stack at the right edge, above
+   the bottom nav on phones. The .view safe-area (body.has-floaters rule
+   above) keeps all content out of their strip. Drag still works — the
+   drag handlers save/restore inline left/top, unchanged. */
+#adminFloatBtn{position:fixed;right:10px;top:64px;z-index:80;width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);background:linear-gradient(135deg,#7c3aed,#ff4d8d);color:#fff;font-size:20px;box-shadow:0 8px 24px rgba(0,0,0,.5);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:0}
 #adminFloatBtn:active{cursor:grabbing}
 @media (max-width:560px){#adminFloatBtn{top:auto;bottom:76px}}
 #staffFloat{position:fixed;left:12px;top:88px;z-index:90;width:min(94vw,560px);max-height:82vh;background:var(--card);border:2px solid var(--line);border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden}
@@ -181,9 +238,9 @@ label.fl{display:inline-block;background:#2c1e55;border:1px solid var(--line);bo
 .staff-body{overflow:auto;padding:12px;flex:1;min-height:0}
 #staffFloat.min .staff-body{display:none}
 /* v2.1: separate 👑 Owner button + window — gold border, sits below the 🛡️ button */
-#ownerFloatBtn{position:fixed;right:12px;top:124px;z-index:80;width:52px;height:52px;border-radius:50%;border:2px solid var(--gold);background:linear-gradient(135deg,#f59e0b,#ff4d8d);color:#fff;font-size:24px;box-shadow:0 8px 24px rgba(0,0,0,.5);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:0}
+#ownerFloatBtn{position:fixed;right:10px;top:116px;z-index:80;width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);background:linear-gradient(135deg,#f59e0b,#ff4d8d);color:#fff;font-size:20px;box-shadow:0 8px 24px rgba(0,0,0,.5);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:0}
 #ownerFloatBtn:active{cursor:grabbing}
-@media (max-width:560px){#ownerFloatBtn{top:auto;bottom:136px}}
+@media (max-width:560px){#ownerFloatBtn{top:auto;bottom:128px}}
 #ownerFloat{position:fixed;left:12px;top:88px;z-index:91;width:min(94vw,560px);max-height:82vh;background:var(--card);border:2px solid var(--gold);border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden}
 #ownerFloat.min .staff-body{display:none}
 .statCard{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;font-size:13px;line-height:1.5}
@@ -254,6 +311,19 @@ label.fl{display:inline-block;background:#2c1e55;border:1px solid var(--line);bo
 .v21BackRow .btn{flex:0 0 auto}
 .menuV21{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
 .menuV21 .btn{margin:0;font-size:14px;padding:11px 6px}
+/* ---------- v2.2: raid select + match modifiers ---------- */
+.bossRow{cursor:pointer}
+.bossRow.sel{border-color:var(--gold);box-shadow:0 0 12px #ffc93c44}
+#bossFightBar{margin:4px 0 10px}
+#bossFightBar .btn{margin:4px 0 0}
+.modCard{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px}
+.modCard h3{font-size:15px;margin-bottom:2px}
+.modRow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.modRow:first-of-type{border-top:0}
+.modRow input[type=checkbox]{width:20px;height:20px;flex:0 0 20px;margin-top:2px;accent-color:#7c3aed}
+.modRow b{font-size:14px;display:block}
+.modRow span{font-size:12px;color:var(--muted);line-height:1.35;display:block}
+.modRow select{flex:1;background:#150e2a;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px;font-size:14px}
 #revengeBox{margin-top:10px}
 </style>
 </head>
@@ -264,7 +334,7 @@ label.fl{display:inline-block;background:#2c1e55;border:1px solid var(--line);bo
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-storage-compat.js"></script>
 <script>
-/* Anime Clash v2.1: vendored GIF libraries (inlined — no CDN, no worker, no WASM):
+/* Anime Clash v2.2: vendored GIF libraries (inlined — no CDN, no worker, no WASM):
    omggif 1.0.10 (MIT, decode) + gifenc 1.0.3 (MIT, encode).
    Same shrinker as Pig Clicker v2.5.3 — big Tenor GIFs shrink in the
    browser so they fit the 300 KB save-doc cap, animation preserved. */
@@ -1915,7 +1985,7 @@ window.gifenc=exports;})();
     <div class="logo">⚔️🌸</div>
     <h1>ANIME CLASH</h1>
     <p>Anime battle arena — deploy units, smash towers, climb the ranks.</p>
-    <div class="gate-version"><span class="ver-badge">v2.1</span> <b>v2.1 — Owner panel fix</b></div>
+    <div class="gate-version"><span class="ver-badge">v2.2</span> <b>v2.2 — UI rework</b></div>
   </div>
   <div class="gate-card">
     <h2>Play Anime Clash</h2>
@@ -1933,7 +2003,7 @@ window.gifenc=exports;})();
     <li>🎞️ <b>GIF profile pics &amp; banners</b> — big Tenor GIFs shrink to fit, free</li>
     <li>👑 <b>Owner panel</b> — give gems, ban, manage admins</li>
   </ul>
-  <p class="foot">Anime Clash v2.1 — original characters only. No accounts yet? Hit “Create account”.</p>
+  <p class="foot">Anime Clash v2.2 — original characters only. No accounts yet? Hit “Create account”.</p>
 </div>
 
 <!-- ============ BANNED SCREEN ============ -->
@@ -1951,7 +2021,7 @@ window.gifenc=exports;})();
 <div id="app" class="hidden">
   <div id="topBar">
     <div id="hudAvatar">⚔️</div>
-    <div>
+    <div class="hudId">
       <div id="hudName">Player</div>
       <div id="hudRole">Lv 1 · 0 🏆</div>
     </div>
@@ -1987,6 +2057,9 @@ window.gifenc=exports;})();
         <button class="btn" id="btnBattleBig" type="button">⚔️<span>BATTLE</span></button>
         <div id="menuDeckRight" class="menuDeck"></div>
       </div>
+      <!-- v2.2: Boss Raids get a big Home entry right under BATTLE — the old
+           button only lived in the .menuV21 grid further down the screen -->
+      <button class="btn" id="btnBossHome" type="button">👹 Boss Raids — Kaido · Madara · Muzan · Rimuru</button>
       <div id="menuRoundBtns">
         <button type="button" class="roundBtn" id="btnMenuShop" aria-label="Shop">🛒<span>Shop</span></button>
         <button type="button" class="roundBtn" id="btnMenuRanks" aria-label="Leaderboard">🏆<span>Ranks</span></button>
@@ -2033,6 +2106,8 @@ window.gifenc=exports;})();
       <div class="hudExtraRow">
         <button class="btn small blue" id="btnEmote" type="button">💬 Emote</button>
         <button class="btn small" id="btnBankSpirit" type="button" disabled title="Spell system hasn't landed yet — arrives with the spells update.">🏦 Bank Spirit</button>
+        <!-- v2.2 #132: deploy the spirit collector (3 spirit, 1 orb / 5s) -->
+        <button class="btn small" id="btnDeployCollector" type="button" disabled title="Deploy a Spirit Collector — 3 spirit, 1 orb every 5s.">🔋 Collector (3 ⬡)</button>
       </div>
       <div id="collectorStatus">🔋 Spirit Collector: not built yet — arrives with the towers update.</div>
       <div id="emoteRow" class="hidden"></div>
@@ -2041,7 +2116,7 @@ window.gifenc=exports;})();
       <button class="btn ghost" id="btnBattleExit" type="button">Leave battle</button>
     </div>
     <div class="card">
-      <h3>📰 Update Log — v2.1</h3>
+      <h3>📰 Update Log — v2.2</h3>
       <div id="updateLogList"></div>
     </div>
   </div>
@@ -2121,6 +2196,8 @@ window.gifenc=exports;})();
       <div class="v21BackRow"><button type="button" class="btn ghost small v21Back">← Back</button><h2 style="align-self:center">🎮 Game Modes</h2></div>
       <p class="sub">Pick how you want to fight. 2v2 and free-for-all use bot teammates and rivals — real 4-player and 3-player PvP need a future server update.</p>
       <div class="modeGrid" id="modeGrid"></div>
+      <!-- v2.2: match modifiers (bot battles only) render here -->
+      <div id="modeMods"></div>
     </div>
   </div>
 
@@ -2176,6 +2253,12 @@ window.gifenc=exports;})();
     <div class="card">
       <div class="v21BackRow"><button type="button" class="btn ghost small v21Back">← Back</button><h2 style="align-self:center">👹 Boss Raids</h2></div>
       <p class="sub">Solo raids vs the biggest names in anime. The boss opens with its signature unit — and a lot more HP than usual.</p>
+      <!-- v2.2: tap a boss to select it, then hit Fight (each row also keeps
+           its own Start Raid button for a one-tap start) -->
+      <div id="bossFightBar">
+        <p class="sub" id="bossSelectedLine">Tap a boss below to select it.</p>
+        <button class="btn" id="btnBossFight" type="button" disabled>⚔️ Fight</button>
+      </div>
       <div id="bossList"></div>
     </div>
   </div>
@@ -2209,6 +2292,8 @@ window.gifenc=exports;})();
       <input type="number" id="privOrbInterval" min="1" max="10" step="0.5" value="2.5">
       <label class="sub">Starting spirit (0–10)</label>
       <input type="number" id="privStartSpirit" min="0" max="10" step="1" value="3">
+      <!-- v2.2: match modifiers (bot battles only) render here too -->
+      <div id="privateMods"></div>
       <button type="button" class="btn" id="btnCreatePrivate">➕ Create Private Room</button>
       <div id="privateResult"></div>
     </div>
@@ -2248,7 +2333,7 @@ window.gifenc=exports;})();
 /* ===== js_10_core.js ===== */
 "use strict";
 /* ================= Anime Clash v1.1 — core ================= */
-var CURRENT_VERSION="v2.1";
+var CURRENT_VERSION="v2.2";
 /* FIREBASE_CONFIG — PLACEHOLDER. The parent creates the real Firebase
    project ("anime-clash") and swaps these values in before deploy.
    DO NOT ship with invented keys: with the placeholder, the game runs
@@ -2264,7 +2349,7 @@ var FIREBASE_CONFIGURED=FIREBASE_CONFIG.apiKey.indexOf("__")!==0;
 function $(id){return document.getElementById(id);}
 function esc(t){var d=document.createElement("div");d.textContent=t==null?"":t;return d.innerHTML;}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
-function fmtNum(n){n=Math.floor(n||0);if(n>=1000000)return (n/1000000).toFixed(1)+"M";if(n>=1000)return (n/1000).toFixed(1)+"K";return String(n);}
+function fmtNum(n){n=Math.floor(n||0);var u=[[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"K"]];for(var i=0;i<u.length;i++){if(n>=u[i][0]){var v=n/u[i][0];if(v>=999.95&&i>0)return (n/u[i-1][0]).toFixed(1)+u[i-1][1];return v.toFixed(1)+u[i][1];}}return String(n);}
 function rand(a,b){return a+Math.random()*(b-a);}
 function randInt(a,b){return Math.floor(rand(a,b+1));}
 function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
@@ -5775,6 +5860,17 @@ function collectorState(st,side){
  if(!st||!st.towers)return null;
  return st.towers[side+"Collector"]||null;
 }
+/* v2.2 #132: the status line the battle HUD reads. This function never
+   existed (updateCollectorStatus guarded on it and always fell through
+   to "not built yet"), so the collector looked unbuilt even though the
+   engine deploys it fine. */
+function spiritCollectorStatus(st,side){
+ if(!st||!st.towers)return "not in a battle";
+ var col=st.towers[side+"Collector"];
+ if(!col)return "not built — 3 spirit to deploy";
+ if(col.dead)return "destroyed — 3 spirit to rebuild";
+ return "deployed — "+col.hp+" HP · 1 orb / 5s";
+}
 
 /* #107: tower skins (data: TOWER_SKINS in js_20_units.js). Visual only —
    the chosen color is read by the UI renderer via towerSkinColor(). */
@@ -6592,21 +6688,27 @@ var AC_META = (function () {
     return { orbInterval: orbInterval, startSpirit: startSpirit, code: code };
   }
 
-  /* ================= 6. Boss raids (#168, #179, #198) ================= */
+  /* ================= 6. Boss raids (#168, #179, #198) =================
+     NOTE (v2.2): each boss's `hp` is the ACTUAL spawn HP — the boss
+     unit's base HP (unitStats at level 1) × hpMult. The old data values
+     (Kaido 12000, Madara 15000, Muzan 18000, Rimuru 25000) did not match
+     what the engine spawns (10800 / 11250 / 25080 / 28800), so the raid
+     screen showed the wrong HP. The engine is unchanged; the data now
+     matches it, so the display and setup.boss.hp are both correct. */
   var BOSS_RAIDS = [
-    { id: "kaido", name: "Kaido", title: "Azure Dragon", unit: "kaido", hp: 12000, hpMult: 8, series: "One Piece",
+    { id: "kaido", name: "Kaido", title: "Azure Dragon", unit: "kaido", hp: 10800, hpMult: 8, series: "One Piece",
       attacks: ["Blast Breath — a sweeping fire beam across the arena", "Thunder Bagua — a crushing club swing that stuns", "Flaming Drum Dragon — Kaido coils into a burning storm"],
       deck: ["kaido", "luffy", "zoro", "saitama", "garou", "tatsumaki", "mob", "eren"],
       reward: { gems: 50, coins: 1000, unit: "kaido" } },
-    { id: "madara", name: "Madara", title: "Ten-Tails", unit: "madara", hp: 15000, hpMult: 10, series: "Naruto",
+    { id: "madara", name: "Madara", title: "Ten-Tails", unit: "madara", hp: 11250, hpMult: 10, series: "Naruto",
       attacks: ["Meteor Summon — burning rocks rain from the sky", "Limbo Clone — an invisible double strikes from nowhere", "Infinite Tsukuyomi — the arena darkens and drains spirit"],
       deck: ["madara", "naruto", "sasuke", "gojo", "sukuna", "yuji", "megumi", "killua"],
       reward: { gems: 75, coins: 1500, unit: "madara" } },
-    { id: "muzan", name: "Muzan", title: "Demon King", unit: "muzan", hp: 18000, hpMult: 12, series: "Demon Slayer",
+    { id: "muzan", name: "Muzan", title: "Demon King", unit: "muzan", hp: 25080, hpMult: 12, series: "Demon Slayer",
       attacks: ["Flesh Whips — lashing tendrils across both lanes", "Demon Creation — spawns lesser demons to fight for him", "Instant Regeneration — heals a chunk of HP mid-fight"],
       deck: ["muzan", "tanjiro", "nezuko", "zenitsu", "asta", "yuno", "natsu", "erza"],
       reward: { gems: 100, coins: 2000, unit: "muzan" } },
-    { id: "rimuru", name: "Rimuru", title: "True Dragon", unit: "rimuru", hp: 25000, hpMult: 16, series: "That Time I Got Reincarnated as a Slime",
+    { id: "rimuru", name: "Rimuru", title: "True Dragon", unit: "rimuru", hp: 28800, hpMult: 16, series: "That Time I Got Reincarnated as a Slime",
       attacks: ["Void God Azathoth — devours everything in a lane", "Predator — absorbs a deployed unit whole", "Megiddo — a storm of light rains down on the arena"],
       deck: ["rimuru", "anos", "zeno", "kumagawa", "yhwach", "aizen", "ichigo", "saitama"],
       reward: { gems: 150, coins: 3000, unit: "rimuru" } }
@@ -7374,8 +7476,8 @@ function staffFloatSetPos(x,y){
 }
 function adminBtnSetPos(x,y){
  var btn=$("adminFloatBtn");if(!btn)return;
- btn.style.left=clamp(x,0,Math.max(0,window.innerWidth-52))+"px";
- btn.style.top=clamp(y,0,Math.max(0,window.innerHeight-52))+"px";
+ btn.style.left=clamp(x,0,Math.max(0,window.innerWidth-44))+"px"; /* v2.2: button is 44px now */
+ btn.style.top=clamp(y,0,Math.max(0,window.innerHeight-44))+"px";
  btn.style.right="auto";btn.style.bottom="auto";
 }
 function saveStaffPos(){
@@ -7468,8 +7570,8 @@ function ownerFloatSetPos(x,y){
 }
 function ownerBtnSetPos(x,y){
  var btn=$("ownerFloatBtn");if(!btn)return;
- btn.style.left=clamp(x,0,Math.max(0,window.innerWidth-52))+"px";
- btn.style.top=clamp(y,0,Math.max(0,window.innerHeight-52))+"px";
+ btn.style.left=clamp(x,0,Math.max(0,window.innerWidth-44))+"px"; /* v2.2: button is 44px now */
+ btn.style.top=clamp(y,0,Math.max(0,window.innerHeight-44))+"px";
  btn.style.right="auto";btn.style.bottom="auto";
 }
 function saveOwnerPos(){
@@ -7556,6 +7658,12 @@ function updateAdminFloatVisibility(){
     role field, so an admin (or a player) never sees it. */
  var obtn=$("ownerFloatBtn");
  if(obtn)obtn.classList.toggle("hidden",!(isOwnerActor()&&!battle));
+ /* v2.2: while either floating button is visible, reserve its right-hand
+    strip in the content (body.has-floaters .view{padding-right:64px}) so
+    no text, pill or button can ever scroll underneath the floaters.
+    Plain players never see a button, so they never get the class. */
+ var anyFloater=(btn&&!btn.classList.contains("hidden"))||(obtn&&!obtn.classList.contains("hidden"));
+ document.body.classList.toggle("has-floaters",!!anyFloater);
  var win=$("staffFloat");
  if(win){
   if(battle){
@@ -7863,7 +7971,7 @@ function renderPanelList(){
   var row=document.createElement("div");row.className="playerRow player";
   var banned=isBanActive(p),muted=isMutedActive(p),on=isOnline(p);
   row.innerHTML='<div style="flex:1"><b>'+esc(p.name||p.username||"?")+'</b> '+roleTag(p.role||"player",p)
-   +'<div class="sub">'+(on?"🟢 ":"⚫ ")+'🏆 '+(p.trophies||0)+' · Lv '+(p.level||1)+' · 💎 '+(p.gems||0)+' · 🪙 '+(p.coins||0)
+   +'<div class="sub">'+(on?"🟢 ":"⚫ ")+'🏆 '+fmtNum(p.trophies||0)+' · Lv '+fmtNum(p.level||1)+' · 💎 '+fmtNum(p.gems||0)+' · 🪙 '+fmtNum(p.coins||0)
    +(banned?' · <b style="color:#ff4d5e">🔨 BANNED</b>':"")
    +(muted?' · <b style="color:#ffc93c">🔇 MUTED</b>':"")+'</div></div>';
   var b=document.createElement("button");b.type="button";b.className="btn small";b.textContent="Manage";
@@ -7910,8 +8018,8 @@ function openStaffPanelFor(p){
  var unitNames=unitIds.map(function(id){var u=UNIT_BY_ID[id];return u?(u.icon+" "+u.name+" Lv"+((p.units[id]||{}).level||1)):id;});
  var deckNames=(p.deck||[]).map(function(id){var u=UNIT_BY_ID[id];return u?u.name:id;});
  insp.innerHTML="<b>👤 Inspector</b><div class='inspGrid'>"
-  +"<div>💎 <b>"+(p.gems||0)+"</b> gems</div><div>🪙 <b>"+(p.coins||0)+"</b> coins</div>"
-  +"<div>🏆 <b>"+(p.trophies||0)+"</b> trophies</div><div>⭐ Lv <b>"+(p.level||1)+"</b> · "+(p.xp||0)+" XP</div>"
+  +"<div>💎 <b>"+fmtNum(p.gems||0)+"</b> gems</div><div>🪙 <b>"+fmtNum(p.coins||0)+"</b> coins</div>"
+  +"<div>🏆 <b>"+fmtNum(p.trophies||0)+"</b> trophies</div><div>⭐ Lv <b>"+fmtNum(p.level||1)+"</b> · "+fmtNum(p.xp||0)+" XP</div>"
   +"<div>✅ <b>"+(p.wins||0)+"</b> wins</div><div>❌ <b>"+(p.losses||0)+"</b> losses</div>"
   +"<div>🃏 <b>"+unitIds.length+"</b> units owned</div><div>"+(isBanActive(p)?"🔨 <b style='color:#ff4d5e'>BANNED</b>"+(p.banReason?" — "+esc(p.banReason):""):"✅ Not banned")+"</div>"
   +"<div>"+(isMutedActive(p)?"🔇 <b style='color:#ffc93c'>MUTED</b>":"🔊 Not muted")+"</div>"
@@ -8463,6 +8571,11 @@ function exportAuditLog(){
 var FB_IMG_MAX=5*1024*1024; /* 5 MB */
 var FB_IMG_SMALL=300000; /* base64 fallback cap */
 var UPDATE_LOG=[
+ {v:"v2.2",tag:"UI rework — header, floaters, shop grid, boss raids",date:"November 12, 2026",
+  highlights:["📱 Header fixed — huge numbers now read 1.0B / 10.0B, nothing runs off the screen","🛡️ Floating Owner/Admin buttons shrunk and kept clear of content","🛒 Shop is now a 2-column grid with big art — tap a card for full details","📰 What's New collapsed — latest update on top, older ones one tap away","👹 Boss Raids — big button under BATTLE, pick a boss, hit Fight","🎛️ Match modifiers in Game Modes & Private Room (shrink, fog, sudden death, more)","🔋 Spirit Collector — deploy button in battle with a real status line"],
+  groups:[
+   {t:"UI fixes",items:["Header: compact numbers (K/M/B/T) + a layout that fits 360px and 412px phones","Floating buttons: 44px, parked clear of text, cards and pills on every screen","Home: Game Modes / Ranked buttons fully clear the bottom nav","Shop: 2-column grid, big art on top, name + spirit cost + Owned pill at a glance","Update log: latest version's summary only — tap any version to expand it"]},
+   {t:"Boss raids & mods",items:["Boss Raids entry right under the BATTLE button and inside Game Modes","Boss HP shown now matches what actually spawns (Kaido 10800, Madara 11250, Muzan 25080, Rimuru 28800)","Match modifiers (arena shrink, fog, double damage, sudden death, custom wins, more) work in Game Modes and Private Room bot battles","Spirit Collector deploys from the battle HUD for 3 spirit — status line shows if it's built, alive, or destroyed"]}]},
  {v:"v2.1",tag:"Game modes, ranked, summon, skins, boss raids & story",date:"November 12, 2026",
   highlights:["🎮 Game Modes — Battle, 2v2 (bot partner), 1v1v1 free-for-all, Chaos (every card 1 spirit), Draft (same 8 cards), Boss Raid, Story","🏆 Ranked — anime seasons, 10 placement matches, rank points","🔮 Spirit Summon — gacha with pity (guaranteed mythic every 200 rolls) + Divine Zone","🎨 Card skins & tower skins — tints on your art and armor","👹 Boss raids vs Kaido, Madara, Muzan, Rimuru · 📖 7-chapter Story Mode · 🛡️ Local clans"],
   groups:[
@@ -8528,7 +8641,7 @@ function renderHud(){
   else av.textContent="⚔️";
  }
  $("hudName").textContent=displayName();
- $("hudRole").innerHTML="Lv "+(S.level||1)+" · "+(S.trophies||0)+" 🏆 "+roleTag(myRole,{customTitle:myCustomTitle});
+ $("hudRole").innerHTML="Lv "+fmtNum(S.level||1)+" · "+fmtNum(S.trophies||0)+" 🏆 "+roleTag(myRole,{customTitle:myCustomTitle});
  $("hudGems").textContent="💎 "+fmtNum(S.gems||0);
  $("hudCoins").textContent="🪙 "+fmtNum(S.coins||0);
  $("hudTroph").textContent="🏆 "+fmtNum(S.trophies||0);
@@ -8603,19 +8716,49 @@ function renderMenu(){
  var fill=$("menuRankFill");
  if(fill)fill.style.width=r.pct+"%";
  var nx=$("menuRankNext");
- if(nx)nx.textContent=r.nxt?((S.trophies||0)+" / "+r.nxt.at+" 🏆 to "+r.nxt.name):"Max rank — Legend! 👑";
+ if(nx)nx.textContent=r.nxt?(fmtNum(S.trophies||0)+" / "+fmtNum(r.nxt.at)+" 🏆 to "+r.nxt.name):"Max rank — Legend! 👑";
  renderDailyRewards();
  renderMenuDeck();
  renderRevenge();
 }
 function renderAll(){renderHud();renderProfile();renderUnits();renderShop();renderLeaderboard();renderUpdateLog();}
+/* v2.2: collapsed by default — only the latest version's one-line summary
+   shows, plus an "Older updates" toggle. Every version is a <details>:
+   tap its header to expand that version's highlights + groups. Nothing is
+   deleted — all changelog text is still in the DOM, one tap away. */
+function logEntryEl(e,isLatest){
+ var det=document.createElement("details");
+ det.className="logEntry"+(isLatest?" latest":"");
+ var sum=document.createElement("summary");
+ sum.innerHTML=esc(e.v)+" — "+esc(e.tag)+' <span class="sub">'+esc(e.date)+"</span>"
+  +(isLatest?' <span class="pill">🆕 Latest</span>':"")+'<span class="chev">▾</span>';
+ det.appendChild(sum);
+ var body=document.createElement("div");
+ body.className="logBody";
+ body.innerHTML="<ul>"+e.highlights.map(function(h){return "<li>"+esc(h)+"</li>";}).join("")+"</ul>"
+  +e.groups.map(function(g){return "<p class='logGroup'><b>"+esc(g.t)+"</b></p><ul class='logGroupItems'>"+g.items.map(function(it){return "<li>"+esc(it)+"</li>";}).join("")+"</ul>";}).join("");
+ det.appendChild(body);
+ return det;
+}
 function renderUpdateLog(){
  var el=$("updateLogList");if(!el)return;
- el.innerHTML=UPDATE_LOG.map(function(e){
-  return "<h3>"+esc(e.v)+" — "+esc(e.tag)+"</h3><p class='sub'>"+esc(e.date)+"</p>"
-   +"<ul style='margin:6px 0;padding-left:18px'>"+e.highlights.map(function(h){return "<li style='font-size:13px'>"+esc(h)+"</li>";}).join("")+"</ul>"
-   +e.groups.map(function(g){return "<p style='font-size:13px;margin:8px 0 2px'><b>"+esc(g.t)+"</b></p><ul style='margin:2px 0;padding-left:18px'>"+g.items.map(function(i){return "<li style='font-size:12px;color:var(--muted)'>"+esc(i)+"</li>";}).join("")+"</ul>";}).join("");
- }).join("");
+ el.innerHTML="";
+ if(!UPDATE_LOG.length){el.innerHTML="<p class='sub'>No updates yet.</p>";return;}
+ /* latest version: one-line summary, always visible, details collapsed */
+ el.appendChild(logEntryEl(UPDATE_LOG[0],true));
+ /* older versions: hidden behind one tap, each still tap-to-expand */
+ if(UPDATE_LOG.length>1){
+  var older=document.createElement("details");
+  older.className="logOlder";
+  var osum=document.createElement("summary");
+  osum.innerHTML="📜 Older updates ("+(UPDATE_LOG.length-1)+" version"+(UPDATE_LOG.length>2?"s":"")+") <span class='chev' style='float:right;color:var(--muted)'>▾</span>";
+  older.appendChild(osum);
+  var obody=document.createElement("div");
+  obody.className="logOlderBody";
+  UPDATE_LOG.slice(1).forEach(function(e){obody.appendChild(logEntryEl(e,false));});
+  older.appendChild(obody);
+  el.appendChild(older);
+ }
 }
 function renderProfile(){
  if(!S)return;
@@ -8633,7 +8776,7 @@ function renderProfile(){
  $("profileTags").innerHTML=roleTag(myRole,{customTitle:myCustomTitle});
  $("stTroph").textContent=fmtNum(S.trophies||0);
  $("stWins").textContent=S.wins||0;
- $("stLevel").textContent=S.level||1;
+ $("stLevel").textContent=fmtNum(S.level||1);
  $("stGems").textContent=fmtNum(S.gems||0);
  $("stCoins").textContent=fmtNum(S.coins||0);
  $("stStreak").textContent=S.winStreak||0;
@@ -8723,16 +8866,26 @@ function renderShop(){
    :seasonalOut?'<span class="pill">⏳ Seasonal — out of window</span>'
    :divine?'<span class="pill">👑 Divine — owner panel / ultra-rare roll only</span>'
    :'<button class="btn small" type="button">Buy · '+priceTxt+'</button>';
+  /* v2.2: 2-column grid card — big art on top, name + spirit cost + Owned/Buy
+     pill at a glance. Ability / forms / stats live in a tap-to-expand strip
+     (the card toggles it; the Buy button stops propagation so a buy never
+     also expands). Class stays .shopRow and the .ic wrapper stays, so the
+     buy/search/filter flow and harness selectors are unchanged. */
   var row=document.createElement("div");row.className="shopRow";
   row.innerHTML='<div class="ic" style="color:'+def.color+'">'+artImg(def)+'</div>'
-   +'<div style="flex:1"><div class="nm">'+esc(def.name)+' <span class="pill '+def.rarity+'">'+def.rarity+'</span></div>'
-   +'<div class="st">'+esc(def.series)+' · '+def.role+' · '+def.cost+' spirit · HP '+unitStats(def,1).hp+' · DMG '+unitStats(def,1).dmg+'</div>'
+   +'<div class="nm">'+esc(def.name)+' <span class="pill '+def.rarity+'">'+def.rarity+'</span></div>'
+   +'<div class="st">'+esc(def.series)+' · '+def.role+' · ⬡ '+def.cost+'</div>'
+   +'<div class="acts">'+acts+'</div>'
+   +'<div class="detail hidden"><div class="st">HP '+unitStats(def,1).hp+' · DMG '+unitStats(def,1).dmg+'</div>'
    +'<div class="st">✨ '+esc(def.ability)+'</div>'
-   +'<div class="st">Forms: '+def.forms.map(esc).join(" → ")+'</div></div>'
-   +'<div class="acts">'+acts+'</div>';
+   +'<div class="st">Forms: '+def.forms.map(esc).join(" → ")+'</div></div>';
+  row.addEventListener("click",function(ev){
+   if(ev.target.closest("button"))return;
+   row.querySelector(".detail").classList.toggle("hidden");
+  });
   if(!owned&&!seasonalOut&&!divine){
    var b=row.querySelector("button");
-   if(b)b.addEventListener("click",function(){buyUnit(def.id);});
+   if(b)b.addEventListener("click",function(ev){ev.stopPropagation();buyUnit(def.id);});
   }
   el.appendChild(row);
  });
@@ -8754,7 +8907,7 @@ function renderLeaderboard(){
   rows.forEach(function(p,i){
    var row=document.createElement("div");row.className="lbRow";
    row.innerHTML='<div class="rank">'+(i+1)+'</div><div style="flex:1"><b>'+esc(p.name||p.username||"?")+'</b> '+roleTag(p.role||"player",p)
-    +'<div class="sub">Lv '+(p.level||1)+' · '+(p.wins||0)+' wins</div></div><div><b>🏆 '+(p.trophies||0)+'</b></div>';
+    +'<div class="sub">Lv '+fmtNum(p.level||1)+' · '+(p.wins||0)+' wins</div></div><div><b>🏆 '+fmtNum(p.trophies||0)+'</b></div>';
    el.appendChild(row);
   });
  }).catch(function(err){noteFbError(err,"lb");el.innerHTML="<p class='sub'>Couldn't load the leaderboard.</p>";});
@@ -8871,7 +9024,14 @@ function renderBattle(st,flipped){
  });
  /* units: create/update, drop the gone */
  var seen={};
- st.units.forEach(function(u){seen[u.uid]=1;unitEl(u,!!flipped);});
+ var mySideEarly=flipped?"enemy":"mine";
+ st.units.forEach(function(u){
+  /* v2.2 #139 fog: enemy units on their half stay hidden from the player
+     — the element is dropped from `seen` here and unitEl recreates it
+     when the unit crosses the river into view. */
+  if(typeof isUnitHiddenByFog==="function"&&isUnitHiddenByFog(st,u,mySideEarly))return;
+  seen[u.uid]=1;unitEl(u,!!flipped);
+ });
  Object.keys(battleEls.units).forEach(function(uid){
   if(!seen[uid]){var el=battleEls.units[uid];if(el&&el.parentNode)el.parentNode.removeChild(el);delete battleEls.units[uid];}
  });
@@ -9043,6 +9203,10 @@ function startModeBattle(setup){
   myLevels:v21MyLevels(),enemyLevels:setup.enemyLevels||{}};
  if(setup.partnerDeck)opts.partnerDeck=setup.partnerDeck;
  if(setup.mods)opts.mods=setup.mods;
+ /* v2.2: Game Modes / Private Room bot battles may carry the match
+    modifiers — they sit UNDER any explicit setup.mods, so a mode's own
+    flags (e.g. private-room rates) always win a conflict. */
+ if(setup.allowMatchMods)opts.mods=Object.assign({},matchModsForBattle(),opts.mods||{});
  if(setup.startSpirit!=null)opts.startSpirit=setup.startSpirit;
  var st=newBattleState(opts);
  if(setup.thirdDeck)st.thirdDeck=setup.thirdDeck.slice();
@@ -9055,25 +9219,25 @@ function startModeBattle(setup){
 }
 /* ---------- v2.1: mode select ---------- */
 var V21_MODES=[
- {id:"battle",icon:"⚔️",name:"Battle",desc:"Classic 1v1 vs Bot Sensei. 3 minutes, smash the Nexus.",start:function(){if(typeof startBotBattle==="function")startBotBattle();}},
+ {id:"battle",icon:"⚔️",name:"Battle",desc:"Classic 1v1 vs Bot Sensei. 3 minutes, smash the Nexus.",start:function(){startModeBattle({mode:"bot",enemyName:"Bot Sensei 🤖",allowMatchMods:true});}},
  {id:"2v2",icon:"🤝",name:"2v2 — Bot Partner",desc:"You + a bot partner vs two bot rivals. Shared spirit pool.",start:function(){
    if(typeof AC_META!=="undefined"&&AC_META&&typeof AC_META.twoVTwoSetup==="function"){
     var s=AC_META.twoVTwoSetup();
-    startModeBattle({mode:s.mode,enemyName:"Bot Duo 🤖🤖",myDeck:s.myDeck,enemyDeck:s.enemyDeck,partnerDeck:s.partnerDeck,mods:s.mods});
+    startModeBattle({mode:s.mode,enemyName:"Bot Duo 🤖🤖",myDeck:s.myDeck,enemyDeck:s.enemyDeck,partnerDeck:s.partnerDeck,mods:s.mods,allowMatchMods:true});
    }else toast("2v2 setup isn't loaded yet — try again in a moment.");
  }},
  {id:"ffa",icon:"🔥",name:"1v1v1 Free-For-All",desc:"Three-way brawl vs two bot rivals. Last Nexus standing wins.",start:function(){
    if(typeof AC_META!=="undefined"&&AC_META&&typeof AC_META.freeForAllSetup==="function"){
     var s=AC_META.freeForAllSetup();
-    startModeBattle({mode:s.mode,enemyName:"Bot Rivals 🤖🤖",myDeck:s.myDeck,enemyDeck:s.enemyDeck,thirdDeck:s.thirdDeck,mods:s.mods});
+    startModeBattle({mode:s.mode,enemyName:"Bot Rivals 🤖🤖",myDeck:s.myDeck,enemyDeck:s.enemyDeck,thirdDeck:s.thirdDeck,mods:s.mods,allowMatchMods:true});
    }else toast("Free-for-all setup isn't loaded yet — try again in a moment.");
  }},
  {id:"chaos",icon:"🌀",name:"Chaos",desc:"Every card costs 1 spirit. Pure madness, zero planning.",start:function(){
-   startModeBattle({mode:"bot",enemyName:"Chaos Bot 🤖",mods:{chaos:true}});
+   startModeBattle({mode:"bot",enemyName:"Chaos Bot 🤖",mods:{chaos:true},allowMatchMods:true});
  }},
  {id:"draft",icon:"🎴",name:"Draft — Same 8 Cards",desc:"Both sides play the exact same 8 cards. Pure skill, no deck gap.",start:function(){
    var d=v21MyDeck();
-   startModeBattle({mode:"bot",enemyName:"Mirror Bot 🤖",myDeck:d,enemyDeck:d.slice(),mods:{draft:true,same8:true}});
+   startModeBattle({mode:"bot",enemyName:"Mirror Bot 🤖",myDeck:d,enemyDeck:d.slice(),mods:{draft:true,same8:true},allowMatchMods:true});
  }},
  {id:"boss",icon:"👹",name:"Boss Raid",desc:"Solo raid vs Kaido, Madara, Muzan or Rimuru. Big HP, big rewards.",start:function(){switchView("boss");}},
  {id:"story",icon:"📖",name:"Story Mode",desc:"Seven chapters, seven legends. Cutscenes, then battle.",start:function(){switchView("story");}}
@@ -9087,6 +9251,71 @@ function renderModes(){
   b.addEventListener("click",function(){sndClick();m.start();});
   grid.appendChild(b);
  });
+ /* v2.2: match modifiers render below the mode cards (same shared state
+    as the Private Room toggles). */
+ var mm=$("modeMods");if(mm)renderMatchMods(mm);
+}
+/* ---------- v2.2: match modifiers (bot battles only) ----------
+   Every toggle wires to a mod flag the engine already reads — no new
+   engine systems. State lives in S.meta.matchMods (same persistence as
+   skins/stages). Ranked, Story and Boss Raids never see these flags:
+   only the Game Modes cards and the Private Room bot button pass
+   allowMatchMods:true into startModeBattle. */
+var V21_MATCH_MODS=[
+ {key:"shrink",icon:"🌪️",name:"Arena Shrinks",desc:"The arena closes in over time — units outside the ring take 10 damage/s. (#117)"},
+ {key:"nexusOnly",icon:"🔮",name:"Nexus Only",desc:"Only the Spirit Nexus decides the game — Guardians falling never ends it. (#126)"},
+ {key:"randomLegend",icon:"🌟",name:"Random Legendary Start",desc:"Each side starts with a random legendary already on the field. (#129)"},
+ {key:"fog",icon:"🌫️",name:"Fog of War",desc:"Enemy units on their half are hidden from you until they cross the river. (#139)"},
+ {key:"doubleDmg2m",icon:"⚔️",name:"Double Damage after 2:00",desc:"All damage ×2 once 2 minutes have passed. (#143)"},
+ {key:"suddenDeath1m",icon:"💀",name:"Sudden Death at 1:00",desc:"At 1 minute, the next tower destroyed wins the battle. (#156)"},
+ {key:"start10noRegen",icon:"🔋",name:"Start 10 Spirit, No Regen",desc:"Both sides start at full spirit — but towers never regenerate and kills drop no orbs. (#147)"}
+];
+var V21_CUSTOM_WIN_OPTS=[{v:"off",label:"Off — normal win rules"},{v:"firstTower",label:"First tower wins"},{v:"mostKills",label:"Most kills wins"}];
+function v21MatchModsState(){
+ var m=v21Meta();
+ if(!m.matchMods)m.matchMods={};
+ return m.matchMods;
+}
+function matchModsForBattle(){
+ var s=v21MatchModsState(),mods={};
+ V21_MATCH_MODS.forEach(function(d){
+  if(!s[d.key])return;
+  if(d.key==="start10noRegen"){mods.startSpirit=10;mods.noRegen=true;}
+  else mods[d.key]=true;
+ });
+ if(s.customWin&&s.customWin!=="off")mods.customWin=s.customWin;
+ return mods;
+}
+function renderMatchMods(el){
+ if(!el)return;
+ var s=v21MatchModsState();
+ el.innerHTML='<div class="modCard"><h3>🎛️ Match Modifiers — bot battles</h3>'
+  +'<p class="sub">These apply to your next bot battle from Game Modes or a Private Room. Ranked, Story and Boss Raids are never modified.</p></div>';
+ var card=el.querySelector(".modCard");
+ V21_MATCH_MODS.forEach(function(d){
+  var row=document.createElement("label");row.className="modRow";
+  row.innerHTML='<input type="checkbox" data-mod="'+d.key+'"'+(s[d.key]?" checked":"")+'>'
+   +'<span><b>'+d.icon+" "+esc(d.name)+'</b><span>'+esc(d.desc)+'</span></span>';
+  row.querySelector("input").addEventListener("change",function(){
+   var st=v21MatchModsState();
+   if(this.checked)st[d.key]=true;else delete st[d.key];
+   v21SaveMeta();
+  });
+  card.appendChild(row);
+ });
+ var winRow=document.createElement("label");winRow.className="modRow";
+ winRow.innerHTML='<span style="flex:0 0 20px;text-align:center;font-size:18px">🏆</span><span style="flex:1"><b>Custom Win Condition (#144)</b><span>How the battle is decided.</span></span>';
+ var sel=document.createElement("select");sel.setAttribute("aria-label","Custom win condition");
+ V21_CUSTOM_WIN_OPTS.forEach(function(o){
+  var op=document.createElement("option");op.value=o.v;op.textContent=o.label;
+  if((s.customWin||"off")===o.v)op.selected=true;
+  sel.appendChild(op);
+ });
+ sel.addEventListener("change",function(){
+  var st=v21MatchModsState();st.customWin=this.value;v21SaveMeta();
+ });
+ winRow.appendChild(sel);
+ card.appendChild(winRow);
 }
 /* ---------- v2.1: ranked ---------- */
 function renderRanked(){
@@ -9323,6 +9552,29 @@ function renderStages(){
  }
 }
 /* ---------- v2.1: boss raids ---------- */
+/* v2.2: tap a row to select that boss; the Fight bar (and each row's own
+   Start Raid button) starts the raid through startBossRaidById. */
+var v21SelectedBoss="kaido";
+function bossById(id){
+ if(typeof AC_META==="undefined"||!AC_META||typeof AC_META.bossRaids!=="function")return null;
+ var list=AC_META.bossRaids()||[];
+ for(var i=0;i<list.length;i++)if(list[i].id===id)return list[i];
+ return null;
+}
+function updateBossFightBar(){
+ var line=$("bossSelectedLine"),btn=$("btnBossFight");
+ var b=bossById(v21SelectedBoss);
+ if(line)line.textContent=b?("Selected: 👹 "+b.name+" — "+b.title+" · HP "+fmtNum(b.hp)+" (×"+b.hpMult+") · Reward: "+(b.reward?((b.reward.gems||0)+" 💎 · "+(b.reward.coins||0)+" 🪙"+(b.reward.unit?" · unlock "+b.reward.unit:"")):"—")):"Tap a boss below to select it.";
+ if(btn)btn.disabled=!b;
+}
+function startBossRaidById(bossId){
+ if(typeof AC_META==="undefined"||!AC_META||typeof AC_META.startBossRaid!=="function"){toast("Boss raids aren't loaded yet.");return false;}
+ var setup=AC_META.startBossRaid(bossId);
+ if(!setup||!setup.ok){toast((setup&&setup.why)||"Couldn't start that raid.");return false;}
+ v21BossReward=setup.boss?setup.boss.reward:null;
+ v21StoryChapter=null;v21RankedBattle=false;
+ return startModeBattle({mode:setup.mode,enemyName:setup.enemyName,myDeck:setup.myDeck,enemyDeck:setup.enemyDeck,mods:setup.mods});
+}
 function renderBoss(){
  var el=$("bossList");if(!el)return;
  if(typeof AC_META==="undefined"||!AC_META||typeof AC_META.bossRaids!=="function"){
@@ -9330,24 +9582,28 @@ function renderBoss(){
  }
  var bosses=AC_META.bossRaids()||[];
  el.innerHTML="";
- if(!bosses.length){el.innerHTML="<p class='sub'>No boss raids yet.</p>";return;}
+ if(!bosses.length){el.innerHTML="<p class='sub'>No boss raids yet.</p>";updateBossFightBar();return;}
+ /* keep the selection valid if the raid list ever changes */
+ if(!bossById(v21SelectedBoss))v21SelectedBoss=bosses[0].id;
  bosses.forEach(function(b){
   var def=(typeof UNIT_BY_ID!=="undefined")?UNIT_BY_ID[b.unit]:null;
-  var row=document.createElement("div");row.className="bossRow";
+  var row=document.createElement("div");row.className="bossRow"+(b.id===v21SelectedBoss?" sel":"");
   row.innerHTML='<div style="display:flex;gap:10px;align-items:center"><div style="font-size:34px">'+(def?artImg(def):"👹")+'</div>'
    +'<div style="flex:1"><b>👹 '+esc(b.name)+' — '+esc(b.title)+'</b><div class="sub">'+esc(b.series)+' · HP '+fmtNum(b.hp)+' (×'+b.hpMult+') · Attacks: '+esc((b.attacks||[]).join("; "))+'</div>'
    +'<div class="sub">🏆 Reward: '+(b.reward?((b.reward.gems||0)+" 💎 · "+(b.reward.coins||0)+" 🪙"+(b.reward.unit?" · unlock "+esc(b.reward.unit):"")):"—")+'</div></div></div>'
    +'<button class="btn small" type="button" style="margin-top:8px">⚔️ Start Raid</button>';
+  /* tap the row (not the button) to select this boss for the Fight bar */
+  row.addEventListener("click",function(ev){
+   if(ev.target.closest("button"))return;
+   v21SelectedBoss=b.id;renderBoss();
+  });
   row.querySelector("button").addEventListener("click",function(){
-   if(typeof AC_META.startBossRaid!=="function"){toast("Boss raids aren't loaded yet.");return;}
-   var setup=AC_META.startBossRaid(b.id);
-   if(!setup||!setup.ok){toast((setup&&setup.why)||"Couldn't start that raid.");return;}
-   v21BossReward=setup.boss?setup.boss.reward:null;
-   v21StoryChapter=null;v21RankedBattle=false;
-   startModeBattle({mode:setup.mode,enemyName:setup.enemyName,myDeck:setup.myDeck,enemyDeck:setup.enemyDeck,mods:setup.mods});
+   v21SelectedBoss=b.id;
+   startBossRaidById(b.id);
   });
   el.appendChild(row);
  });
+ updateBossFightBar();
 }
 /* ---------- v2.1: story mode ---------- */
 function renderStory(){
@@ -9442,11 +9698,13 @@ function renderPrivate(){
   res.innerHTML='<div class="note">🔧 <b>Room '+esc(v21PrivateRates.code)+'</b> — orb interval '+v21PrivateRates.orbInterval+'s, starting spirit '+v21PrivateRates.startSpirit+'.<br>Share the code with a friend to join the same room, or tap below to battle a bot on these rates.</div>'
    +'<button class="btn small" type="button" id="btnPrivateStart">⚔️ Battle a bot on these rates</button>';
   $("btnPrivateStart").addEventListener("click",function(){
-   startModeBattle({mode:"bot",enemyName:"Private Bot 🤖",mods:{startSpirit:v21PrivateRates.startSpirit,orbInterval:v21PrivateRates.orbInterval,privateRoom:v21PrivateRates.code}});
+   startModeBattle({mode:"bot",enemyName:"Private Bot 🤖",mods:{startSpirit:v21PrivateRates.startSpirit,orbInterval:v21PrivateRates.orbInterval,privateRoom:v21PrivateRates.code},allowMatchMods:true});
   });
  }else{
   res.innerHTML="";
  }
+ /* v2.2: match modifiers render here too (same shared state as Game Modes). */
+ var pm=$("privateMods");if(pm)renderMatchMods(pm);
 }
 /* ---------- v2.1: revenge ---------- */
 function renderRevenge(){
@@ -9575,6 +9833,14 @@ function renderEnemyNext3(st,flipped){
  }).join("");
 }
 function updateCollectorStatus(st){
+ /* v2.2 #132: the Deploy Collector button lives or dies on this status —
+    enabled only mid-battle, with 3+ spirit, while no live collector stands. */
+ var dc=$("btnDeployCollector");
+ if(dc){
+  var alive=false;
+  try{if(typeof collectorState==="function"){var c=collectorState(st,"mine");alive=!!(c&&!c.dead);}}catch(e){}
+  dc.disabled=!st||!!st.result||alive||((st&&st.spirit&&st.spirit.mine)||0)<3;
+ }
  var el=$("collectorStatus");if(!el)return;
  if(typeof spiritCollectorStatus==="function"){
   try{
@@ -9724,7 +9990,7 @@ function boot(){
   if(reg&&reg.parentNode)reg.parentNode.insertBefore(off,reg.nextSibling);
  }
  /* v2.1: mode / meta screens */
- var v21Nav=[["btnOpenModes","modes"],["btnOpenRanked","ranked"],["btnOpenChallenges","challenges"],["btnOpenGacha","gacha"],["btnOpenSkins","skins"],["btnOpenStages","stages"],["btnOpenBoss","boss"],["btnOpenStory","story"],["btnOpenClan","clan"],["btnOpenPrivate","private"]];
+ var v21Nav=[["btnOpenModes","modes"],["btnOpenRanked","ranked"],["btnOpenChallenges","challenges"],["btnOpenGacha","gacha"],["btnOpenSkins","skins"],["btnOpenStages","stages"],["btnOpenBoss","boss"],["btnBossHome","boss"],["btnOpenStory","story"],["btnOpenClan","clan"],["btnOpenPrivate","private"]];
  v21Nav.forEach(function(pair){
   var b=$(pair[0]);if(b)b.addEventListener("click",function(){switchView(pair[1]);});
  });
@@ -9745,6 +10011,17 @@ function boot(){
  });
  buildEmoteRow();
  var bb=$("btnBankSpirit");if(bb)bb.addEventListener("click",doBankSpirit);
+ /* v2.2: raid Fight button + Deploy Collector button */
+ var bf=$("btnBossFight");if(bf)bf.addEventListener("click",function(){startBossRaidById(v21SelectedBoss);});
+ var dc=$("btnDeployCollector");
+ if(dc)dc.addEventListener("click",function(){
+  if(typeof battle==="undefined"||!battle){toast("Start a battle first.");return;}
+  if(typeof deployCollector!=="function"){toast("Collector isn't loaded yet.");return;}
+  var r=deployCollector(battle,"mine",180,470);
+  if(r&&r.ok){toast("🔋 Spirit Collector deployed!");if(typeof sndBuy==="function")sndBuy();}
+  else toast("🔋 "+((r&&r.why)||"Can't deploy a collector."));
+  renderBattle(battle,false);
+ });
  var cp=$("btnCreatePrivate");
  if(cp)cp.addEventListener("click",function(){
   if(typeof AC_META==="undefined"||!AC_META||typeof AC_META.createPrivateRoom!=="function"){toast("Private rooms aren't loaded yet — try again in a moment.");return;}
